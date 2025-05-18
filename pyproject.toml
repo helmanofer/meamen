@@ -1,0 +1,30 @@
+[project]
+name = "meamen"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "aiosqlite>=0.21.0",
+    "fastapi>=0.115.12",
+    "fastapi-users[sqlalchemy]>=14.0.1",
+    "httpx>=0.28.1",
+    "sqlmodel>=0.0.24",
+    "uvicorn>=0.34.2",
+]
+[tool.hatch.build.targets.wheel]
+packages = ["meamen"]
+
+[dependency-groups]
+dev = [
+    "pytest>=8.3.5",
+    "pytest-asyncio>=0.26.0",
+]
+
+[tool.pytest.ini_options]   
+log_cli = true
+pythonpath = ["."]
+testpaths = ["tests"]
+log_level = "INFO"
+log_cli_level = "INFO"
+addopts = "-s"
