@@ -1,5 +1,5 @@
 from uuid import uuid4
-from sqlalchemy import Column, String, Boolean
+from sqlalchemy import Column, String, Boolean, Text
 from sqlalchemy.dialects.postgresql import UUID as PG_UUID
 from sqlalchemy.orm import declarative_base
 
@@ -14,3 +14,4 @@ class User(Base):
     is_active = Column(Boolean, default=True)
     is_superuser = Column(Boolean, default=False)
     is_verified = Column(Boolean, default=False)
+    avatar_url = Column(Text, nullable=True)

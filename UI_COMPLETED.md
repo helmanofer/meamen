@@ -42,6 +42,12 @@
 
 - Created Pinia store for authentication logic (login, register, forgot password, logout)
 - Created Login, Register, and Forgot Password UI views with form validation and error handling
+- Completed User Profile Management:
+  - Built Profile Settings UI with form for email, name, and avatar upload
+  - Integrated `GET /users/me` and `PATCH /users/me` endpoints for fetching and updating profile data
+  - Added avatar upload functionality with preview
+  - Implemented email verification status and resend functionality
+  - Added account deletion process with confirmation dialog
 
 ## Core Data Models & APIs
 
