@@ -1,5 +1,8 @@
 <template>
-  <div id="app" class="min-h-screen bg-light-gray text-dark-gray font-sans">
+  <div
+    id="app"
+    class="min-h-screen bg-light-gray text-dark-gray font-sans"
+  >
     <component :is="layout">
       <router-view />
     </component>
