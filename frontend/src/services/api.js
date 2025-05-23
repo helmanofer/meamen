@@ -95,19 +95,19 @@ export default {
 
   // Training sessions endpoints
   getSessions(params) {
-    return axios.get("/sessions", { params });
+    return axios.get("/training-sessions", { params });
   },
   getSession(id) {
-    return axios.get(`/sessions/${id}`);
+    return axios.get(`/training-sessions/${id}`);
   },
   createSession(sessionData) {
-    return axios.post("/sessions", sessionData);
+    return axios.post("/training-sessions", sessionData);
   },
   updateSession(id, sessionData) {
-    return axios.put(`/sessions/${id}`, sessionData);
+    return axios.put(`/training-sessions/${id}`, sessionData);
   },
   deleteSession(id) {
-    return axios.delete(`/sessions/${id}`);
+    return axios.delete(`/training-sessions/${id}`);
   },
 
   // Session records endpoints
