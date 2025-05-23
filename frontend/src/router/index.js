@@ -81,9 +81,49 @@ const routes = [
     },
   },
   {
+    path: "/programs/builder",
+    name: "ProgramBuilder",
+    component: () => import("../views/programs/ProgramBuilderView.vue"),
+    meta: {
+      requiresAuth: true,
+    },
+  },
+  {
+    path: "/programs/builder/:id",
+    name: "ProgramBuilderEdit",
+    component: () => import("../views/programs/ProgramBuilderView.vue"),
+    meta: {
+      requiresAuth: true,
+    },
+  },
+  {
     path: "/programs/:id",
     name: "ProgramDetail",
     component: () => import("../views/programs/ProgramDetailView.vue"),
+    meta: {
+      requiresAuth: true,
+    },
+  },
+  {
+    path: "/workout",
+    name: "Workout",
+    component: () => import("../views/workout/WorkoutSessionView.vue"),
+    meta: {
+      requiresAuth: true,
+    },
+  },
+  {
+    path: "/workout/:templateId",
+    name: "WorkoutFromTemplate",
+    component: () => import("../views/workout/WorkoutSessionView.vue"),
+    meta: {
+      requiresAuth: true,
+    },
+  },
+  {
+    path: "/sessions",
+    name: "Sessions",
+    component: () => import("../views/sessions/SessionsView.vue"),
     meta: {
       requiresAuth: true,
     },
