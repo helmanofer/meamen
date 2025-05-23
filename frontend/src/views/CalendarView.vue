@@ -2,7 +2,9 @@
   <div>
     <div class="mb-6 flex justify-between items-center">
       <div>
-        <h1 class="text-display font-bold text-dark-gray">Calendar</h1>
+        <h1 class="text-display font-bold text-dark-gray">
+          Calendar
+        </h1>
         <p class="text-medium-gray">
           Schedule and manage your training sessions
         </p>
@@ -28,7 +30,9 @@
     <div class="bg-white rounded-lg shadow-sm p-4 mb-6">
       <div class="flex justify-between items-center">
         <div class="flex space-x-4">
-          <button class="btn btn-secondary">Today</button>
+          <button class="btn btn-secondary">
+            Today
+          </button>
           <div class="flex">
             <button class="btn btn-secondary rounded-r-none">
               <svg
@@ -59,12 +63,20 @@
               </svg>
             </button>
           </div>
-          <h2 class="text-h2 font-semibold py-2">December 2023</h2>
+          <h2 class="text-h2 font-semibold py-2">
+            December 2023
+          </h2>
         </div>
         <div class="flex space-x-2">
-          <button class="btn btn-secondary">Month</button>
-          <button class="btn btn-secondary">Week</button>
-          <button class="btn btn-secondary">Day</button>
+          <button class="btn btn-secondary">
+            Month
+          </button>
+          <button class="btn btn-secondary">
+            Week
+          </button>
+          <button class="btn btn-secondary">
+            Day
+          </button>
         </div>
       </div>
     </div>
@@ -100,11 +112,17 @@
             >
               {{ ((i - 3 + 31) % 31) + 1 }}
             </span>
-            <span v-if="i === 15" class="text-xs text-success">Today</span>
+            <span
+              v-if="i === 15"
+              class="text-xs text-success"
+            >Today</span>
           </div>
 
           <!-- Example Events -->
-          <div v-if="i === 15" class="mt-2 space-y-1">
+          <div
+            v-if="i === 15"
+            class="mt-2 space-y-1"
+          >
             <div
               class="text-xs bg-primary-blue/20 text-primary-blue rounded p-1"
             >
