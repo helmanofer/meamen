@@ -4,12 +4,23 @@
       Create your account
     </template>
     <template #subtitle>
-      Or <router-link to="/login" class="font-medium text-primary-blue hover:text-dark-blue">sign in to your existing account</router-link>
+      Or <router-link
+        to="/login"
+        class="font-medium text-primary-blue hover:text-dark-blue"
+      >
+        sign in to your existing account
+      </router-link>
     </template>
     
-    <form @submit.prevent="handleSubmit" class="space-y-6">
+    <form
+      class="space-y-6"
+      @submit.prevent="handleSubmit"
+    >
       <!-- Error Alert -->
-      <div v-if="error" class="p-3 bg-red-100 text-error text-sm rounded-md">
+      <div
+        v-if="error"
+        class="p-3 bg-red-100 text-error text-sm rounded-md"
+      >
         {{ error }}
       </div>
       
@@ -18,34 +29,56 @@
         <label class="form-label">I am a</label>
         <div class="grid grid-cols-2 gap-4 mt-1">
           <button 
-            @click.prevent="userType = 'trainer'" 
-            type="button"
+            type="button" 
             :class="[
               'p-4 border rounded-md flex flex-col items-center justify-center text-center',
               userType === 'trainer' 
                 ? 'border-primary-blue bg-light-blue text-primary-blue' 
                 : 'border-medium-gray text-medium-gray hover:border-primary-blue hover:text-primary-blue'
             ]"
+            @click.prevent="userType = 'trainer'"
           >
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              class="h-8 w-8 mb-2"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+              />
             </svg>
             <span class="font-medium">Trainer</span>
             <span class="text-xs mt-1">I train clients</span>
           </button>
           
           <button 
-            @click.prevent="userType = 'trainee'" 
-            type="button"
+            type="button" 
             :class="[
               'p-4 border rounded-md flex flex-col items-center justify-center text-center',
               userType === 'trainee' 
                 ? 'border-primary-blue bg-light-blue text-primary-blue' 
                 : 'border-medium-gray text-medium-gray hover:border-primary-blue hover:text-primary-blue'
             ]"
+            @click.prevent="userType = 'trainee'"
           >
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5.121 17.804A13.937 13.937 0 0112 16c2.5 0 4.847.655 6.879 1.804M15 10a3 3 0 11-6 0 3 3 0 016 0zm6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              class="h-8 w-8 mb-2"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M5.121 17.804A13.937 13.937 0 0112 16c2.5 0 4.847.655 6.879 1.804M15 10a3 3 0 11-6 0 3 3 0 016 0zm6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+              />
             </svg>
             <span class="font-medium">Trainee</span>
             <span class="text-xs mt-1">I work with a trainer</span>
@@ -55,7 +88,10 @@
 
       <!-- Name Input -->
       <div>
-        <label for="name" class="form-label">Full name</label>
+        <label
+          for="name"
+          class="form-label"
+        >Full name</label>
         <input 
           id="name" 
           v-model="name" 
@@ -64,12 +100,15 @@
           required 
           class="form-input" 
           :disabled="loading" 
-        />
+        >
       </div>
 
       <!-- Email Input -->
       <div>
-        <label for="email" class="form-label">Email address</label>
+        <label
+          for="email"
+          class="form-label"
+        >Email address</label>
         <input 
           id="email" 
           v-model="email" 
@@ -78,12 +117,15 @@
           required 
           class="form-input" 
           :disabled="loading" 
-        />
+        >
       </div>
 
       <!-- Password Input -->
       <div>
-        <label for="password" class="form-label">Password</label>
+        <label
+          for="password"
+          class="form-label"
+        >Password</label>
         <input 
           id="password" 
           v-model="password" 
@@ -92,7 +134,7 @@
           required 
           class="form-input" 
           :disabled="loading" 
-        />
+        >
         <!-- Password Strength Indicator -->
         <div class="mt-1">
           <div class="flex h-1 overflow-hidden bg-light-gray rounded">
@@ -102,7 +144,7 @@
                 passwordStrength < 2 ? 'bg-error' : passwordStrength < 3 ? 'bg-warning' : 'bg-success'
               ]"
               :style="{ width: `${passwordStrength * 25}%` }"
-            ></div>
+            />
           </div>
           <p class="text-xs mt-1 text-medium-gray">
             {{ passwordStrengthText }}
@@ -119,12 +161,21 @@
           required 
           class="h-4 w-4 mt-1 text-primary-blue focus:ring-primary-blue border-medium-gray rounded" 
           :disabled="loading" 
-        />
-        <label for="terms" class="ml-2 text-sm text-dark-gray">
+        >
+        <label
+          for="terms"
+          class="ml-2 text-sm text-dark-gray"
+        >
           I agree to the 
-          <a href="#" class="text-primary-blue hover:text-dark-blue">Terms of Service</a> 
+          <a
+            href="#"
+            class="text-primary-blue hover:text-dark-blue"
+          >Terms of Service</a> 
           and 
-          <a href="#" class="text-primary-blue hover:text-dark-blue">Privacy Policy</a>
+          <a
+            href="#"
+            class="text-primary-blue hover:text-dark-blue"
+          >Privacy Policy</a>
         </label>
       </div>
 
@@ -135,9 +186,26 @@
           class="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-primary-blue hover:bg-dark-blue focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-blue"
           :disabled="loading || !acceptTerms || !userType"
         >
-          <svg v-if="loading" class="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+          <svg
+            v-if="loading"
+            class="animate-spin -ml-1 mr-3 h-5 w-5 text-white"
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+          >
+            <circle
+              class="opacity-25"
+              cx="12"
+              cy="12"
+              r="10"
+              stroke="currentColor"
+              stroke-width="4"
+            />
+            <path
+              class="opacity-75"
+              fill="currentColor"
+              d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+            />
           </svg>
           {{ loading ? 'Creating Account...' : 'Create Account' }}
         </button>
@@ -147,7 +215,10 @@
     <template #footer>
       <p class="text-sm text-medium-gray">
         Already have an account? 
-        <router-link to="/login" class="font-medium text-primary-blue hover:text-dark-blue">
+        <router-link
+          to="/login"
+          class="font-medium text-primary-blue hover:text-dark-blue"
+        >
           Sign in
         </router-link>
       </p>

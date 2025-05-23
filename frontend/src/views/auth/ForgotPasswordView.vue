@@ -7,20 +7,32 @@
       Enter your email address and we'll send you a link to reset your password
     </template>
     
-    <form @submit.prevent="handleSubmit" class="space-y-6">
+    <form
+      class="space-y-6"
+      @submit.prevent="handleSubmit"
+    >
       <!-- Success Message -->
-      <div v-if="success" class="p-3 bg-green-100 text-success text-sm rounded-md">
+      <div
+        v-if="success"
+        class="p-3 bg-green-100 text-success text-sm rounded-md"
+      >
         We've sent you an email with instructions to reset your password. Please check your inbox.
       </div>
 
       <!-- Error Alert -->
-      <div v-if="error" class="p-3 bg-red-100 text-error text-sm rounded-md">
+      <div
+        v-if="error"
+        class="p-3 bg-red-100 text-error text-sm rounded-md"
+      >
         {{ error }}
       </div>
       
       <!-- Email Input -->
       <div>
-        <label for="email" class="form-label">Email address</label>
+        <label
+          for="email"
+          class="form-label"
+        >Email address</label>
         <input 
           id="email" 
           v-model="email" 
@@ -29,7 +41,7 @@
           required 
           class="form-input" 
           :disabled="loading || success" 
-        />
+        >
       </div>
 
       <!-- Submit Button -->
@@ -39,9 +51,26 @@
           class="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-primary-blue hover:bg-dark-blue focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-blue"
           :disabled="loading || success"
         >
-          <svg v-if="loading" class="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+          <svg
+            v-if="loading"
+            class="animate-spin -ml-1 mr-3 h-5 w-5 text-white"
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+          >
+            <circle
+              class="opacity-25"
+              cx="12"
+              cy="12"
+              r="10"
+              stroke="currentColor"
+              stroke-width="4"
+            />
+            <path
+              class="opacity-75"
+              fill="currentColor"
+              d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+            />
           </svg>
           {{ loading ? 'Sending...' : 'Send Reset Link' }}
         </button>
@@ -51,7 +80,10 @@
     <template #footer>
       <p class="text-sm text-medium-gray">
         Remember your password? 
-        <router-link to="/login" class="font-medium text-primary-blue hover:text-dark-blue">
+        <router-link
+          to="/login"
+          class="font-medium text-primary-blue hover:text-dark-blue"
+        >
           Sign in
         </router-link>
       </p>

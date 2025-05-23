@@ -1,24 +1,36 @@
 <template>
   <AuthLayout>
-    <template #title> Sign in to your account </template>
+    <template #title>
+      Sign in to your account
+    </template>
     <template #subtitle>
       Or
       <router-link
         to="/register"
         class="font-medium text-primary-blue hover:text-dark-blue"
-        >create a new account</router-link
       >
+        create a new account
+      </router-link>
     </template>
 
-    <form @submit.prevent="handleSubmit" class="space-y-6">
+    <form
+      class="space-y-6"
+      @submit.prevent="handleSubmit"
+    >
       <!-- Error Alert -->
-      <div v-if="error" class="p-3 bg-red-100 text-error text-sm rounded-md">
+      <div
+        v-if="error"
+        class="p-3 bg-red-100 text-error text-sm rounded-md"
+      >
         {{ error }}
       </div>
 
       <!-- Email Input -->
       <div>
-        <label for="email" class="form-label">Email address</label>
+        <label
+          for="email"
+          class="form-label"
+        >Email address</label>
         <input
           id="email"
           v-model="email"
@@ -27,13 +39,16 @@
           required
           class="form-input"
           :disabled="loading"
-        />
+        >
       </div>
 
       <!-- Password Input -->
       <div>
         <div class="flex justify-between">
-          <label for="password" class="form-label">Password</label>
+          <label
+            for="password"
+            class="form-label"
+          >Password</label>
           <router-link
             to="/forgot-password"
             class="text-sm text-primary-blue hover:text-dark-blue"
@@ -49,7 +64,7 @@
           required
           class="form-input"
           :disabled="loading"
-        />
+        >
       </div>
 
       <!-- Remember Me Checkbox -->
@@ -60,8 +75,11 @@
           type="checkbox"
           class="h-4 w-4 text-primary-blue focus:ring-primary-blue border-medium-gray rounded"
           :disabled="loading"
-        />
-        <label for="remember_me" class="ml-2 block text-sm text-dark-gray">
+        >
+        <label
+          for="remember_me"
+          class="ml-2 block text-sm text-dark-gray"
+        >
           Remember me
         </label>
       </div>
