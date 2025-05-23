@@ -1,0 +1,216 @@
+import { defineStore } from "pinia";
+import api from "../services/api";
+
+export const useTraineesStore = defineStore("trainees", {
+  state: () => ({
+    trainees: [],
+    traineeDetail: null,
+    measurements: [],
+    loading: false,
+    error: null,
+    filters: {
+      search: "",
+      status: "",
+      program: "",
+      sort: "name"
+    },
+    pagination: {
+      page: 1,
+      limit: 10,
+      total: 0
+    }
+  }),
+
+  getters: {
+    filteredTrainees: (state) => {
+      // This getter returns trainees filtered by the current search term
+      // In a real application, this filtering would typically be done on the server
+      if (!state.search) return state.trainees;
+      
+      const searchTerm = state.search.toLowerCase();
+      return state.trainees.filter(trainee => 
+        trainee.name.toLowerCase().includes(searchTerm) ||
+        (trainee.email && trainee.email.toLowerCase().includes(searchTerm))
+      );
+    },
+    
+    isLoading: (state) => state.loading
+  },
+
+  actions: {
+    async fetchTrainees() {
+      this.loading = true;
+      this.error = null;
+
+      try {
+        // For now, use a default trainer_id of 1
+        // In a real app, this would come from the authenticated user
+        const trainerId = 1;
+        
+        const params = {
+          trainer_id: trainerId,
+          skip: (this.pagination.page - 1) * this.pagination.limit,
+          limit: this.pagination.limit,
+          ...this.filters
+        };
+
+        const response = await api.getTrainees(params);
+        
+        // Check if the API returns data in the expected format
+        if (response.data && Array.isArray(response.data.items)) {
+          this.trainees = response.data.items;
+          this.pagination.total = response.data.total || response.data.items.length;
+        } else {
+          // Fallback for different API response structure
+          this.trainees = Array.isArray(response.data) ? response.data : [];
+          this.pagination.total = this.trainees.length;
+        }
+      } catch (error) {
+        this.error = error.response?.data?.detail || "Failed to fetch trainees";
+        console.error("Error fetching trainees:", error);
+        this.trainees = [];
+      } finally {
+        this.loading = false;
+      }
+    },
+
+    async fetchTraineeDetail(id) {
+      this.loading = true;
+      this.error = null;
+      this.traineeDetail = null;
+
+      try {
+        const response = await api.getTrainee(id);
+        this.traineeDetail = response.data;
+      } catch (error) {
+        this.error = error.response?.data?.detail || "Failed to fetch trainee details";
+        console.error("Error fetching trainee details:", error);
+      } finally {
+        this.loading = false;
+      }
+    },
+
+    async fetchMeasurements(traineeId) {
+      this.loading = true;
+      this.error = null;
+
+      try {
+        const response = await api.getTraineeMeasurements(traineeId);
+        this.measurements = response.data;
+      } catch (error) {
+        this.error = error.response?.data?.detail || "Failed to fetch measurements";
+        console.error("Error fetching measurements:", error);
+      } finally {
+        this.loading = false;
+      }
+    },
+
+    async createTrainee(traineeData) {
+      this.loading = true;
+      this.error = null;
+
+      try {
+        // For now, use a default trainer_id of 1
+        // In a real app, this would come from the authenticated user
+        const trainerId = 1;
+        const response = await api.createTrainee(traineeData, trainerId);
+        // Add the new trainee to the list
+        this.trainees.push(response.data);
+        return response.data;
+      } catch (error) {
+        this.error = error.response?.data?.detail || "Failed to create trainee";
+        console.error("Error creating trainee:", error);
+        throw error;
+      } finally {
+        this.loading = false;
+      }
+    },
+
+    async updateTrainee(id, traineeData) {
+      this.loading = true;
+      this.error = null;
+
+      try {
+        const response = await api.updateTrainee(id, traineeData);
+        // Update the trainee in the list
+        const index = this.trainees.findIndex(t => t.id === id);
+        if (index !== -1) {
+          this.trainees[index] = response.data;
+        }
+        // Update the detail view if it's the same trainee
+        if (this.traineeDetail && this.traineeDetail.id === id) {
+          this.traineeDetail = response.data;
+        }
+        return response.data;
+      } catch (error) {
+        this.error = error.response?.data?.detail || "Failed to update trainee";
+        console.error("Error updating trainee:", error);
+        throw error;
+      } finally {
+        this.loading = false;
+      }
+    },
+
+    async deleteTrainee(id) {
+      this.loading = true;
+      this.error = null;
+
+      try {
+        await api.deleteTrainee(id);
+        // Remove the trainee from the list
+        this.trainees = this.trainees.filter(t => t.id !== id);
+        return true;
+      } catch (error) {
+        this.error = error.response?.data?.detail || "Failed to delete trainee";
+        console.error("Error deleting trainee:", error);
+        throw error;
+      } finally {
+        this.loading = false;
+      }
+    },
+
+    async addMeasurement(traineeId, measurementData) {
+      this.loading = true;
+      this.error = null;
+
+      try {
+        const response = await api.addTraineeMeasurement(traineeId, measurementData);
+        // Add the new measurement to the list
+        this.measurements.push(response.data);
+        return response.data;
+      } catch (error) {
+        this.error = error.response?.data?.detail || "Failed to add measurement";
+        console.error("Error adding measurement:", error);
+        throw error;
+      } finally {
+        this.loading = false;
+      }
+    },
+
+    setFilters(filters) {
+      this.filters = { ...this.filters, ...filters };
+      this.pagination.page = 1; // Reset to first page when filters change
+      this.fetchTrainees();
+    },
+
+    setPage(page) {
+      this.pagination.page = page;
+      this.fetchTrainees();
+    },
+
+    clearFilters() {
+      this.filters = {
+        search: "",
+        status: "",
+        program: "",
+        sort: "name"
+      };
+      this.fetchTrainees();
+    },
+
+    clearDetail() {
+      this.traineeDetail = null;
+      this.measurements = [];
+    }
+  }
+});

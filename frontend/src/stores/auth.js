@@ -1,18 +1,17 @@
 import { defineStore } from "pinia";
+import authService from "../services/authService";
 import axios from "axios";
-
-import API_BASE_URL from "../config/apiConfig";
+import apiConfig from "../config/apiConfig";
 
 export const useAuthStore = defineStore("auth", {
   state: () => ({
     user: null,
-    token: localStorage.getItem("token") || null,
     loading: false,
     error: null,
   }),
 
   getters: {
-    isAuthenticated: (state) => !!state.token,
+    isAuthenticated: () => authService.isAuthenticated(),
     userRole: (state) => state.user?.role || null,
   },
 
@@ -22,25 +21,16 @@ export const useAuthStore = defineStore("auth", {
       this.error = null;
 
       try {
-        const formData = new FormData();
-        for (const key in credentials) {
-          formData.append(key, credentials[key]);
-        }
-
-        const response = await axios.post(
-          `${API_BASE_URL}/auth/jwt/login`,
-          formData
-        );
-        this.token = response.data.access_token;
-        localStorage.setItem("token", this.token);
-
+        // Use authService for login
+        await authService.login(credentials);
+        
         // Fetch user details
         await this.fetchUserProfile();
 
         return true;
       } catch (error) {
         this.error =
-          error.response?.data?.message || "Login failed. Please try again.";
+          error.response?.data?.detail || "Login failed. Please try again.";
         return false;
       } finally {
         this.loading = false;
@@ -52,9 +42,8 @@ export const useAuthStore = defineStore("auth", {
       this.error = null;
 
       try {
-        const response = await axios.post("/api/auth/register", userData);
-        this.token = response.data.token;
-        localStorage.setItem("token", this.token);
+        // Use authService for registration
+        await authService.register(userData);
 
         // Fetch user details
         await this.fetchUserProfile();
@@ -62,7 +51,7 @@ export const useAuthStore = defineStore("auth", {
         return true;
       } catch (error) {
         this.error =
-          error.response?.data?.message ||
+          error.response?.data?.detail ||
           "Registration failed. Please try again.";
         return false;
       } finally {
@@ -71,18 +60,18 @@ export const useAuthStore = defineStore("auth", {
     },
 
     async fetchUserProfile() {
-      if (!this.token) return;
+      if (!authService.isAuthenticated()) return;
 
       this.loading = true;
 
       try {
-        const response = await axios.get("h/users/me", {
+        const token = authService.getToken();
+        const response = await axios.get(apiConfig.auth.me, {
           headers: {
-            Authorization: `Bearer ${this.token}`,
-          },
+            Authorization: `Bearer ${token}`
+          }
         });
-
-        this.user = response.data.id;
+        this.user = response.data;
       } catch (error) {
         this.error = "Failed to fetch user profile";
         this.logout();
@@ -93,8 +82,7 @@ export const useAuthStore = defineStore("auth", {
 
     logout() {
       this.user = null;
-      this.token = null;
-      localStorage.removeItem("token");
+      authService.logout();
     },
 
     async forgotPassword(email) {
@@ -102,11 +90,11 @@ export const useAuthStore = defineStore("auth", {
       this.error = null;
 
       try {
-        await axios.post("/api/auth/forgot-password", { email });
+        await axios.post(apiConfig.auth.forgotPassword, { email });
         return true;
       } catch (error) {
         this.error =
-          error.response?.data?.message ||
+          error.response?.data?.detail ||
           "Failed to send password reset email";
         return false;
       } finally {
@@ -119,13 +107,13 @@ export const useAuthStore = defineStore("auth", {
       this.error = null;
 
       try {
-        await axios.post("/api/auth/reset-password", {
+        await axios.post(apiConfig.auth.resetPassword, {
           token,
-          password: newPassword,
+          password: newPassword
         });
         return true;
       } catch (error) {
-        this.error = error.response?.data?.message || "Password reset failed";
+        this.error = error.response?.data?.detail || "Password reset failed";
         return false;
       } finally {
         this.loading = false;
