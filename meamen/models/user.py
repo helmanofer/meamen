@@ -14,4 +14,4 @@ class User(Base):
     is_active = Column(Boolean, default=True)
     is_superuser = Column(Boolean, default=False)
     is_verified = Column(Boolean, default=False)
-    avatar_url = Column(Text, nullable=True)
+    # avatar_url = Column(Text, nullable=True)
