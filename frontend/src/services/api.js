@@ -1,158 +1,150 @@
-import axios from 'axios'
+import axios from "axios";
 
-const apiClient = axios.create({
-  baseURL: 'http://localhost:8000/api',
-  headers: {
-    'Content-Type': 'application/json'
-  }
-})
+// We don't create a custom axios instance here anymore
+// because we're using the global axios configuration set up in apiSetup.js
 
-// Request interceptor for adding auth token
-apiClient.interceptors.request.use(config => {
-  const token = localStorage.getItem('token')
-  if (token) {
-    config.headers.Authorization = `Bearer ${token}`
-  }
-  return config
-})
-
-// Response interceptor for handling common errors
-apiClient.interceptors.response.use(
-  response => response,
-  error => {
-    // Handle 401 Unauthorized - redirect to login
-    if (error.response && error.response.status === 401) {
-      localStorage.removeItem('token')
-      window.location.href = '/login'
-    }
-    return Promise.reject(error)
-  }
-)
+// This service wraps axios calls with proper resource paths and error handling
 
 export default {
   // Auth endpoints
   login(credentials) {
-    return apiClient.post('/auth/login', credentials)
+    const formData = new FormData();
+    formData.append('username', credentials.username);
+    formData.append('password', credentials.password);
+    formData.append('grant_type', 'password');
+    
+    return axios.post("/auth/jwt/login", formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data'
+      }
+    });
   },
   register(userData) {
-    return apiClient.post('/auth/register', userData)
+    return axios.post("/auth/register", userData);
   },
   forgotPassword(email) {
-    return apiClient.post('/auth/forgot-password', { email })
+    return axios.post("/auth/request-password-reset", { email });
   },
   resetPassword(token, newPassword) {
-    return apiClient.post('/auth/reset-password', { token, password: newPassword })
+    return axios.post("/auth/reset-password", { token, password: newPassword });
   },
   getUserProfile() {
-    return apiClient.get('/auth/profile')
+    return axios.get("/users/me");
   },
-  
+
   // Trainee endpoints
   getTrainees(params) {
-    return apiClient.get('/trainees', { params })
+    return axios.get("/trainees/", { params });
   },
   getTrainee(id) {
-    return apiClient.get(`/trainees/${id}`)
+    return axios.get(`/trainees/${id}`);
   },
-  createTrainee(traineeData) {
-    return apiClient.post('/trainees', traineeData)
+  createTrainee(traineeData, trainerId) {
+    return axios.post("/trainees/", traineeData, {
+      params: { trainer_id: trainerId }
+    });
   },
   updateTrainee(id, traineeData) {
-    return apiClient.put(`/trainees/${id}`, traineeData)
+    return axios.put(`/trainees/${id}`, traineeData);
   },
   deleteTrainee(id) {
-    return apiClient.delete(`/trainees/${id}`)
+    return axios.delete(`/trainees/${id}`);
   },
-  
+
   // Measurements
   getTraineeMeasurements(traineeId, params) {
-    return apiClient.get(`/trainees/${traineeId}/measurements`, { params })
+    return axios.get(`/trainees/${traineeId}/measurements`, { params });
   },
   addTraineeMeasurement(traineeId, measurementData) {
-    return apiClient.post(`/trainees/${traineeId}/measurements`, measurementData)
+    return axios.post(`/trainees/${traineeId}/measurements`, measurementData);
   },
-  
+
   // Exercise endpoints
   getExercises(params) {
-    return apiClient.get('/exercises', { params })
+    return axios.get("/exercises/", { params });
   },
   getExercise(id) {
-    return apiClient.get(`/exercises/${id}`)
+    return axios.get(`/exercises/${id}`);
   },
   createExercise(exerciseData) {
-    return apiClient.post('/exercises', exerciseData)
+    return axios.post("/exercises/", exerciseData);
   },
   updateExercise(id, exerciseData) {
-    return apiClient.put(`/exercises/${id}`, exerciseData)
+    return axios.put(`/exercises/${id}`, exerciseData);
   },
   deleteExercise(id) {
-    return apiClient.delete(`/exercises/${id}`)
+    return axios.delete(`/exercises/${id}`);
   },
-  
+
   // Training programs endpoints
   getPrograms(params) {
-    return apiClient.get('/programs', { params })
+    return axios.get("/programs", { params });
   },
   getProgram(id) {
-    return apiClient.get(`/programs/${id}`)
+    return axios.get(`/programs/${id}`);
   },
   createProgram(programData) {
-    return apiClient.post('/programs', programData)
+    return axios.post("/programs", programData);
   },
   updateProgram(id, programData) {
-    return apiClient.put(`/programs/${id}`, programData)
+    return axios.put(`/programs/${id}`, programData);
   },
   deleteProgram(id) {
-    return apiClient.delete(`/programs/${id}`)
+    return axios.delete(`/programs/${id}`);
   },
-  
+
   // Training sessions endpoints
   getSessions(params) {
-    return apiClient.get('/sessions', { params })
+    return axios.get("/sessions", { params });
   },
   getSession(id) {
-    return apiClient.get(`/sessions/${id}`)
+    return axios.get(`/sessions/${id}`);
   },
   createSession(sessionData) {
-    return apiClient.post('/sessions', sessionData)
+    return axios.post("/sessions", sessionData);
   },
   updateSession(id, sessionData) {
-    return apiClient.put(`/sessions/${id}`, sessionData)
+    return axios.put(`/sessions/${id}`, sessionData);
   },
   deleteSession(id) {
-    return apiClient.delete(`/sessions/${id}`)
+    return axios.delete(`/sessions/${id}`);
   },
-  
+
   // Session records endpoints
   getSessionRecords(params) {
-    return apiClient.get('/session-records', { params })
+    return axios.get("/session-records", { params });
   },
   getSessionRecord(id) {
-    return apiClient.get(`/session-records/${id}`)
+    return axios.get(`/session-records/${id}`);
   },
   createSessionRecord(recordData) {
-    return apiClient.post('/session-records', recordData)
+    return axios.post("/session-records", recordData);
   },
   updateSessionRecord(id, recordData) {
-    return apiClient.put(`/session-records/${id}`, recordData)
+    return axios.put(`/session-records/${id}`, recordData);
   },
-  
+
   // Messages endpoints
   getMessages(params) {
-    return apiClient.get('/messages', { params })
+    return axios.get("/messages", { params });
   },
   sendMessage(messageData) {
-    return apiClient.post('/messages', messageData)
+    return axios.post("/messages", messageData);
   },
   markMessageRead(id) {
-    return apiClient.patch(`/messages/${id}/read`)
+    return axios.patch(`/messages/${id}/read`);
   },
-  
+
   // Notifications endpoints
   getNotifications() {
-    return apiClient.get('/notifications')
+    return axios.get("/notifications");
   },
   markNotificationRead(id) {
-    return apiClient.patch(`/notifications/${id}/read`)
+    return axios.patch(`/notifications/${id}/read`);
+  },
+
+  // System endpoints
+  healthCheck() {
+    return axios.get('/');
   }
-}
+};
