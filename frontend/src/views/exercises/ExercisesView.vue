@@ -3,8 +3,12 @@
     <!-- Header -->
     <header class="flex justify-between items-center mb-6">
       <div>
-        <h1 class="text-display font-bold text-dark-gray">Exercise Library</h1>
-        <p class="text-medium-gray">Browse and manage your exercise collection</p>
+        <h1 class="text-display font-bold text-dark-gray">
+          Exercise Library
+        </h1>
+        <p class="text-medium-gray">
+          Browse and manage your exercise collection
+        </p>
       </div>
       <div class="flex items-center space-x-4">
         <button
@@ -35,12 +39,12 @@
         <div class="xl:col-span-2">
           <div class="relative">
             <input
-              type="text"
               v-model="searchQuery"
+              type="text"
               placeholder="Search exercises..."
               class="input-field pl-10 w-full"
               @input="onSearchInput"
-            />
+            >
             <svg
               xmlns="http://www.w3.org/2000/svg"
               class="h-5 w-5 absolute left-3 top-3 text-medium-gray"
@@ -60,8 +64,14 @@
 
         <!-- Category Filter -->
         <div>
-          <select v-model="categoryFilter" class="input-field w-full" @change="onFilterChange">
-            <option value="">All Categories</option>
+          <select
+            v-model="categoryFilter"
+            class="input-field w-full"
+            @change="onFilterChange"
+          >
+            <option value="">
+              All Categories
+            </option>
             <option
               v-for="category in exercisesStore.categories"
               :key="category"
@@ -74,8 +84,14 @@
 
         <!-- Muscle Group Filter -->
         <div>
-          <select v-model="muscleGroupFilter" class="input-field w-full" @change="onFilterChange">
-            <option value="">All Muscle Groups</option>
+          <select
+            v-model="muscleGroupFilter"
+            class="input-field w-full"
+            @change="onFilterChange"
+          >
+            <option value="">
+              All Muscle Groups
+            </option>
             <option
               v-for="muscleGroup in exercisesStore.muscleGroups"
               :key="muscleGroup"
@@ -88,8 +104,14 @@
 
         <!-- Equipment Filter -->
         <div>
-          <select v-model="equipmentFilter" class="input-field w-full" @change="onFilterChange">
-            <option value="">All Equipment</option>
+          <select
+            v-model="equipmentFilter"
+            class="input-field w-full"
+            @change="onFilterChange"
+          >
+            <option value="">
+              All Equipment
+            </option>
             <option
               v-for="equipment in exercisesStore.equipmentTypes"
               :key="equipment"
@@ -102,8 +124,14 @@
 
         <!-- Difficulty Filter -->
         <div>
-          <select v-model="difficultyFilter" class="input-field w-full" @change="onFilterChange">
-            <option value="">All Difficulties</option>
+          <select
+            v-model="difficultyFilter"
+            class="input-field w-full"
+            @change="onFilterChange"
+          >
+            <option value="">
+              All Difficulties
+            </option>
             <option
               v-for="difficulty in exercisesStore.difficultyLevels"
               :key="difficulty"
@@ -119,12 +147,12 @@
       <div class="flex items-center justify-between">
         <button
           v-if="hasActiveFilters"
-          @click="clearFilters"
           class="text-sm text-primary-blue hover:text-dark-blue"
+          @click="clearFilters"
         >
           Clear Filters
         </button>
-        <div v-else></div>
+        <div v-else />
 
         <div class="flex items-center space-x-4">
           <span class="text-sm text-medium-gray">
@@ -136,8 +164,8 @@
             <button
               class="btn-icon"
               :class="{ 'text-primary-blue': exercisesStore.viewMode === 'grid' }"
-              @click="exercisesStore.setViewMode('grid')"
               title="Grid View"
+              @click="exercisesStore.setViewMode('grid')"
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -153,8 +181,8 @@
             <button
               class="btn-icon"
               :class="{ 'text-primary-blue': exercisesStore.viewMode === 'list' }"
-              @click="exercisesStore.setViewMode('list')"
               title="List View"
+              @click="exercisesStore.setViewMode('list')"
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -175,14 +203,25 @@
     </section>
 
     <!-- Loading State -->
-    <div v-if="exercisesStore.loading" class="flex justify-center py-8">
-      <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-blue"></div>
+    <div
+      v-if="exercisesStore.loading"
+      class="flex justify-center py-8"
+    >
+      <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-blue" />
     </div>
 
     <!-- Error State -->
-    <div v-else-if="exercisesStore.error" class="text-center py-8">
-      <p class="text-red-600 mb-4">{{ exercisesStore.error }}</p>
-      <button @click="exercisesStore.fetchExercises()" class="btn btn-primary">
+    <div
+      v-else-if="exercisesStore.error"
+      class="text-center py-8"
+    >
+      <p class="text-red-600 mb-4">
+        {{ exercisesStore.error }}
+      </p>
+      <button
+        class="btn btn-primary"
+        @click="exercisesStore.fetchExercises()"
+      >
         Try Again
       </button>
     </div>
@@ -206,28 +245,33 @@
           d="M13 10V3L4 14h7v7l9-11h-7z"
         />
       </svg>
-      <h3 class="text-lg font-medium text-dark-gray mb-2">No exercises found</h3>
+      <h3 class="text-lg font-medium text-dark-gray mb-2">
+        No exercises found
+      </h3>
       <p class="text-medium-gray mb-4">
         {{ hasActiveFilters ? 'Try adjusting your filters' : 'Get started by adding your first exercise' }}
       </p>
       <button
         v-if="!hasActiveFilters"
-        @click="createExercise"
         class="btn btn-primary"
+        @click="createExercise"
       >
         Add Exercise
       </button>
       <button
         v-else
-        @click="clearFilters"
         class="btn btn-secondary"
+        @click="clearFilters"
       >
         Clear Filters
       </button>
     </div>
 
     <!-- Exercise Grid/List -->
-    <section v-else class="exercises-list">
+    <section
+      v-else
+      class="exercises-list"
+    >
       <transition-group
         :name="exercisesStore.viewMode === 'grid' ? 'grid' : 'list'"
         tag="div"
@@ -247,6 +291,13 @@
         />
       </transition-group>
     </section>
+
+    <!-- Add Exercise Modal -->
+    <AddExerciseModal
+      :is-open="showAddModal"
+      @close="showAddModal = false"
+      @created="onExerciseCreated"
+    />
   </div>
 </template>
 
@@ -255,6 +306,7 @@ import { ref, computed, onMounted } from "vue";
 import { useRouter } from "vue-router";
 import { useExercisesStore } from "@/stores/exercises";
 import ExerciseCard from "@/components/exercise/ExerciseCard.vue";
+import AddExerciseModal from "@/components/exercise/AddExerciseModal.vue";
 
 const router = useRouter();
 const exercisesStore = useExercisesStore();
@@ -314,9 +366,15 @@ const addToProgram = (exercise) => {
   alert(`"${exercise.name}" will be added to program (feature coming soon)`);
 };
 
+const showAddModal = ref(false);
+
 const createExercise = () => {
-  // TODO: Implement create exercise modal/form
-  alert("Create exercise feature coming soon!");
+  showAddModal.value = true;
+};
+
+const onExerciseCreated = (newExercise) => {
+  // Exercise is already added to store by the createExercise action
+  console.log("New exercise created:", newExercise);
 };
 
 // Initialize

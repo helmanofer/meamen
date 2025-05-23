@@ -19,7 +19,7 @@
           'w-full h-full object-cover',
           viewMode === 'grid' ? '' : 'rounded-l-xl'
         ]"
-      />
+      >
       <div
         v-else
         :class="[
@@ -97,8 +97,8 @@
         <!-- Quick Add Button -->
         <button
           class="btn-icon text-primary-blue hover:text-dark-blue ml-2 flex-shrink-0"
-          @click.stop="$emit('add-to-program', exercise)"
           title="Add to Program"
+          @click.stop="$emit('add-to-program', exercise)"
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -118,7 +118,10 @@
       </div>
       
       <!-- Muscle Groups -->
-      <div v-if="exercise.muscle_groups" class="mb-2">
+      <div
+        v-if="exercise.muscle_groups"
+        class="mb-2"
+      >
         <div class="flex flex-wrap gap-1">
           <span
             v-for="group in muscleGroupsList"
@@ -131,7 +134,10 @@
       </div>
       
       <!-- Equipment -->
-      <div v-if="exercise.equipment" class="mb-2">
+      <div
+        v-if="exercise.equipment"
+        class="mb-2"
+      >
         <span class="text-sm text-medium-gray">
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -163,7 +169,10 @@
       </p>
       
       <!-- Category -->
-      <div v-if="exercise.category" class="mt-2">
+      <div
+        v-if="exercise.category"
+        class="mt-2"
+      >
         <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
           {{ exercise.category }}
         </span>

@@ -1,23 +1,44 @@
 <template>
   <div class="exercise-detail-view container mx-auto px-4 py-6">
     <!-- Loading State -->
-    <div v-if="exercisesStore.loading" class="flex justify-center py-8">
-      <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-blue"></div>
+    <div
+      v-if="exercisesStore.loading"
+      class="flex justify-center py-8"
+    >
+      <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-blue" />
     </div>
 
     <!-- Error State -->
-    <div v-else-if="exercisesStore.error" class="text-center py-8">
-      <p class="text-red-600 mb-4">{{ exercisesStore.error }}</p>
-      <button @click="loadExercise" class="btn btn-primary">
+    <div
+      v-else-if="exercisesStore.error"
+      class="text-center py-8"
+    >
+      <p class="text-red-600 mb-4">
+        {{ exercisesStore.error }}
+      </p>
+      <button
+        class="btn btn-primary"
+        @click="loadExercise"
+      >
         Try Again
       </button>
     </div>
 
     <!-- Exercise Not Found -->
-    <div v-else-if="!exercise" class="text-center py-8">
-      <h2 class="text-2xl font-bold text-dark-gray mb-4">Exercise Not Found</h2>
-      <p class="text-medium-gray mb-4">The exercise you're looking for doesn't exist.</p>
-      <router-link to="/exercises" class="btn btn-primary">
+    <div
+      v-else-if="!exercise"
+      class="text-center py-8"
+    >
+      <h2 class="text-2xl font-bold text-dark-gray mb-4">
+        Exercise Not Found
+      </h2>
+      <p class="text-medium-gray mb-4">
+        The exercise you're looking for doesn't exist.
+      </p>
+      <router-link
+        to="/exercises"
+        class="btn btn-primary"
+      >
         Back to Exercise Library
       </router-link>
     </div>
@@ -27,8 +48,8 @@
       <!-- Header with Navigation -->
       <div class="flex items-center justify-between mb-6">
         <button
-          @click="$router.push('/exercises')"
           class="btn btn-secondary flex items-center"
+          @click="$router.push('/exercises')"
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -49,8 +70,8 @@
 
         <div class="flex items-center space-x-2">
           <button
-            @click="editExercise"
             class="btn btn-primary flex items-center"
+            @click="editExercise"
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -69,8 +90,8 @@
             Edit
           </button>
           <button
-            @click="addToProgram"
             class="btn btn-success flex items-center"
+            @click="addToProgram"
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -103,7 +124,7 @@
                 :src="exercise.image_url"
                 :alt="exercise.name"
                 class="w-full h-full object-cover"
-              />
+              >
               <div
                 v-else
                 class="w-full h-full flex items-center justify-center text-medium-gray"
@@ -127,8 +148,8 @@
               <!-- Video Play Button -->
               <button
                 v-if="exercise.video_url"
-                @click="playVideo"
                 class="absolute inset-0 flex items-center justify-center bg-black bg-opacity-30 hover:bg-opacity-50 transition-all"
+                @click="playVideo"
               >
                 <div class="bg-white rounded-full p-4 shadow-lg">
                   <svg
@@ -152,7 +173,9 @@
 
           <!-- Exercise Stats -->
           <div class="bg-white rounded-lg shadow-sm p-6">
-            <h3 class="text-h3 font-semibold mb-4">Exercise Information</h3>
+            <h3 class="text-h3 font-semibold mb-4">
+              Exercise Information
+            </h3>
             <div class="grid grid-cols-2 gap-4">
               <div>
                 <span class="text-sm text-medium-gray">Difficulty</span>
@@ -177,11 +200,15 @@
               </div>
               <div>
                 <span class="text-sm text-medium-gray">Equipment</span>
-                <p class="text-dark-gray font-medium">{{ exercise.equipment || 'None' }}</p>
+                <p class="text-dark-gray font-medium">
+                  {{ exercise.equipment || 'None' }}
+                </p>
               </div>
               <div>
                 <span class="text-sm text-medium-gray">Created</span>
-                <p class="text-dark-gray font-medium">{{ formatDate(exercise.created_at) }}</p>
+                <p class="text-dark-gray font-medium">
+                  {{ formatDate(exercise.created_at) }}
+                </p>
               </div>
             </div>
           </div>
@@ -191,7 +218,9 @@
         <div class="space-y-6">
           <!-- Header -->
           <div class="bg-white rounded-lg shadow-sm p-6">
-            <h1 class="text-display font-bold text-dark-gray mb-2">{{ exercise.name }}</h1>
+            <h1 class="text-display font-bold text-dark-gray mb-2">
+              {{ exercise.name }}
+            </h1>
             <p
               v-if="exercise.description"
               class="text-medium-gray leading-relaxed"
@@ -201,8 +230,13 @@
           </div>
 
           <!-- Muscle Groups -->
-          <div v-if="exercise.muscle_groups" class="bg-white rounded-lg shadow-sm p-6">
-            <h3 class="text-h3 font-semibold mb-4">Muscle Groups</h3>
+          <div
+            v-if="exercise.muscle_groups"
+            class="bg-white rounded-lg shadow-sm p-6"
+          >
+            <h3 class="text-h3 font-semibold mb-4">
+              Muscle Groups
+            </h3>
             <div class="flex flex-wrap gap-2">
               <span
                 v-for="group in muscleGroupsList"
@@ -215,16 +249,26 @@
           </div>
 
           <!-- Instructions -->
-          <div v-if="exercise.instructions" class="bg-white rounded-lg shadow-sm p-6">
-            <h3 class="text-h3 font-semibold mb-4">Instructions</h3>
+          <div
+            v-if="exercise.instructions"
+            class="bg-white rounded-lg shadow-sm p-6"
+          >
+            <h3 class="text-h3 font-semibold mb-4">
+              Instructions
+            </h3>
             <div class="text-dark-gray leading-relaxed whitespace-pre-line">
               {{ exercise.instructions }}
             </div>
           </div>
 
           <!-- Tips -->
-          <div v-if="exercise.tips" class="bg-white rounded-lg shadow-sm p-6">
-            <h3 class="text-h3 font-semibold mb-4">Tips & Common Mistakes</h3>
+          <div
+            v-if="exercise.tips"
+            class="bg-white rounded-lg shadow-sm p-6"
+          >
+            <h3 class="text-h3 font-semibold mb-4">
+              Tips & Common Mistakes
+            </h3>
             <div class="text-dark-gray leading-relaxed whitespace-pre-line">
               {{ exercise.tips }}
             </div>
@@ -232,16 +276,29 @@
         </div>
       </div>
     </div>
+
+    <!-- Edit Exercise Modal -->
+    <EditExerciseModal
+      :is-open="showEditModal"
+      :exercise="exercise"
+      @close="showEditModal = false"
+      @updated="onExerciseUpdated"
+      @deleted="onExerciseDeleted"
+    />
   </div>
 </template>
 
 <script setup>
-import { computed, onMounted } from 'vue';
-import { useRoute } from 'vue-router';
+import { ref, computed, onMounted } from 'vue';
+import { useRoute, useRouter } from 'vue-router';
 import { useExercisesStore } from '@/stores/exercises';
+import EditExerciseModal from '@/components/exercise/EditExerciseModal.vue';
 
 const route = useRoute();
+const router = useRouter();
 const exercisesStore = useExercisesStore();
+
+const showEditModal = ref(false);
 
 const exercise = computed(() => exercisesStore.exerciseDetail);
 
@@ -271,8 +328,18 @@ const loadExercise = () => {
 };
 
 const editExercise = () => {
-  // TODO: Implement edit exercise functionality
-  alert('Edit exercise feature coming soon!');
+  showEditModal.value = true;
+};
+
+const onExerciseUpdated = (updatedExercise) => {
+  console.log('Exercise updated:', updatedExercise);
+  // The exercise detail is automatically updated in the store
+};
+
+const onExerciseDeleted = (deletedExercise) => {
+  console.log('Exercise deleted:', deletedExercise);
+  // Navigate back to the exercise library
+  router.push('/exercises');
 };
 
 const addToProgram = () => {
