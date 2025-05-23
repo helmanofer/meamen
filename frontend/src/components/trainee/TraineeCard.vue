@@ -42,7 +42,7 @@
             <div
               class="bg-success h-2 rounded-full"
               :style="{ width: progressPercentage + '%' }"
-            ></div>
+            />
           </div>
           <p class="text-xs mt-1">
             {{ progressPercentage }}%
