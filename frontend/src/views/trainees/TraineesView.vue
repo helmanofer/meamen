@@ -1,6 +1,6 @@
 <template>
-  <div class="trainees-view container mx-auto px-4 py-6">
-    <header class="flex justify-between items-center mb-6">
+  <div class="view-container">
+    <header class="view-header">
       <div>
         <h1 class="text-display font-bold text-dark-gray">
           Trainees
@@ -28,16 +28,16 @@
           </svg>
           Add Trainee
         </button>
-        <div class="relative">
+        <div class="search-container">
           <input
             v-model="searchQuery"
             type="text"
             placeholder="Search trainees..."
-            class="input-field pl-8"
+            class="search-input"
           >
           <svg
             xmlns="http://www.w3.org/2000/svg"
-            class="h-5 w-5 absolute left-2 top-3 text-medium-gray"
+            class="search-icon"
             fill="none"
             viewBox="0 0 24 24"
             stroke="currentColor"
@@ -53,41 +53,9 @@
       </div>
     </header>
 
-    <section class="filters mb-6">
-      <div class="flex space-x-4">
-        <select
-          v-model="statusFilter"
-          class="input-field"
-        >
-          <option value="">
-            All Statuses
-          </option>
-          <option value="active">
-            Active
-          </option>
-          <option value="paused">
-            Paused
-          </option>
-          <option value="completed">
-            Completed
-          </option>
-        </select>
-        <select
-          v-model="programFilter"
-          class="input-field"
-        >
-          <option value="">
-            All Programs
-          </option>
-          <option
-            v-for="program in availablePrograms"
-            :key="program.id"
-            :value="program.id"
-          >
-            {{ program.name }}
-          </option>
-        </select>
-        <div class="ml-auto flex items-center space-x-2">
+    <section class="filters-section">
+      <div class="flex justify-end">
+        <div class="view-controls">
           <button
             class="btn-icon"
             :class="{ 'text-primary-blue': viewMode === 'grid' }"
@@ -146,7 +114,7 @@
         :name="viewMode === 'grid' ? 'grid' : 'list'"
         tag="div"
         :class="{
-          'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4':
+          'responsive-grid':
             viewMode === 'grid',
           'space-y-4': viewMode === 'list',
         }"
@@ -172,15 +140,7 @@ import TraineeCard from "@/components/trainee/TraineeCard.vue";
 const router = useRouter();
 const traineesStore = useTraineesStore();
 const searchQuery = ref("");
-const statusFilter = ref("");
-const programFilter = ref("");
 const viewMode = ref("grid");
-
-const availablePrograms = ref([
-  { id: 1, name: "Weight Loss Program" },
-  { id: 2, name: "Muscle Gain Program" },
-  { id: 3, name: "Endurance Training" },
-]);
 
 // Initialize data
 onMounted(async () => {
@@ -192,17 +152,9 @@ onMounted(async () => {
 // Computed
 const filteredTrainees = computed(() => {
   return traineesStore.trainees.filter((trainee) => {
-    const matchesSearch = trainee.name
+    return trainee.name
       .toLowerCase()
       .includes(searchQuery.value.toLowerCase());
-    const matchesStatus =
-      !statusFilter.value || trainee.status === statusFilter.value;
-    const matchesProgram =
-      !programFilter.value ||
-      trainee.program_name ===
-        availablePrograms.value.find((p) => p.id === programFilter.value)?.name;
-
-    return matchesSearch && matchesStatus && matchesProgram;
   });
 });
 

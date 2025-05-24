@@ -3,45 +3,72 @@
     <!-- Header -->
     <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6">
       <div>
-        <h1 class="text-display font-bold text-dark-gray">Analytics & Reports</h1>
-        <p class="text-medium-gray">Track performance, progress, and business insights</p>
+        <h1 class="text-display font-bold text-dark-gray">
+          Analytics & Reports
+        </h1>
+        <p class="text-medium-gray">
+          Track performance, progress, and business insights
+        </p>
       </div>
       
       <div class="flex items-center space-x-3 mt-4 sm:mt-0">
         <!-- Date Range Selector -->
         <select
           v-model="selectedPeriod"
-          @change="updateDateRange"
           class="border border-gray-300 rounded-md px-3 py-2 text-sm focus:ring-2 focus:ring-primary-blue focus:border-primary-blue"
+          @change="updateDateRange"
         >
-          <option value="week">Last 7 days</option>
-          <option value="month">Last 30 days</option>
-          <option value="quarter">Last 3 months</option>
-          <option value="year">Last year</option>
+          <option value="week">
+            Last 7 days
+          </option>
+          <option value="month">
+            Last 30 days
+          </option>
+          <option value="quarter">
+            Last 3 months
+          </option>
+          <option value="year">
+            Last year
+          </option>
         </select>
         
         <!-- Export Button -->
         <div class="relative">
           <button
-            @click="showExportMenu = !showExportMenu"
             class="btn btn-secondary flex items-center"
+            @click="showExportMenu = !showExportMenu"
           >
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2" viewBox="0 0 20 20" fill="currentColor">
-              <path fill-rule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clip-rule="evenodd" />
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              class="h-4 w-4 mr-2"
+              viewBox="0 0 20 20"
+              fill="currentColor"
+            >
+              <path
+                fill-rule="evenodd"
+                d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z"
+                clip-rule="evenodd"
+              />
             </svg>
             Export Report
           </button>
           
           <!-- Export Menu -->
-          <div v-if="showExportMenu" class="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg border border-gray-200 z-10">
+          <div
+            v-if="showExportMenu"
+            class="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg border border-gray-200 z-10"
+          >
             <div class="py-1">
               <button
                 v-for="format in exportFormats"
                 :key="format.value"
-                @click="exportReport(format.value)"
                 class="w-full text-left px-4 py-2 text-sm text-dark-gray hover:bg-light-gray flex items-center"
+                @click="exportReport(format.value)"
               >
-                <component :is="format.icon" class="h-4 w-4 mr-2" />
+                <component
+                  :is="format.icon"
+                  class="h-4 w-4 mr-2"
+                />
                 {{ format.label }}
               </button>
             </div>
@@ -51,29 +78,47 @@
     </div>
 
     <!-- Loading State -->
-    <div v-if="analyticsStore.loading" class="flex items-center justify-center h-64">
-      <div class="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-primary-blue"></div>
+    <div
+      v-if="analyticsStore.loading"
+      class="flex items-center justify-center h-64"
+    >
+      <div class="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-primary-blue" />
       <span class="ml-2 text-medium-gray">Loading analytics...</span>
     </div>
 
     <!-- Error State -->
-    <div v-else-if="analyticsStore.error" class="bg-error/10 border border-error/20 rounded-lg p-4 mb-6">
+    <div
+      v-else-if="analyticsStore.error"
+      class="bg-error/10 border border-error/20 rounded-lg p-4 mb-6"
+    >
       <div class="flex items-center">
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-error mr-2" viewBox="0 0 20 20" fill="currentColor">
-          <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          class="h-5 w-5 text-error mr-2"
+          viewBox="0 0 20 20"
+          fill="currentColor"
+        >
+          <path
+            fill-rule="evenodd"
+            d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z"
+            clip-rule="evenodd"
+          />
         </svg>
         <span class="text-error font-medium">{{ analyticsStore.error }}</span>
       </div>
       <button
-        @click="analyticsStore.clearError(); refreshData()"
         class="mt-2 text-sm text-error hover:text-error/80"
+        @click="analyticsStore.clearError(); refreshData()"
       >
         Try again
       </button>
     </div>
 
     <!-- Analytics Content -->
-    <div v-else class="space-y-6">
+    <div
+      v-else
+      class="space-y-6"
+    >
       <!-- Key Metrics Grid -->
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         <MetricCard
@@ -167,10 +212,12 @@
         <!-- Top Performers -->
         <div class="card">
           <div class="flex items-center justify-between mb-4">
-            <h3 class="text-lg font-semibold text-dark-gray">Top Performing Clients</h3>
+            <h3 class="text-lg font-semibold text-dark-gray">
+              Top Performing Clients
+            </h3>
             <button
-              @click="viewAllClients"
               class="text-sm text-primary-blue hover:text-primary-blue/80"
+              @click="viewAllClients"
             >
               View All
             </button>
@@ -188,13 +235,21 @@
                   {{ index + 1 }}
                 </div>
                 <div>
-                  <p class="font-medium text-dark-gray">{{ client.name }}</p>
-                  <p class="text-xs text-medium-gray">{{ client.sessionsCompleted }} sessions</p>
+                  <p class="font-medium text-dark-gray">
+                    {{ client.name }}
+                  </p>
+                  <p class="text-xs text-medium-gray">
+                    {{ client.sessionsCompleted }} sessions
+                  </p>
                 </div>
               </div>
               <div class="text-right">
-                <p class="text-sm font-semibold text-success">{{ client.progressPercentage }}%</p>
-                <p class="text-xs text-medium-gray">Progress</p>
+                <p class="text-sm font-semibold text-success">
+                  {{ client.progressPercentage }}%
+                </p>
+                <p class="text-xs text-medium-gray">
+                  Progress
+                </p>
               </div>
             </div>
           </div>
@@ -205,7 +260,9 @@
       <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <!-- Peak Hours Analysis -->
         <div class="card">
-          <h3 class="text-lg font-semibold text-dark-gray mb-4">Peak Operating Hours</h3>
+          <h3 class="text-lg font-semibold text-dark-gray mb-4">
+            Peak Operating Hours
+          </h3>
           <div class="space-y-3">
             <div
               v-for="hour in peakHours"
@@ -222,7 +279,7 @@
                   <div
                     class="bg-primary-blue h-2 rounded-full"
                     :style="{ width: `${(hour.count / maxHourCount) * 100}%` }"
-                  ></div>
+                  />
                 </div>
                 <span class="text-sm text-medium-gray w-8 text-right">{{ hour.count }}</span>
               </div>
@@ -232,36 +289,50 @@
         
         <!-- Business Insights -->
         <div class="card">
-          <h3 class="text-lg font-semibold text-dark-gray mb-4">Business Insights</h3>
+          <h3 class="text-lg font-semibold text-dark-gray mb-4">
+            Business Insights
+          </h3>
           <div class="space-y-4">
             <div class="flex items-start space-x-3">
-              <div class="w-2 h-2 rounded-full bg-success mt-2"></div>
+              <div class="w-2 h-2 rounded-full bg-success mt-2" />
               <div>
-                <p class="text-sm font-medium text-dark-gray">High Client Retention</p>
-                <p class="text-xs text-medium-gray">85% of clients are actively booking sessions</p>
+                <p class="text-sm font-medium text-dark-gray">
+                  High Client Retention
+                </p>
+                <p class="text-xs text-medium-gray">
+                  85% of clients are actively booking sessions
+                </p>
               </div>
             </div>
             
             <div class="flex items-start space-x-3">
-              <div class="w-2 h-2 rounded-full bg-warning mt-2"></div>
+              <div class="w-2 h-2 rounded-full bg-warning mt-2" />
               <div>
-                <p class="text-sm font-medium text-dark-gray">Peak Hour Optimization</p>
-                <p class="text-xs text-medium-gray">Consider adding more slots during 6-8 PM</p>
+                <p class="text-sm font-medium text-dark-gray">
+                  Peak Hour Optimization
+                </p>
+                <p class="text-xs text-medium-gray">
+                  Consider adding more slots during 6-8 PM
+                </p>
               </div>
             </div>
             
             <div class="flex items-start space-x-3">
-              <div class="w-2 h-2 rounded-full bg-primary-blue mt-2"></div>
+              <div class="w-2 h-2 rounded-full bg-primary-blue mt-2" />
               <div>
-                <p class="text-sm font-medium text-dark-gray">Revenue Growth</p>
-                <p class="text-xs text-medium-gray">On track for 15% monthly growth target</p>
+                <p class="text-sm font-medium text-dark-gray">
+                  Revenue Growth
+                </p>
+                <p class="text-xs text-medium-gray">
+                  On track for 15% monthly growth target
+                </p>
               </div>
             </div>
             
             <div class="pt-3 border-t border-gray-100">
               <button
-                @click="generateInsightReport"
                 class="btn btn-primary w-full text-sm"
+                @click="generateInsightReport"
               >
                 Generate Detailed Report
               </button>

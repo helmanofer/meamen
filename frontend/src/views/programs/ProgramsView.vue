@@ -1,7 +1,7 @@
 <template>
-  <div class="programs-view container mx-auto px-4 py-6">
+  <div class="view-container">
     <!-- Header -->
-    <header class="flex justify-between items-center mb-6">
+    <header class="view-header">
       <div>
         <h1 class="text-display font-bold text-dark-gray">
           Session Templates
@@ -10,44 +10,24 @@
           Create and manage reusable workout session templates
         </p>
       </div>
-      <div class="flex items-center space-x-4">
-        <button
-          class="btn btn-primary flex items-center"
-          @click="createProgram"
-        >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            class="h-5 w-5 mr-2"
-            viewBox="0 0 20 20"
-            fill="currentColor"
-          >
-            <path
-              fill-rule="evenodd"
-              d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z"
-              clip-rule="evenodd"
-            />
-          </svg>
-          Create Template
-        </button>
-      </div>
     </header>
 
     <!-- Search and Filters -->
-    <section class="bg-white rounded-lg shadow-sm p-6 mb-6">
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
+    <section class="filters-section">
+      <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
         <!-- Search -->
-        <div class="lg:col-span-2">
-          <div class="relative">
+        <div class="flex-1 max-w-md">
+          <div class="search-container">
             <input
               v-model="searchQuery"
               type="text"
               placeholder="Search templates..."
-              class="input-field pl-10 w-full"
+              class="search-input"
               @input="onSearchInput"
             >
             <svg
               xmlns="http://www.w3.org/2000/svg"
-              class="h-5 w-5 absolute left-3 top-3 text-medium-gray"
+              class="search-icon"
               fill="none"
               viewBox="0 0 24 24"
               stroke="currentColor"
@@ -62,11 +42,11 @@
           </div>
         </div>
 
-        <!-- Difficulty Filter -->
-        <div>
+        <!-- Filters and Create Button -->
+        <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
           <select
             v-model="difficultyFilter"
-            class="input-field w-full"
+            class="input-field w-40"
             @change="onFilterChange"
           >
             <option value="">
@@ -80,13 +60,10 @@
               {{ difficulty }}
             </option>
           </select>
-        </div>
 
-        <!-- Category Filter -->
-        <div>
           <select
             v-model="categoryFilter"
-            class="input-field w-full"
+            class="input-field w-40"
             @change="onFilterChange"
           >
             <option value="">
@@ -100,6 +77,25 @@
               {{ category }}
             </option>
           </select>
+
+          <button
+            class="btn btn-primary flex items-center whitespace-nowrap"
+            @click="createProgram"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              class="h-5 w-5 mr-2"
+              viewBox="0 0 20 20"
+              fill="currentColor"
+            >
+              <path
+                fill-rule="evenodd"
+                d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z"
+                clip-rule="evenodd"
+              />
+            </svg>
+            Create Template
+          </button>
         </div>
       </div>
 
@@ -190,7 +186,7 @@
       v-else
       class="programs-list"
     >
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div class="responsive-grid">
         <ProgramCard
           v-for="program in programsStore.filteredPrograms"
           :key="program.id"

@@ -37,7 +37,7 @@
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4 mb-4">
         <!-- Search -->
         <div class="xl:col-span-2">
-          <div class="relative">
+          <div class="search-container">
             <input
               v-model="searchQuery"
               type="text"
@@ -276,7 +276,7 @@
         :name="exercisesStore.viewMode === 'grid' ? 'grid' : 'list'"
         tag="div"
         :class="{
-          'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6':
+          'responsive-grid-extended':
             exercisesStore.viewMode === 'grid',
           'space-y-4': exercisesStore.viewMode === 'list',
         }"

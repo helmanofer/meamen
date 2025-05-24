@@ -60,7 +60,10 @@
               placeholder="Enter full name"
               :class="{ 'border-red-500': errors.name }"
             >
-            <p v-if="errors.name" class="text-red-500 text-sm mt-1">
+            <p
+              v-if="errors.name"
+              class="text-red-500 text-sm mt-1"
+            >
               {{ errors.name }}
             </p>
           </div>
@@ -82,7 +85,10 @@
               placeholder="Enter email address"
               :class="{ 'border-red-500': errors.email }"
             >
-            <p v-if="errors.email" class="text-red-500 text-sm mt-1">
+            <p
+              v-if="errors.email"
+              class="text-red-500 text-sm mt-1"
+            >
               {{ errors.email }}
             </p>
           </div>
@@ -133,10 +139,18 @@
               v-model="form.gender"
               class="input-field w-full"
             >
-              <option value="">Select gender</option>
-              <option value="Male">Male</option>
-              <option value="Female">Female</option>
-              <option value="Other">Other</option>
+              <option value="">
+                Select gender
+              </option>
+              <option value="Male">
+                Male
+              </option>
+              <option value="Female">
+                Female
+              </option>
+              <option value="Other">
+                Other
+              </option>
             </select>
           </div>
 
@@ -260,8 +274,8 @@
           <button
             type="button"
             class="btn btn-secondary"
-            @click="goBack"
             :disabled="loading"
+            @click="goBack"
           >
             Cancel
           </button>

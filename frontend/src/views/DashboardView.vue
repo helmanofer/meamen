@@ -10,7 +10,7 @@
     </div>
 
     <!-- Overview Statistics -->
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
+    <div class="responsive-grid-stats mb-6">
       <!-- Total Trainees Card -->
       <div class="card">
         <div class="flex items-center">
@@ -103,7 +103,7 @@
       </div>
     </div>
 
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+    <div class="dashboard-layout">
       <!-- Today's Schedule -->
       <div class="lg:col-span-2">
         <div class="card mb-6">
@@ -135,8 +135,8 @@
               <div class="flex space-x-2">
                 <button
                   class="p-2 text-primary-blue hover:bg-light-blue rounded-md"
-                  @click="editSession('session-1')"
                   title="Edit Session"
+                  @click="editSession('session-1')"
                 >
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
@@ -149,8 +149,8 @@
                 </button>
                 <button 
                   class="p-2 text-primary-blue hover:bg-light-blue rounded-md"
-                  @click="viewSession('session-1')"
                   title="View Details"
+                  @click="viewSession('session-1')"
                 >
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
@@ -184,8 +184,8 @@
               <div class="flex space-x-2">
                 <button 
                   class="p-2 text-primary-blue hover:bg-light-blue rounded-md"
-                  @click="editSession('session-2')"
                   title="Edit Session"
+                  @click="editSession('session-2')"
                 >
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
@@ -198,8 +198,8 @@
                 </button>
                 <button 
                   class="p-2 text-primary-blue hover:bg-light-blue rounded-md"
-                  @click="viewSession('session-2')"
                   title="View Details"
+                  @click="viewSession('session-2')"
                 >
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
@@ -232,8 +232,8 @@
               <div class="flex space-x-2">
                 <button 
                   class="p-2 text-primary-blue hover:bg-light-blue rounded-md"
-                  @click="editSession('session-3')"
                   title="Edit Session"
+                  @click="editSession('session-3')"
                 >
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
@@ -246,8 +246,8 @@
                 </button>
                 <button 
                   class="p-2 text-primary-blue hover:bg-light-blue rounded-md"
-                  @click="viewSession('session-3')"
                   title="View Details"
+                  @click="viewSession('session-3')"
                 >
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
@@ -486,10 +486,8 @@
                 />
               </div>
             </div>
-            
           </div>
         </div>
-
       </div>
     </div>
   </div>

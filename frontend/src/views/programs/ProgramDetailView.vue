@@ -185,7 +185,10 @@
               Workout Structure
             </h2>
             
-            <div v-if="workoutExercises.length > 0" class="space-y-4">
+            <div
+              v-if="workoutExercises.length > 0"
+              class="space-y-4"
+            >
               <div
                 v-for="(exercise, index) in workoutExercises"
                 :key="index"
@@ -217,7 +220,10 @@
               </div>
             </div>
 
-            <div v-else class="text-center py-8 text-medium-gray">
+            <div
+              v-else
+              class="text-center py-8 text-medium-gray"
+            >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 class="mx-auto h-12 w-12 text-gray-400 mb-4"
@@ -237,7 +243,10 @@
           </div>
 
           <!-- Trainer Notes -->
-          <div v-if="program.notes" class="bg-white rounded-lg shadow-sm p-6 mt-6">
+          <div
+            v-if="program.notes"
+            class="bg-white rounded-lg shadow-sm p-6 mt-6"
+          >
             <h2 class="text-h2 font-semibold text-dark-gray mb-4">
               Trainer Notes
             </h2>
@@ -299,7 +308,10 @@
           </div>
 
           <!-- Equipment Card -->
-          <div v-if="equipmentList.length > 0" class="bg-white rounded-lg shadow-sm p-6">
+          <div
+            v-if="equipmentList.length > 0"
+            class="bg-white rounded-lg shadow-sm p-6"
+          >
             <h2 class="text-h2 font-semibold text-dark-gray mb-4">
               Equipment Needed
             </h2>
@@ -314,7 +326,10 @@
               </span>
             </div>
             
-            <div v-if="equipmentList.includes('None')" class="mt-4 p-3 bg-green-50 border border-green-200 rounded-lg">
+            <div
+              v-if="equipmentList.includes('None')"
+              class="mt-4 p-3 bg-green-50 border border-green-200 rounded-lg"
+            >
               <p class="text-green-800 text-sm">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -346,14 +361,18 @@
                 <div class="text-2xl font-bold text-primary-blue">
                   {{ totalSets }}
                 </div>
-                <div class="text-xs text-medium-gray">Total Sets</div>
+                <div class="text-xs text-medium-gray">
+                  Total Sets
+                </div>
               </div>
               
               <div class="text-center p-3 bg-green-50 rounded-lg">
                 <div class="text-2xl font-bold text-green-600">
                   {{ estimatedCalories }}
                 </div>
-                <div class="text-xs text-medium-gray">Est. Calories</div>
+                <div class="text-xs text-medium-gray">
+                  Est. Calories
+                </div>
               </div>
             </div>
           </div>
@@ -390,7 +409,10 @@
     </div>
 
     <!-- Not Found State -->
-    <div v-else class="text-center py-12">
+    <div
+      v-else
+      class="text-center py-12"
+    >
       <h1 class="text-h1 font-bold text-dark-gray mb-4">
         Program Not Found
       </h1>

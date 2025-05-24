@@ -6,10 +6,17 @@
     <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-blue" />
   </div>
   
-  <div v-else-if="!loading && !trainee" class="text-center py-8">
+  <div
+    v-else-if="!loading && !trainee"
+    class="text-center py-8"
+  >
     <div class="text-medium-gray">
-      <p class="text-lg">Trainee not found</p>
-      <p class="text-sm mt-2">The trainee you're looking for doesn't exist or you don't have permission to view them.</p>
+      <p class="text-lg">
+        Trainee not found
+      </p>
+      <p class="text-sm mt-2">
+        The trainee you're looking for doesn't exist or you don't have permission to view them.
+      </p>
       <button 
         class="btn btn-primary mt-4"
         @click="$router.push('/trainees')"
@@ -212,8 +219,13 @@
         >
           <!-- Weight History -->
           <div class="bg-white rounded-lg shadow-sm p-6">
-            <h3 class="text-lg font-semibold text-dark-gray mb-4">Weight History</h3>
-            <div v-if="trainee.measurement_history && trainee.measurement_history.length > 0" class="space-y-3">
+            <h3 class="text-lg font-semibold text-dark-gray mb-4">
+              Weight History
+            </h3>
+            <div
+              v-if="trainee.measurement_history && trainee.measurement_history.length > 0"
+              class="space-y-3"
+            >
               <div 
                 v-for="measurement in trainee.measurement_history.slice(0, 5)" 
                 :key="measurement.date"
@@ -223,33 +235,54 @@
                 <span class="font-medium text-dark-gray">{{ measurement.weight }}kg</span>
               </div>
             </div>
-            <div v-else class="text-center py-8 text-medium-gray">
+            <div
+              v-else
+              class="text-center py-8 text-medium-gray"
+            >
               <p>No weight measurements recorded yet</p>
-              <button class="btn btn-primary mt-4">Add Measurement</button>
+              <button class="btn btn-primary mt-4">
+                Add Measurement
+              </button>
             </div>
           </div>
           
           <!-- Body Measurements -->
           <div class="bg-white rounded-lg shadow-sm p-6">
-            <h3 class="text-lg font-semibold text-dark-gray mb-4">Body Measurements</h3>
+            <h3 class="text-lg font-semibold text-dark-gray mb-4">
+              Body Measurements
+            </h3>
             <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
               <div class="text-center p-4 bg-light-blue rounded-lg">
-                <p class="text-sm text-medium-gray">Height</p>
-                <p class="text-lg font-semibold text-dark-gray">{{ trainee.height ? trainee.height + ' cm' : 'Not recorded' }}</p>
+                <p class="text-sm text-medium-gray">
+                  Height
+                </p>
+                <p class="text-lg font-semibold text-dark-gray">
+                  {{ trainee.height ? trainee.height + ' cm' : 'Not recorded' }}
+                </p>
               </div>
               <div class="text-center p-4 bg-light-blue rounded-lg">
-                <p class="text-sm text-medium-gray">Current Weight</p>
-                <p class="text-lg font-semibold text-dark-gray">{{ trainee.current_weight ? trainee.current_weight + ' kg' : 'Not recorded' }}</p>
+                <p class="text-sm text-medium-gray">
+                  Current Weight
+                </p>
+                <p class="text-lg font-semibold text-dark-gray">
+                  {{ trainee.current_weight ? trainee.current_weight + ' kg' : 'Not recorded' }}
+                </p>
               </div>
               <div class="text-center p-4 bg-light-blue rounded-lg">
-                <p class="text-sm text-medium-gray">BMI</p>
+                <p class="text-sm text-medium-gray">
+                  BMI
+                </p>
                 <p class="text-lg font-semibold text-dark-gray">
                   {{ (trainee.height && trainee.current_weight) ? ((trainee.current_weight / Math.pow(trainee.height / 100, 2)).toFixed(1)) : 'N/A' }}
                 </p>
               </div>
               <div class="text-center p-4 bg-light-blue rounded-lg">
-                <p class="text-sm text-medium-gray">Heart Rate</p>
-                <p class="text-lg font-semibold text-dark-gray">{{ trainee.resting_heart_rate ? trainee.resting_heart_rate + ' bpm' : 'Not recorded' }}</p>
+                <p class="text-sm text-medium-gray">
+                  Heart Rate
+                </p>
+                <p class="text-lg font-semibold text-dark-gray">
+                  {{ trainee.resting_heart_rate ? trainee.resting_heart_rate + ' bpm' : 'Not recorded' }}
+                </p>
               </div>
             </div>
           </div>
@@ -262,18 +295,29 @@
           <!-- Recent Sessions -->
           <div class="bg-white rounded-lg shadow-sm p-6">
             <div class="flex justify-between items-center mb-4">
-              <h3 class="text-lg font-semibold text-dark-gray">Recent Sessions</h3>
-              <button class="btn btn-primary">Schedule Session</button>
+              <h3 class="text-lg font-semibold text-dark-gray">
+                Recent Sessions
+              </h3>
+              <button class="btn btn-primary">
+                Schedule Session
+              </button>
             </div>
-            <div v-if="recentSessions.length > 0" class="space-y-3">
+            <div
+              v-if="recentSessions.length > 0"
+              class="space-y-3"
+            >
               <div 
                 v-for="session in recentSessions" 
                 :key="session.id"
                 class="flex justify-between items-center p-4 border border-gray-200 rounded-lg"
               >
                 <div>
-                  <p class="font-medium text-dark-gray">{{ session.name || 'Training Session' }}</p>
-                  <p class="text-sm text-medium-gray">{{ new Date(session.scheduled_at).toLocaleDateString() }}</p>
+                  <p class="font-medium text-dark-gray">
+                    {{ session.name || 'Training Session' }}
+                  </p>
+                  <p class="text-sm text-medium-gray">
+                    {{ new Date(session.scheduled_at).toLocaleDateString() }}
+                  </p>
                 </div>
                 <span 
                   :class="[
@@ -287,17 +331,24 @@
                 </span>
               </div>
             </div>
-            <div v-else class="text-center py-8 text-medium-gray">
+            <div
+              v-else
+              class="text-center py-8 text-medium-gray"
+            >
               <p>No workout sessions recorded yet</p>
             </div>
           </div>
           
           <!-- Training Programs -->
           <div class="bg-white rounded-lg shadow-sm p-6">
-            <h3 class="text-lg font-semibold text-dark-gray mb-4">Training Programs</h3>
+            <h3 class="text-lg font-semibold text-dark-gray mb-4">
+              Training Programs
+            </h3>
             <div class="text-center py-8 text-medium-gray">
               <p>Training programs will be displayed here</p>
-              <button class="btn btn-secondary mt-4">Assign Program</button>
+              <button class="btn btn-secondary mt-4">
+                Assign Program
+              </button>
             </div>
           </div>
         </div>
@@ -330,26 +381,42 @@
           
           <!-- Session Statistics -->
           <div class="bg-white rounded-lg shadow-sm p-6">
-            <h3 class="text-lg font-semibold text-dark-gray mb-4">Session Statistics</h3>
+            <h3 class="text-lg font-semibold text-dark-gray mb-4">
+              Session Statistics
+            </h3>
             <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
               <div class="text-center p-4 bg-light-blue rounded-lg">
-                <p class="text-sm text-medium-gray">Total Sessions</p>
-                <p class="text-2xl font-bold text-dark-gray">{{ traineeSessionsStats.total }}</p>
+                <p class="text-sm text-medium-gray">
+                  Total Sessions
+                </p>
+                <p class="text-2xl font-bold text-dark-gray">
+                  {{ traineeSessionsStats.total }}
+                </p>
               </div>
               <div class="text-center p-4 bg-light-blue rounded-lg">
-                <p class="text-sm text-medium-gray">Completed</p>
-                <p class="text-2xl font-bold text-dark-gray">{{ traineeSessionsStats.completed }}</p>
+                <p class="text-sm text-medium-gray">
+                  Completed
+                </p>
+                <p class="text-2xl font-bold text-dark-gray">
+                  {{ traineeSessionsStats.completed }}
+                </p>
               </div>
               <div class="text-center p-4 bg-light-blue rounded-lg">
-                <p class="text-sm text-medium-gray">Completion Rate</p>
-                <p class="text-2xl font-bold text-dark-gray">{{ traineeSessionsStats.percentage }}%</p>
+                <p class="text-sm text-medium-gray">
+                  Completion Rate
+                </p>
+                <p class="text-2xl font-bold text-dark-gray">
+                  {{ traineeSessionsStats.percentage }}%
+                </p>
               </div>
             </div>
           </div>
           
           <!-- Achievements -->
           <div class="bg-white rounded-lg shadow-sm p-6">
-            <h3 class="text-lg font-semibold text-dark-gray mb-4">Recent Achievements</h3>
+            <h3 class="text-lg font-semibold text-dark-gray mb-4">
+              Recent Achievements
+            </h3>
             <div class="text-center py-8 text-medium-gray">
               <p>Achievements tracking coming soon...</p>
             </div>
@@ -362,18 +429,20 @@
         >
           <!-- Add New Note -->
           <div class="bg-white rounded-lg shadow-sm p-6">
-            <h3 class="text-lg font-semibold text-dark-gray mb-4">Add Note</h3>
+            <h3 class="text-lg font-semibold text-dark-gray mb-4">
+              Add Note
+            </h3>
             <div class="space-y-4">
               <textarea
                 v-model="newNote"
                 rows="4"
                 class="input-field"
                 placeholder="Enter trainer notes, observations, or feedback..."
-              ></textarea>
+              />
               <button 
                 class="btn btn-primary"
-                @click="addNote"
                 :disabled="!newNote.trim()"
+                @click="addNote"
               >
                 Add Note
               </button>
@@ -382,8 +451,13 @@
           
           <!-- Notes History -->
           <div class="bg-white rounded-lg shadow-sm p-6">
-            <h3 class="text-lg font-semibold text-dark-gray mb-4">Training Notes</h3>
-            <div v-if="trainerNotes.length > 0" class="space-y-4">
+            <h3 class="text-lg font-semibold text-dark-gray mb-4">
+              Training Notes
+            </h3>
+            <div
+              v-if="trainerNotes.length > 0"
+              class="space-y-4"
+            >
               <div 
                 v-for="note in trainerNotes" 
                 :key="note.id"
@@ -391,19 +465,28 @@
               >
                 <div class="flex justify-between items-start mb-2">
                   <span class="text-sm text-medium-gray">{{ new Date(note.created_at).toLocaleDateString() }}</span>
-                  <button class="text-danger hover:text-red-700 text-sm">Delete</button>
+                  <button class="text-danger hover:text-red-700 text-sm">
+                    Delete
+                  </button>
                 </div>
-                <p class="text-dark-gray">{{ note.content }}</p>
+                <p class="text-dark-gray">
+                  {{ note.content }}
+                </p>
               </div>
             </div>
-            <div v-else class="text-center py-8 text-medium-gray">
+            <div
+              v-else
+              class="text-center py-8 text-medium-gray"
+            >
               <p>No notes recorded yet</p>
             </div>
           </div>
           
           <!-- Medical Notes -->
           <div class="bg-white rounded-lg shadow-sm p-6">
-            <h3 class="text-lg font-semibold text-dark-gray mb-4">Medical Information</h3>
+            <h3 class="text-lg font-semibold text-dark-gray mb-4">
+              Medical Information
+            </h3>
             <div class="space-y-4">
               <div>
                 <label class="block text-sm font-medium text-dark-gray mb-2">Medical Notes</label>
