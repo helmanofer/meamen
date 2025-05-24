@@ -287,8 +287,14 @@ const loading = computed(() => traineesStore.loading);
 
 onMounted(() => {
   const traineeId = route.params.id;
+  console.log('TraineeDetailView mounted with ID:', traineeId);
+  console.log('Route params:', route.params);
+  console.log('Route path:', route.path);
   if (traineeId) {
+    console.log('Fetching trainee detail for ID:', traineeId);
     traineesStore.fetchTraineeDetail(traineeId);
+  } else {
+    console.error('No trainee ID found in route params');
   }
 });
 

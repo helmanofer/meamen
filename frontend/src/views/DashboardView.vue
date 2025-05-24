@@ -164,6 +164,8 @@
               <div class="flex space-x-2">
                 <button
                   class="p-2 text-primary-blue hover:bg-light-blue rounded-md"
+                  @click="editSession('session-1')"
+                  title="Edit Session"
                 >
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
@@ -174,7 +176,11 @@
                     <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" />
                   </svg>
                 </button>
-                <button class="p-2 text-primary-blue hover:bg-light-blue rounded-md">
+                <button 
+                  class="p-2 text-primary-blue hover:bg-light-blue rounded-md"
+                  @click="viewSession('session-1')"
+                  title="View Details"
+                >
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
                     class="h-5 w-5"
@@ -205,7 +211,11 @@
                 </p>
               </div>
               <div class="flex space-x-2">
-                <button class="p-2 text-primary-blue hover:bg-light-blue rounded-md">
+                <button 
+                  class="p-2 text-primary-blue hover:bg-light-blue rounded-md"
+                  @click="editSession('session-2')"
+                  title="Edit Session"
+                >
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
                     class="h-5 w-5"
@@ -215,7 +225,11 @@
                     <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" />
                   </svg>
                 </button>
-                <button class="p-2 text-primary-blue hover:bg-light-blue rounded-md">
+                <button 
+                  class="p-2 text-primary-blue hover:bg-light-blue rounded-md"
+                  @click="viewSession('session-2')"
+                  title="View Details"
+                >
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
                     class="h-5 w-5"
@@ -245,7 +259,11 @@
                 </p>
               </div>
               <div class="flex space-x-2">
-                <button class="p-2 text-primary-blue hover:bg-light-blue rounded-md">
+                <button 
+                  class="p-2 text-primary-blue hover:bg-light-blue rounded-md"
+                  @click="editSession('session-3')"
+                  title="Edit Session"
+                >
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
                     class="h-5 w-5"
@@ -255,7 +273,11 @@
                     <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" />
                   </svg>
                 </button>
-                <button class="p-2 text-primary-blue hover:bg-light-blue rounded-md">
+                <button 
+                  class="p-2 text-primary-blue hover:bg-light-blue rounded-md"
+                  @click="viewSession('session-3')"
+                  title="View Details"
+                >
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
                     class="h-5 w-5"
@@ -590,9 +612,26 @@
 import { computed, onMounted } from 'vue'
 import { useAuthStore } from '@/stores/auth'
 import { useTraineesStore } from '@/stores/trainees'
+import { useRouter } from 'vue-router'
 
 const authStore = useAuthStore()
 const traineesStore = useTraineesStore()
+const router = useRouter()
+
+// Session management functions
+const editSession = (sessionId) => {
+  console.log('Editing session:', sessionId)
+  // TODO: Open session edit modal or navigate to edit page
+  // For now, navigate to calendar with edit mode
+  router.push({ path: '/calendar', query: { edit: sessionId } })
+}
+
+const viewSession = (sessionId) => {
+  console.log('Viewing session:', sessionId)
+  // TODO: Open session detail modal
+  // For now, navigate to calendar
+  router.push({ path: '/calendar', query: { view: sessionId } })
+}
 
 // Computed values for dashboard metrics
 const sessionsThisWeek = computed(() => {

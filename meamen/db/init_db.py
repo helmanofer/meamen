@@ -1,9 +1,11 @@
 from sqlmodel import SQLModel
-from meamen.db.session import engine
+from sqlalchemy import create_engine
+from meamen.db.session import DATABASE_URL
 
 
 def init_db():
-    SQLModel.metadata.create_all(engine)
+    sync_engine = create_engine(DATABASE_URL.replace("+aiosqlite", ""))
+    SQLModel.metadata.create_all(sync_engine)
 
 
 if __name__ == "__main__":

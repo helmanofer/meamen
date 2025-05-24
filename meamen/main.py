@@ -9,6 +9,7 @@ from sqlmodel import SQLModel
 from meamen.db.session import engine
 from fastapi.middleware.cors import CORSMiddleware
 from meamen.middleware.logging import RequestLoggingMiddleware
+from contextlib import asynccontextmanager
 
 # Configure root logger
 logging.basicConfig(
@@ -16,7 +17,14 @@ logging.basicConfig(
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
 )
 
-app = FastAPI(title="Fitness Trainer API", version="1.0.0")
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    async with engine.begin() as conn:
+        await conn.run_sync(SQLModel.metadata.create_all)
+    yield
+
+app = FastAPI(title="Fitness Trainer API", version="1.0.0", lifespan=lifespan)
 
 # Add request logging middleware (order matters - add before CORS)
 app.add_middleware(RequestLoggingMiddleware)
@@ -37,10 +45,7 @@ app.include_router(trainers_router)
 app.include_router(exercise_router)
 app.include_router(training_session_router)
 
-@app.on_event("startup")
-async def on_startup():
-    async with engine.begin() as conn:
-        await conn.run_sync(SQLModel.metadata.create_all)
+
 
 
 @app.get("/")

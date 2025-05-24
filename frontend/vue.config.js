@@ -3,6 +3,7 @@ const webpack = require('webpack');
 
 module.exports = defineConfig({
   transpileDependencies: true,
+  lintOnSave: false, // Temporarily disable linting
   devServer: {
     port: 8080,
     proxy: {

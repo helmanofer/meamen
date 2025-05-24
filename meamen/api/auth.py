@@ -13,17 +13,18 @@ from uuid import UUID
 import os
 from fastapi_users.manager import BaseUserManager, UUIDIDMixin
 from fastapi import Depends
+from typing import AsyncGenerator
 
 SECRET = os.getenv("SECRET", "SECRET")
 
 bearer_transport = BearerTransport(tokenUrl="auth/jwt/login")
 
 
-def get_jwt_strategy() -> JWTStrategy:
+def get_jwt_strategy() -> JWTStrategy[User, UUID]:
     return JWTStrategy(secret=SECRET, lifetime_seconds=3600)
 
 
-auth_backend = AuthenticationBackend(
+auth_backend = AuthenticationBackend[User, UUID](
     name="jwt",
     transport=bearer_transport,
     get_strategy=get_jwt_strategy,
@@ -34,16 +35,16 @@ class UserManager(UUIDIDMixin, BaseUserManager[User, UUID]):
     reset_password_token_secret = SECRET
     verification_token_secret = SECRET
 
-    def __init__(self, user_db):
+    def __init__(self, user_db: SQLAlchemyUserDatabase[User, UUID]):
         super().__init__(user_db)
 
 
-async def get_user_db():
+async def get_user_db() -> AsyncGenerator[SQLAlchemyUserDatabase[User, UUID], None]:
     async for session in get_session():
         yield SQLAlchemyUserDatabase(session, User)
 
 
-async def get_user_manager(user_db=Depends(get_user_db)):
+async def get_user_manager(user_db: SQLAlchemyUserDatabase[User, UUID] = Depends(get_user_db)) -> AsyncGenerator[UserManager, None]:
     yield UserManager(user_db)
 
 

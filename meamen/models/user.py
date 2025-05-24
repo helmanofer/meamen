@@ -1,5 +1,5 @@
 from uuid import uuid4
-from sqlalchemy import Column, String, Boolean, Text
+from sqlalchemy import Column, String, Boolean
 from sqlalchemy.dialects.postgresql import UUID as PG_UUID
 from sqlalchemy.orm import declarative_base
 

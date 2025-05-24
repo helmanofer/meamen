@@ -48,23 +48,16 @@ export const useTraineesStore = defineStore("trainees", {
         const trainerId = 1;
         
         const params = {
-          trainer_id: trainerId,
           skip: (this.pagination.page - 1) * this.pagination.limit,
           limit: this.pagination.limit,
           ...this.filters
         };
 
-        const response = await api.getTrainees(params);
+        const response = await api.getTrainees(trainerId, params);
         
-        // Check if the API returns data in the expected format
-        if (response.data && Array.isArray(response.data.items)) {
-          this.trainees = response.data.items;
-          this.pagination.total = response.data.total || response.data.items.length;
-        } else {
-          // Fallback for different API response structure
-          this.trainees = Array.isArray(response.data) ? response.data : [];
-          this.pagination.total = this.trainees.length;
-        }
+        // The API returns a simple array of trainees
+        this.trainees = Array.isArray(response.data) ? response.data : [];
+        this.pagination.total = this.trainees.length;
       } catch (error) {
         this.error = error.response?.data?.detail || "Failed to fetch trainees";
         console.error("Error fetching trainees:", error);
@@ -80,7 +73,8 @@ export const useTraineesStore = defineStore("trainees", {
       this.traineeDetail = null;
 
       try {
-        const response = await api.getTrainee(id);
+        const trainerId = 1; // Default trainer ID
+        const response = await api.getTrainee(id, trainerId);
         this.traineeDetail = response.data;
       } catch (error) {
         this.error = error.response?.data?.detail || "Failed to fetch trainee details";
@@ -131,7 +125,8 @@ export const useTraineesStore = defineStore("trainees", {
       this.error = null;
 
       try {
-        const response = await api.updateTrainee(id, traineeData);
+        const trainerId = 1; // Default trainer ID
+        const response = await api.updateTrainee(id, traineeData, trainerId);
         // Update the trainee in the list
         const index = this.trainees.findIndex(t => t.id === id);
         if (index !== -1) {
@@ -156,7 +151,8 @@ export const useTraineesStore = defineStore("trainees", {
       this.error = null;
 
       try {
-        await api.deleteTrainee(id);
+        const trainerId = 1; // Default trainer ID
+        await api.deleteTrainee(id, trainerId);
         // Remove the trainee from the list
         this.trainees = this.trainees.filter(t => t.id !== id);
         return true;
@@ -174,13 +170,37 @@ export const useTraineesStore = defineStore("trainees", {
       this.error = null;
 
       try {
-        const response = await api.addTraineeMeasurement(traineeId, measurementData);
-        // Add the new measurement to the list
-        this.measurements.push(response.data);
+        const trainerId = 1; // Default trainer ID
+        const response = await api.addTraineeMeasurement(traineeId, measurementData, trainerId);
+        // Update the trainee's measurement history
+        if (this.traineeDetail && this.traineeDetail.id === traineeId) {
+          this.traineeDetail = response.data;
+        }
         return response.data;
       } catch (error) {
         this.error = error.response?.data?.detail || "Failed to add measurement";
         console.error("Error adding measurement:", error);
+        throw error;
+      } finally {
+        this.loading = false;
+      }
+    },
+
+    async addProgressPhoto(traineeId, photoData) {
+      this.loading = true;
+      this.error = null;
+
+      try {
+        const trainerId = 1; // Default trainer ID
+        const response = await api.addTraineeProgressPhoto(traineeId, photoData, trainerId);
+        // Update the trainee's progress photos
+        if (this.traineeDetail && this.traineeDetail.id === traineeId) {
+          this.traineeDetail = response.data;
+        }
+        return response.data;
+      } catch (error) {
+        this.error = error.response?.data?.detail || "Failed to add progress photo";
+        console.error("Error adding progress photo:", error);
         throw error;
       } finally {
         this.loading = false;

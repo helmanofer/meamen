@@ -33,30 +33,42 @@ export default {
   },
 
   // Trainee endpoints
-  getTrainees(params) {
-    return axios.get("/trainees/", { params });
+  getTrainees(trainerId, params = {}) {
+    return axios.get("/trainees/", { 
+      params: { trainer_id: trainerId, ...params } 
+    });
   },
-  getTrainee(id) {
-    return axios.get(`/trainees/${id}`);
+  getTrainee(id, trainerId) {
+    return axios.get(`/trainees/${id}`, {
+      params: { trainer_id: trainerId }
+    });
   },
   createTrainee(traineeData, trainerId) {
     return axios.post("/trainees/", traineeData, {
       params: { trainer_id: trainerId }
     });
   },
-  updateTrainee(id, traineeData) {
-    return axios.put(`/trainees/${id}`, traineeData);
+  updateTrainee(id, traineeData, trainerId) {
+    return axios.put(`/trainees/${id}`, traineeData, {
+      params: { trainer_id: trainerId }
+    });
   },
-  deleteTrainee(id) {
-    return axios.delete(`/trainees/${id}`);
+  deleteTrainee(id, trainerId) {
+    return axios.delete(`/trainees/${id}`, {
+      params: { trainer_id: trainerId }
+    });
   },
 
-  // Measurements
-  getTraineeMeasurements(traineeId, params) {
-    return axios.get(`/trainees/${traineeId}/measurements`, { params });
+  // Measurements and progress photos
+  addTraineeMeasurement(traineeId, measurementData, trainerId) {
+    return axios.post(`/trainees/${traineeId}/measurements`, measurementData, {
+      params: { trainer_id: trainerId }
+    });
   },
-  addTraineeMeasurement(traineeId, measurementData) {
-    return axios.post(`/trainees/${traineeId}/measurements`, measurementData);
+  addTraineeProgressPhoto(traineeId, photoData, trainerId) {
+    return axios.post(`/trainees/${traineeId}/photos`, photoData, {
+      params: { trainer_id: trainerId }
+    });
   },
 
   // Exercise endpoints

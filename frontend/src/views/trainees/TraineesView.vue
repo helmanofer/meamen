@@ -184,8 +184,10 @@ const availablePrograms = ref([
 ]);
 
 // Initialize data
-onMounted(() => {
-  traineesStore.fetchTrainees();
+onMounted(async () => {
+  await traineesStore.fetchTrainees();
+  console.log('Trainees loaded:', traineesStore.trainees);
+  console.log('First trainee structure:', traineesStore.trainees[0]);
 });
 
 // Computed
@@ -207,6 +209,9 @@ const filteredTrainees = computed(() => {
 
 // Methods
 const openTraineeDetail = (trainee) => {
+  console.log('Opening trainee detail for:', trainee);
+  console.log('Trainee ID:', trainee.id);
+  console.log('Navigating to:', `/trainees/${trainee.id}`);
   router.push(`/trainees/${trainee.id}`);
 };
 
