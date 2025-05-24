@@ -10,7 +10,7 @@ from sqlmodel import SQLModel
 from fastapi.middleware.cors import CORSMiddleware
 from meamen.middleware.logging import RequestLoggingMiddleware
 from contextlib import asynccontextmanager
-from meamen.db.session import async_engine, get_session
+from meamen.db.session import sync_engine, get_session
 from meamen.db.seed_data import seed_default_exercises, seed_default_session_templates
 
 # Configure root logger
@@ -23,13 +23,12 @@ logging.basicConfig(
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     # Create database tables
-    async with async_engine.begin() as conn:
-        await conn.run_sync(SQLModel.metadata.create_all)
+    SQLModel.metadata.create_all(sync_engine)
     
     # Seed default exercises and session templates
-    async for session in get_session():
-        await seed_default_exercises(session)
-        await seed_default_session_templates(session)
+    for session in get_session():
+        seed_default_exercises(session)
+        seed_default_session_templates(session)
         break
     
     yield

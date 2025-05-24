@@ -5,6 +5,22 @@ from sqlalchemy import Column
 from sqlalchemy.types import JSON
 
 
+class TraineeProgramAssignment(SQLModel, table=True):
+    """Association table for many-to-many relationship between trainees and programs"""
+    id: Optional[int] = Field(default=None, primary_key=True)
+    trainee_id: int = Field(foreign_key="trainee.id")
+    program_id: int = Field(foreign_key="sessiontemplate.id") 
+    assigned_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    status: str = Field(default="active")  # active, completed, paused
+    notes: Optional[str] = None
+    
+    # Relationships
+    if TYPE_CHECKING:
+        from .session_template import SessionTemplate
+    trainee: Optional["Trainee"] = Relationship(back_populates="program_assignments")
+    program: Optional["SessionTemplate"] = Relationship()
+
+
 class Trainee(SQLModel, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
     trainer_id: int = Field(foreign_key="trainer.id")
@@ -44,3 +60,7 @@ class Trainee(SQLModel, table=True):
         from .training_session import TrainingSession
     trainer: Optional["Trainer"] = Relationship(back_populates="trainees")
     training_sessions: List["TrainingSession"] = Relationship(back_populates="trainee")
+    program_assignments: Optional[List["TraineeProgramAssignment"]] = Relationship(
+        back_populates="trainee",
+        sa_relationship_kwargs={"lazy": "noload"}
+    )

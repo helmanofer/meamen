@@ -63,15 +63,30 @@ class TraineeUpdate(BaseModel):
     medical_notes: Optional[str] = None
 
 
+class ProgramAssignmentRead(BaseModel):
+    id: int
+    program_id: int
+    assigned_at: datetime
+    status: str
+    notes: Optional[str] = None
+
+
 class TraineeRead(TraineeBase):
     id: int
     trainer_id: int
-    measurement_history: List[dict] = []
-    progress_photos: List[dict] = []
+    program_assignments: Optional[List[ProgramAssignmentRead]] = None
+    measurement_history: List[MeasurementRecord] = []
+    progress_photos: List[ProgressPhoto] = []
     created_at: datetime
     updated_at: datetime
+    
+    class Config:
+        from_attributes = True
 
 
 class TraineeWithMeasurements(TraineeRead):
-    measurement_history: List[MeasurementRecord] = []
-    progress_photos: List[ProgressPhoto] = []
+    pass
+
+
+class ProgramAssignment(BaseModel):
+    program_id: int

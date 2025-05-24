@@ -1,4 +1,7 @@
-from fastapi import APIRouter
+import os
+from typing import AsyncGenerator
+
+from fastapi import APIRouter, Depends
 from fastapi_users import FastAPIUsers
 from fastapi_users.authentication import (
     AuthenticationBackend,
@@ -6,13 +9,11 @@ from fastapi_users.authentication import (
     BearerTransport,
 )
 from fastapi_users.db import SQLAlchemyUserDatabase
+from fastapi_users.manager import BaseUserManager
+
 from meamen.models.user import User
 from meamen.schemas.user import UserRead, UserCreate, UserUpdate
-from meamen.db.session import get_session
-import os
-from fastapi_users.manager import BaseUserManager
-from fastapi import Depends
-from typing import AsyncGenerator
+from meamen.db.session import get_async_session
 
 SECRET = os.getenv("SECRET", "SECRET")
 
@@ -37,12 +38,12 @@ class UserManager(BaseUserManager[User, str]):
     def __init__(self, user_db: SQLAlchemyUserDatabase[User, str]):
         super().__init__(user_db)
 
-    def parse_id(self, id: str) -> str:
-        return id
+    def parse_id(self, value: str) -> str:
+        return value
 
 
 async def get_user_db() -> AsyncGenerator[SQLAlchemyUserDatabase[User, str], None]:
-    async for session in get_session():
+    async for session in get_async_session():
         yield SQLAlchemyUserDatabase(session, User)
 
 

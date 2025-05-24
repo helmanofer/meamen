@@ -1,45 +1,38 @@
-from typing import Optional, Any, Sequence
-from sqlmodel import select
-from sqlalchemy.ext.asyncio import AsyncSession
+from typing import Optional, Any
+from typing import List
 from meamen.models.trainer import Trainer
 
 
-async def get_trainers(session: AsyncSession, skip: int = 0, limit: int = 100) -> Sequence[Trainer]:
-    statement = select(Trainer).offset(skip).limit(limit)
-    result = await session.execute(statement)
-    return result.scalars().all()
+def get_trainers(data_store: List[Trainer], skip: int = 0, limit: int = 100) -> List[Trainer]:
+    return data_store[skip:skip + limit]
 
 
-async def create_trainer(session: AsyncSession, trainer: Trainer) -> Trainer:
-    session.add(trainer)
-    await session.commit()
-    await session.refresh(trainer)
+def create_trainer(data_store: List[Trainer], trainer: Trainer) -> Trainer:
+    data_store.append(trainer)
     return trainer
 
 
-async def get_trainer_by_id(session: AsyncSession, trainer_id: int) -> Optional[Trainer]:
-    statement = select(Trainer).where(Trainer.id == trainer_id)
-    result = await session.execute(statement)
-    return result.scalar_one_or_none()
+def get_trainer_by_id(data_store: List[Trainer], trainer_id: int) -> Optional[Trainer]:
+    for trainer in data_store:
+        if trainer.id == trainer_id:
+            return trainer
+    return None
 
 
-async def update_trainer(
-    session: AsyncSession, trainer_id: int, trainer_data: dict[str, Any]
+def update_trainer(
+    data_store: List[Trainer], trainer_id: int, trainer_data: dict[str, Any]
 ) -> Optional[Trainer]:
-    trainer = await get_trainer_by_id(session, trainer_id)
+    trainer = get_trainer_by_id(data_store, trainer_id)
     if not trainer:
         return None
     for key, value in trainer_data.items():
         setattr(trainer, key, value)
-    await session.commit()
-    await session.refresh(trainer)
     return trainer
 
 
-async def delete_trainer(session: AsyncSession, trainer_id: int) -> bool:
-    trainer = await get_trainer_by_id(session, trainer_id)
+def delete_trainer(data_store: List[Trainer], trainer_id: int) -> bool:
+    trainer = get_trainer_by_id(data_store, trainer_id)
     if not trainer:
         return False
-    await session.delete(trainer)
-    await session.commit()
+    data_store.remove(trainer)
     return True

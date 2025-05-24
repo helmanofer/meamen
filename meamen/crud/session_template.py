@@ -1,45 +1,45 @@
-from typing import Optional, Any, Sequence
-from sqlmodel import select
-from sqlalchemy.ext.asyncio import AsyncSession
+from typing import Optional, Any, List
+from sqlmodel import Session, select
 from meamen.models.session_template import SessionTemplate
 
 
-async def get_session_templates(session: AsyncSession, skip: int = 0, limit: int = 100) -> Sequence[SessionTemplate]:
+def get_session_templates(session: Session, skip: int = 0, limit: int = 100) -> List[SessionTemplate]:
     statement = select(SessionTemplate).offset(skip).limit(limit)
-    result = await session.execute(statement)
-    return result.scalars().all()
+    result = session.exec(statement)
+    return list(result.all())
 
 
-async def get_session_template_by_id(session: AsyncSession, template_id: int) -> Optional[SessionTemplate]:
+def get_session_template_by_id(session: Session, template_id: int) -> Optional[SessionTemplate]:
     statement = select(SessionTemplate).where(SessionTemplate.id == template_id)
-    result = await session.execute(statement)
-    return result.scalar_one_or_none()
+    result = session.exec(statement)
+    return result.first()
 
 
-async def create_session_template(session: AsyncSession, template: SessionTemplate) -> SessionTemplate:
+def create_session_template(session: Session, template: SessionTemplate) -> SessionTemplate:
     session.add(template)
-    await session.commit()
-    await session.refresh(template)
+    session.commit()
+    session.refresh(template)
     return template
 
 
-async def update_session_template(
-    session: AsyncSession, template_id: int, template_data: dict[str, Any]
+def update_session_template(
+    session: Session, template_id: int, template_data: dict[str, Any]
 ) -> Optional[SessionTemplate]:
-    template = await get_session_template_by_id(session, template_id)
+    template = get_session_template_by_id(session, template_id)
     if not template:
         return None
     for key, value in template_data.items():
         setattr(template, key, value)
-    await session.commit()
-    await session.refresh(template)
+    session.add(template)
+    session.commit()
+    session.refresh(template)
     return template
 
 
-async def delete_session_template(session: AsyncSession, template_id: int) -> bool:
-    template = await get_session_template_by_id(session, template_id)
+def delete_session_template(session: Session, template_id: int) -> bool:
+    template = get_session_template_by_id(session, template_id)
     if not template:
         return False
-    await session.delete(template)
-    await session.commit()
+    session.delete(template)
+    session.commit()
     return True

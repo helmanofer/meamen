@@ -1,10 +1,9 @@
-from sqlalchemy.ext.asyncio import AsyncSession
-from sqlmodel import select
+import json
+from sqlmodel import Session, select
 from meamen.models.exercise import Exercise
 from meamen.models.session_template import SessionTemplate
 from meamen.crud.exercise import create_exercise
 from meamen.crud.session_template import create_session_template
-import json
 
 
 DEFAULT_EXERCISES = [
@@ -372,43 +371,53 @@ DEFAULT_SESSION_TEMPLATES = [
 ]
 
 
-async def seed_default_exercises(session: AsyncSession) -> None:
+def seed_default_exercises(session: Session) -> None:
     """Seed the database with default exercises if none exist."""
     # Check if any exercises already exist
     statement = select(Exercise)
-    result = await session.execute(statement)
-    existing_exercises = result.scalars().all()
-    
+    result = session.exec(statement)
+    existing_exercises = result.all()
+
     if existing_exercises:
         print(f"Database already contains {len(existing_exercises)} exercises. Skipping seed.")
         return
-    
+
     print("Seeding database with default exercises...")
-    
+
     # Create all default exercises
     for exercise_data in DEFAULT_EXERCISES:
-        exercise = Exercise(**exercise_data)
-        await create_exercise(session, exercise)
-    
+        # Create exercise with explicit field mapping to avoid type checker issues
+        exercise = Exercise(
+            name=exercise_data["name"],
+            description=exercise_data.get("description"),
+            category=exercise_data.get("category"),
+            muscle_groups=exercise_data.get("muscle_groups"),
+            difficulty=exercise_data.get("difficulty"),
+            equipment=exercise_data.get("equipment"),
+            instructions=exercise_data.get("instructions"),
+            tips=exercise_data.get("tips")
+        )
+        create_exercise(session, exercise)
+
     print(f"Successfully seeded {len(DEFAULT_EXERCISES)} default exercises.")
 
 
-async def seed_default_session_templates(session: AsyncSession) -> None:
+def seed_default_session_templates(session: Session) -> None:
     """Seed the database with default session templates if none exist."""
     # Check if any session templates already exist
     statement = select(SessionTemplate)
-    result = await session.execute(statement)
-    existing_templates = result.scalars().all()
-    
+    result = session.exec(statement)
+    existing_templates = result.all()
+
     if existing_templates:
         print(f"Database already contains {len(existing_templates)} session templates. Skipping seed.")
         return
-    
+
     print("Seeding database with default session templates...")
-    
+
     # Create all default session templates
     for template_data in DEFAULT_SESSION_TEMPLATES:
-        template = SessionTemplate(**template_data)
-        await create_session_template(session, template)
-    
+        template = SessionTemplate(**template_data)  #  type: ignore
+        create_session_template(session, template)
+
     print(f"Successfully seeded {len(DEFAULT_SESSION_TEMPLATES)} default session templates.")

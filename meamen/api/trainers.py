@@ -1,8 +1,5 @@
 from fastapi import APIRouter, Depends, HTTPException, status
-from sqlmodel import select
-from sqlalchemy.ext.asyncio import AsyncSession
 from typing import List, Any
-from meamen.db.session import get_session
 from meamen.models.trainer import Trainer
 from meamen.models.trainee import Trainee
 from meamen.schemas.trainer import TrainerCreate, TrainerRead
@@ -19,20 +16,20 @@ router = APIRouter(prefix="/trainers", tags=["trainers"])
 
 @router.get("/", response_model=List[TrainerRead])
 async def read_trainers(
-    skip: int = 0, limit: int = 100, session: AsyncSession = Depends(get_session)
+    skip: int = 0, limit: int = 100, data_store: List[Trainer] = Depends(lambda: [])
 ):
-    return await get_trainers(session, skip, limit)
+    return get_trainers(data_store, skip, limit)
 
 
 @router.post("/", response_model=TrainerRead, status_code=status.HTTP_201_CREATED)
-async def add_trainer(trainer: TrainerCreate, session: AsyncSession = Depends(get_session)):
+async def add_trainer(trainer: TrainerCreate, data_store: List[Trainer] = Depends(lambda: [])):
     db_trainer = Trainer(**trainer.model_dump())
-    return await create_trainer(session, db_trainer)
+    return create_trainer(data_store, db_trainer)
 
 
 @router.get("/{trainer_id}", response_model=TrainerRead)
-async def get_trainer(trainer_id: int, session: AsyncSession = Depends(get_session)):
-    trainer = await get_trainer_by_id(session, trainer_id)
+async def get_trainer(trainer_id: int, data_store: List[Trainer] = Depends(lambda: [])):
+    trainer = get_trainer_by_id(data_store, trainer_id)
     if not trainer:
         raise HTTPException(status_code=404, detail="Trainer not found")
     return trainer
@@ -40,9 +37,9 @@ async def get_trainer(trainer_id: int, session: AsyncSession = Depends(get_sessi
 
 @router.put("/{trainer_id}", response_model=TrainerRead)
 async def update_trainer_endpoint(
-    trainer_id: int, trainer: TrainerCreate, session: AsyncSession = Depends(get_session)
+    trainer_id: int, trainer: TrainerCreate, data_store: List[Trainer] = Depends(lambda: [])
 ):
-    updated = await update_trainer(session, trainer_id, trainer.model_dump())
+    updated = update_trainer(data_store, trainer_id, trainer.model_dump())
     if not updated:
         raise HTTPException(status_code=404, detail="Trainer not found")
     return updated
@@ -50,19 +47,17 @@ async def update_trainer_endpoint(
 
 @router.delete("/{trainer_id}")
 async def delete_trainer_endpoint(
-    trainer_id: int, session: AsyncSession = Depends(get_session)
+    trainer_id: int, data_store: List[Trainer] = Depends(lambda: [])
 ):
-    deleted = await delete_trainer(session, trainer_id)
+    deleted = delete_trainer(data_store, trainer_id)
     if not deleted:
         raise HTTPException(status_code=404, detail="Trainer not found")
     return {"ok": True}
 
 
 @router.get("/{trainer_id}/dashboard")
-async def trainer_dashboard(trainer_id: int, session: AsyncSession = Depends(get_session)) -> dict[str, Any]:
-    statement = select(Trainee).where(Trainee.trainer_id == trainer_id)
-    result = await session.execute(statement)
-    trainees = result.scalars().all()
+async def trainer_dashboard(trainer_id: int, data_store: List[Trainee] = Depends(lambda: [])) -> dict[str, Any]:
+    trainees = [trainee for trainee in data_store if trainee.trainer_id == trainer_id]
     return {
         "trainer_id": trainer_id,
         "trainee_count": len(trainees),
