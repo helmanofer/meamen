@@ -31,10 +31,10 @@
 - Goal setting and monitoring endpoints
 - Automated progress report generation
 
-## Communication
-- In-app messaging endpoints
-- Notification endpoints (reminders, achievements, messages)
-- File/image sharing endpoints
+## Communication (REMOVED)
+- ~~In-app messaging endpoints~~ (Removed - messaging system excluded from application)
+- ~~Notification endpoints (reminders, achievements, messages)~~ (Messaging-related notifications removed)
+- ~~File/image sharing endpoints~~ (Messaging-related file sharing removed)
 
 ## Analytics & Reporting
 - Trainee adherence metrics endpoints
@@ -53,19 +53,25 @@
 - Prepare Docker configuration and CI/CD pipeline
 
 ## UI / Frontend Implementation
-- Create Exercise Builder (search/browse, details, set/rep config, rest, notes)
-- Develop Workout Planner (calendar, templates, sequencing, assignment, scheduling)
+
+### Completed ✅
+- ~~Create Exercise Builder (search/browse, details, set/rep config, rest, notes)~~ ✅
+- ~~Develop Workout Planner (calendar, templates, sequencing, assignment, scheduling)~~ ✅ Session templates
+- ~~Connect frontend to FastAPI backend via Axios~~ ✅
+- ~~Implement authentication and role-based access in UI~~ ✅
+- ~~Add error and loading states to all views~~ ✅
+- ~~Ensure mobile-responsive design (tablet, mobile, desktop)~~ ✅
+
+### Removed from Scope
+- ~~Implement in-app messaging UI~~ (Messaging system removed)
+- ~~Add notification UI (reminders, achievements, messages)~~ (Messaging-related notifications removed)
+- ~~File/image upload and sharing UI~~ (Messaging-related file sharing removed)
+- ~~Build Trainee Portal (upcoming workouts, progress charts, achievements, messages, profile)~~ (Messages removed)
+
+### Remaining Tasks
 - Implement Session Recording Interface (real-time tracking, timer, checklist, notes, quick adjust)
-- Build Trainee Portal (upcoming workouts, progress charts, achievements, messages, profile)
-- Ensure mobile-responsive design (tablet, mobile, desktop)
 - Integrate Chart.js for data visualization
-- Implement in-app messaging UI
-- Add notification UI (reminders, achievements, messages)
-- File/image upload and sharing UI
 - Apply accessibility best practices (WCAG 2.1, keyboard nav, screen reader, color contrast)
-- Add error and loading states to all views
-- Connect frontend to FastAPI backend via Axios
-- Implement authentication and role-based access in UI
 - Add unit and integration tests for UI (Jest)
 - Add end-to-end tests for UI (Cypress)
 - Optimize performance (lazy loading, image optimization)
