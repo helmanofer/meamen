@@ -6,6 +6,7 @@
     <component :is="layout">
       <router-view />
     </component>
+    <ToastContainer />
   </div>
 </template>
 
@@ -14,12 +15,14 @@ import { computed } from 'vue'
 import { useRoute } from 'vue-router'
 import DefaultLayout from './layouts/DefaultLayout.vue'
 import AuthLayout from './layouts/AuthLayout.vue'
+import ToastContainer from './components/common/ToastContainer.vue'
 
 export default {
   name: 'App',
   components: {
     DefaultLayout,
-    AuthLayout
+    AuthLayout,
+    ToastContainer
   },
   setup() {
     const route = useRoute()

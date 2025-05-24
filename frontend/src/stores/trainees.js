@@ -231,6 +231,81 @@ export const useTraineesStore = defineStore("trainees", {
     clearDetail() {
       this.traineeDetail = null;
       this.measurements = [];
+    },
+
+    async assignProgramToTrainee(traineeId, programId) {
+      this.loading = true;
+      this.error = null;
+
+      try {
+        const trainerId = 1; // Default trainer ID
+        const response = await api.assignProgramToTrainee(traineeId, programId, trainerId);
+        
+        // Update the trainee in the list
+        const traineeIndex = this.trainees.findIndex(t => t.id === traineeId);
+        if (traineeIndex !== -1) {
+          this.trainees[traineeIndex] = response.data;
+        }
+        
+        // Update trainee detail if it's the same trainee
+        if (this.traineeDetail && this.traineeDetail.id === traineeId) {
+          this.traineeDetail = response.data;
+        }
+        
+        return response.data;
+      } catch (error) {
+        this.error = error.response?.data?.detail || "Failed to assign program";
+        console.error("Error assigning program:", error);
+        throw error;
+      } finally {
+        this.loading = false;
+      }
+    },
+
+    async unassignProgramFromTrainee(traineeId, programId) {
+      this.loading = true;
+      this.error = null;
+
+      try {
+        const trainerId = 1; // Default trainer ID
+        const response = await api.unassignProgramFromTrainee(traineeId, programId, trainerId);
+        
+        // Update the trainee in the list
+        const traineeIndex = this.trainees.findIndex(t => t.id === traineeId);
+        if (traineeIndex !== -1) {
+          this.trainees[traineeIndex] = response.data;
+        }
+        
+        // Update trainee detail if it's the same trainee
+        if (this.traineeDetail && this.traineeDetail.id === traineeId) {
+          this.traineeDetail = response.data;
+        }
+        
+        return response.data;
+      } catch (error) {
+        this.error = error.response?.data?.detail || "Failed to unassign program";
+        console.error("Error unassigning program:", error);
+        throw error;
+      } finally {
+        this.loading = false;
+      }
+    },
+
+    async fetchTraineePrograms(traineeId) {
+      this.loading = true;
+      this.error = null;
+
+      try {
+        const trainerId = 1; // Default trainer ID
+        const response = await api.getTraineePrograms(traineeId, trainerId);
+        return response.data;
+      } catch (error) {
+        this.error = error.response?.data?.detail || "Failed to fetch trainee programs";
+        console.error("Error fetching trainee programs:", error);
+        throw error;
+      } finally {
+        this.loading = false;
+      }
     }
   }
 });

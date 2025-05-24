@@ -46,11 +46,11 @@
         <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
           <select
             v-model="difficultyFilter"
-            class="input-field w-40"
+            class="input-field w-36"
             @change="onFilterChange"
           >
             <option value="">
-              All Difficulties
+              All Difficulty
             </option>
             <option
               v-for="difficulty in programsStore.difficulties"
@@ -63,11 +63,11 @@
 
           <select
             v-model="categoryFilter"
-            class="input-field w-40"
+            class="input-field w-36"
             @change="onFilterChange"
           >
             <option value="">
-              All Categories
+              All Category
             </option>
             <option
               v-for="category in programsStore.categories"
@@ -197,6 +197,14 @@
         />
       </div>
     </section>
+
+    <!-- Assign to Trainee Modal -->
+    <AssignToTraineeModal
+      :is-open="showAssignModal"
+      :program="selectedProgram"
+      @close="closeAssignModal"
+      @assigned="handleProgramAssigned"
+    />
   </div>
 </template>
 
@@ -205,6 +213,7 @@ import { ref, computed, onMounted } from "vue";
 import { useRouter } from "vue-router";
 import { useProgramsStore } from "@/stores/programs";
 import ProgramCard from "@/components/program/ProgramCard.vue";
+import AssignToTraineeModal from "@/components/program/AssignToTraineeModal.vue";
 
 const router = useRouter();
 const programsStore = useProgramsStore();
@@ -213,6 +222,8 @@ const programsStore = useProgramsStore();
 const searchQuery = ref("");
 const difficultyFilter = ref("");
 const categoryFilter = ref("");
+const showAssignModal = ref(false);
+const selectedProgram = ref(null);
 
 // Computed
 const hasActiveFilters = computed(() => {
@@ -259,9 +270,18 @@ const editProgram = (program) => {
 };
 
 const assignProgram = (program) => {
-  // TODO: Implement assign program functionality
-  console.log("Assign program:", program);
-  alert(`"${program.name}" assignment feature coming soon!`);
+  selectedProgram.value = program;
+  showAssignModal.value = true;
+};
+
+const closeAssignModal = () => {
+  showAssignModal.value = false;
+  selectedProgram.value = null;
+};
+
+const handleProgramAssigned = () => {
+  // Program has been assigned, no need to refresh anything in this view
+  console.log('Program assigned successfully');
 };
 
 // Initialize

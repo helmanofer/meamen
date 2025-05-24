@@ -71,6 +71,24 @@ export default {
     });
   },
 
+  // Program assignment endpoints
+  assignProgramToTrainee(traineeId, programId, trainerId) {
+    return axios.post(`/trainees/${traineeId}/assign-program`, 
+      { program_id: programId }, 
+      { params: { trainer_id: trainerId } }
+    );
+  },
+  unassignProgramFromTrainee(traineeId, programId, trainerId) {
+    return axios.delete(`/trainees/${traineeId}/unassign-program/${programId}`, {
+      params: { trainer_id: trainerId }
+    });
+  },
+  getTraineePrograms(traineeId, trainerId) {
+    return axios.get(`/trainees/${traineeId}/programs`, {
+      params: { trainer_id: trainerId }
+    });
+  },
+
   // Exercise endpoints
   getExercises(params) {
     return axios.get("/exercises/", { params });

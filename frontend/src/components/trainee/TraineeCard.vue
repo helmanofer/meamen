@@ -22,8 +22,8 @@
           {{ trainee.status || "Active" }}
         </span>
       </div>
-      <p class="text-sm text-medium-gray mt-1">
-        {{ trainee.program_name || trainee.programName || "No Program" }}
+      <p class="text-sm mt-1" :class="programsAssigned > 0 ? 'text-primary-blue' : 'text-medium-gray'">
+        {{ programsAssigned > 0 ? `${programsAssigned} Program${programsAssigned > 1 ? 's' : ''} Assigned` : 'No Programs Assigned' }}
       </p>
       <div class="flex items-center mt-2 space-x-4">
         <div>
@@ -57,6 +57,30 @@
           </p>
         </div>
       </div>
+      
+      <!-- Action area -->
+      <div class="ml-4 flex flex-col space-y-2">
+        <button
+          @click.stop="$emit('assign-program', trainee)"
+          class="btn-icon text-primary-blue hover:text-dark-blue"
+          title="Assign Program"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            class="h-5 w-5"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"
+            />
+          </svg>
+        </button>
+      </div>
     </div>
   </div>
 </template>
@@ -72,11 +96,16 @@ const props = defineProps({
   }
 });
 
-defineEmits(['click']);
+defineEmits(['click', 'assign-program']);
 
 const progressPercentage = computed(() => {
   if (!props.trainee.completedSessions || !props.trainee.totalSessions) return 0;
   return Math.round((props.trainee.completedSessions / props.trainee.totalSessions) * 100);
+});
+
+const programsAssigned = computed(() => {
+  const assignments = props.trainee.program_assignments;
+  return (assignments && Array.isArray(assignments)) ? assignments.length : 0;
 });
 
 const statusClass = computed(() => {
