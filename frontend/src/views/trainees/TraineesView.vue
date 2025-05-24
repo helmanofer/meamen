@@ -156,7 +156,6 @@
           :key="trainee.id"
           :trainee="trainee"
           @click="openTraineeDetail(trainee)"
-          @message="openMessageModal(trainee)"
         />
       </transition-group>
     </section>
@@ -215,46 +214,10 @@ const openTraineeDetail = (trainee) => {
   router.push(`/trainees/${trainee.id}`);
 };
 
-const openMessageModal = (trainee) => {
-  // Navigate to messages with trainee pre-selected
-  router.push({ name: 'Messages', query: { trainee: trainee.id } });
-};
 
 
 const createTrainee = () => {
-  // For now, just show simple prompts. In a real app, this would be a proper modal/form
-  const name = prompt('Enter trainee name:');
-  if (!name) return;
-  
-  const email = prompt('Enter trainee email:');
-  if (!email) return;
-  
-  const gender = prompt('Enter trainee gender (male/female/other):');
-  if (!gender) return;
-  
-  const dateOfBirth = prompt('Enter date of birth (YYYY-MM-DD):');
-  if (!dateOfBirth) return;
-  
-  const phone = prompt('Enter phone number (optional):') || null;
-  const address = prompt('Enter address (optional):') || null;
-  
-  // Create trainee data matching backend schema
-  const traineeData = {
-    name,
-    email,
-    gender,
-    date_of_birth: dateOfBirth,
-    phone,
-    address
-  };
-  
-  traineesStore.createTrainee(traineeData).then(() => {
-    alert('Trainee created successfully!');
-  }).catch((error) => {
-    console.error('Create trainee error:', error);
-    const errorMessage = error.response?.data?.detail || error.message || 'Unknown error occurred';
-    alert('Failed to create trainee: ' + errorMessage);
-  });
+  router.push('/trainees/add');
 };
 </script>
 

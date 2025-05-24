@@ -10,7 +10,7 @@
     </div>
 
     <!-- Overview Statistics -->
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
       <!-- Total Trainees Card -->
       <div class="card">
         <div class="flex items-center">
@@ -71,35 +71,6 @@
         </div>
       </div>
 
-      <!-- Unread Messages Card -->
-      <div class="card">
-        <div class="flex items-center">
-          <div class="rounded-full p-3 bg-light-blue text-primary-blue mr-4">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              class="h-6 w-6"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
-              />
-            </svg>
-          </div>
-          <div>
-            <p class="text-medium-gray text-sm">
-              Unread Messages
-            </p>
-            <p class="text-h1 font-bold">
-              {{ unreadMessages }}
-            </p>
-          </div>
-        </div>
-      </div>
 
       <!-- Pending Tasks Card -->
       <div class="card">
@@ -516,93 +487,9 @@
               </div>
             </div>
             
-            <div>
-              <div class="flex justify-between mb-1">
-                <span class="text-sm font-medium">Communication Response</span>
-                <span class="text-sm font-medium">96%</span>
-              </div>
-              <div class="w-full bg-light-gray rounded-full h-2">
-                <div
-                  class="bg-success h-2 rounded-full"
-                  style="width: 96%"
-                />
-              </div>
-            </div>
           </div>
         </div>
 
-        <!-- Recent Messages -->
-        <div class="card">
-          <div class="flex justify-between items-center mb-4">
-            <h2 class="text-h2 font-semibold">
-              Recent Messages
-            </h2>
-            <button
-              class="btn btn-secondary text-sm py-1"
-              @click="$router.push('/messages')"
-            >
-              View All
-            </button>
-          </div>
-          <div class="space-y-4">
-            <div class="flex">
-              <img
-                src="https://randomuser.me/api/portraits/women/44.jpg"
-                alt="Sarah"
-                class="w-10 h-10 rounded-full mr-3"
-              >
-              <div>
-                <p class="font-medium">
-                  Sarah Johnson
-                </p>
-                <p class="text-sm text-medium-gray truncate">
-                  Thanks for the updated workout plan!
-                </p>
-                <p class="text-xs text-medium-gray">
-                  10 min ago
-                </p>
-              </div>
-            </div>
-            
-            <div class="flex">
-              <img
-                src="https://randomuser.me/api/portraits/men/32.jpg"
-                alt="Michael"
-                class="w-10 h-10 rounded-full mr-3"
-              >
-              <div>
-                <p class="font-medium">
-                  Michael Chen
-                </p>
-                <p class="text-sm text-medium-gray truncate">
-                  Can we reschedule tomorrow's session?
-                </p>
-                <p class="text-xs text-medium-gray">
-                  1 hour ago
-                </p>
-              </div>
-            </div>
-            
-            <div class="flex">
-              <img
-                src="https://randomuser.me/api/portraits/women/68.jpg"
-                alt="Emily"
-                class="w-10 h-10 rounded-full mr-3"
-              >
-              <div>
-                <p class="font-medium">
-                  Emily Rodriguez
-                </p>
-                <p class="text-sm text-medium-gray truncate">
-                  I've been feeling much better after...
-                </p>
-                <p class="text-xs text-medium-gray">
-                  Yesterday
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
       </div>
     </div>
   </div>
@@ -639,10 +526,6 @@ const sessionsThisWeek = computed(() => {
   return Math.floor(Math.random() * 15) + 5
 })
 
-const unreadMessages = computed(() => {
-  // TODO: Calculate actual unread messages from API
-  return Math.floor(Math.random() * 8)
-})
 
 const pendingTasks = computed(() => {
   // TODO: Calculate actual pending tasks from API

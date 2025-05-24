@@ -82,22 +82,22 @@
           </select>
         </div>
 
-        <!-- Duration Filter -->
+        <!-- Category Filter -->
         <div>
           <select
-            v-model="durationFilter"
+            v-model="categoryFilter"
             class="input-field w-full"
             @change="onFilterChange"
           >
             <option value="">
-              All Durations
+              All Categories
             </option>
             <option
-              v-for="duration in programsStore.durations"
-              :key="duration"
-              :value="duration"
+              v-for="category in programsStore.categories"
+              :key="category"
+              :value="category"
             >
-              {{ duration }} weeks
+              {{ category }}
             </option>
           </select>
         </div>
@@ -216,14 +216,14 @@ const programsStore = useProgramsStore();
 // Local filter state
 const searchQuery = ref("");
 const difficultyFilter = ref("");
-const durationFilter = ref("");
+const categoryFilter = ref("");
 
 // Computed
 const hasActiveFilters = computed(() => {
   return !!(
     searchQuery.value ||
     difficultyFilter.value ||
-    durationFilter.value
+    categoryFilter.value
   );
 });
 
@@ -239,14 +239,14 @@ const onSearchInput = () => {
 const onFilterChange = () => {
   programsStore.setFilters({
     difficulty: difficultyFilter.value,
-    duration: durationFilter.value,
+    category: categoryFilter.value,
   });
 };
 
 const clearFilters = () => {
   searchQuery.value = "";
   difficultyFilter.value = "";
-  durationFilter.value = "";
+  categoryFilter.value = "";
   programsStore.clearFilters();
 };
 

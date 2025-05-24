@@ -5,11 +5,13 @@ from meamen.api.trainees import router as trainees_router
 from meamen.api.trainers import router as trainers_router
 from meamen.api.exercise import router as exercise_router
 from meamen.api.training_session import router as training_session_router
+from meamen.api.session_template import router as session_template_router
 from sqlmodel import SQLModel
 from fastapi.middleware.cors import CORSMiddleware
 from meamen.middleware.logging import RequestLoggingMiddleware
 from contextlib import asynccontextmanager
-from meamen.db.session import async_engine
+from meamen.db.session import async_engine, get_session
+from meamen.db.seed_data import seed_default_exercises, seed_default_session_templates
 
 # Configure root logger
 logging.basicConfig(
@@ -20,8 +22,16 @@ logging.basicConfig(
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
+    # Create database tables
     async with async_engine.begin() as conn:
         await conn.run_sync(SQLModel.metadata.create_all)
+    
+    # Seed default exercises and session templates
+    async for session in get_session():
+        await seed_default_exercises(session)
+        await seed_default_session_templates(session)
+        break
+    
     yield
 
 app = FastAPI(title="Fitness Trainer API", version="1.0.0", lifespan=lifespan)
@@ -44,6 +54,7 @@ app.include_router(trainees_router)
 app.include_router(trainers_router)
 app.include_router(exercise_router)
 app.include_router(training_session_router)
+app.include_router(session_template_router)
 
 
 

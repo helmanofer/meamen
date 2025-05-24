@@ -69,6 +69,12 @@
       <!-- Program Info -->
       <div class="flex items-center space-x-3 mb-3">
         <span
+          v-if="program.category"
+          class="px-2 py-1 bg-primary-blue/10 text-primary-blue rounded-full text-xs font-medium"
+        >
+          {{ program.category }}
+        </span>
+        <span
           v-if="program.difficulty"
           class="px-2 py-1 rounded-full text-xs font-medium"
           :class="getDifficultyClass(program.difficulty)"
@@ -76,10 +82,10 @@
           {{ program.difficulty }}
         </span>
         <span
-          v-if="program.duration_weeks"
+          v-if="program.duration_minutes"
           class="px-2 py-1 bg-blue-100 text-blue-800 rounded-full text-xs font-medium"
         >
-          {{ program.duration_weeks }} weeks
+          {{ program.duration_minutes }}min
         </span>
       </div>
 
@@ -94,15 +100,7 @@
 
     <!-- Program Stats -->
     <div class="px-6 pb-4">
-      <div class="grid grid-cols-3 gap-4">
-        <div class="text-center">
-          <div class="text-lg font-semibold text-dark-gray">
-            {{ program.sessions?.length || 0 }}
-          </div>
-          <div class="text-xs text-medium-gray">
-            Sessions
-          </div>
-        </div>
+      <div class="grid grid-cols-2 gap-4">
         <div class="text-center">
           <div class="text-lg font-semibold text-dark-gray">
             {{ totalExercises }}
@@ -113,33 +111,33 @@
         </div>
         <div class="text-center">
           <div class="text-lg font-semibold text-dark-gray">
-            {{ assignedCount }}
+            {{ equipmentCount }}
           </div>
           <div class="text-xs text-medium-gray">
-            Assigned
+            Equipment
           </div>
         </div>
       </div>
     </div>
 
-    <!-- Goals Tags -->
+    <!-- Equipment Tags -->
     <div
-      v-if="goalsList.length > 0"
+      v-if="equipmentList.length > 0"
       class="px-6 pb-4"
     >
       <div class="flex flex-wrap gap-1">
         <span
-          v-for="goal in goalsList.slice(0, 3)"
-          :key="goal"
+          v-for="equipment in equipmentList.slice(0, 3)"
+          :key="equipment"
           class="px-2 py-1 bg-gray-100 text-gray-700 rounded text-xs"
         >
-          {{ goal }}
+          {{ equipment }}
         </span>
         <span
-          v-if="goalsList.length > 3"
+          v-if="equipmentList.length > 3"
           class="px-2 py-1 bg-gray-100 text-gray-700 rounded text-xs"
         >
-          +{{ goalsList.length - 3 }} more
+          +{{ equipmentList.length - 3 }} more
         </span>
       </div>
     </div>
@@ -195,19 +193,16 @@ const showMenu = ref(false);
 
 // Computed
 const totalExercises = computed(() => {
-  return (props.program.sessions || []).reduce((total, session) => {
-    return total + (session.exercises ? session.exercises.length : 0);
-  }, 0);
+  return props.program.exercises ? props.program.exercises.length : 0;
 });
 
-const assignedCount = computed(() => {
-  // TODO: Get actual assigned count from backend
-  return props.program.assigned_count || 0;
+const equipmentCount = computed(() => {
+  return equipmentList.value.length;
 });
 
-const goalsList = computed(() => {
-  if (!props.program.goals) return [];
-  return props.program.goals.split(",").map(goal => goal.trim());
+const equipmentList = computed(() => {
+  if (!props.program.equipment_needed) return [];
+  return props.program.equipment_needed.split(",").map(equipment => equipment.trim()).filter(Boolean);
 });
 
 // Methods

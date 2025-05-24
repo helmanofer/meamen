@@ -3,14 +3,14 @@ import api from "../services/api";
 
 export const useProgramsStore = defineStore("programs", {
   state: () => ({
-    programs: [], // These will be training session templates
+    programs: [], // These will be session templates
     programDetail: null,
     loading: false,
     error: null,
     filters: {
       search: "",
       difficulty: "",
-      duration: "",
+      category: "",
     },
     pagination: {
       page: 1,
@@ -21,26 +21,26 @@ export const useProgramsStore = defineStore("programs", {
 
   getters: {
     filteredPrograms: (state) => {
-      // Transform training sessions to program format
-      let filtered = state.programs.map(session => {
-        let parsedData = {};
+      // Session templates are already in the right format
+      let filtered = state.programs.map(template => {
+        let workoutStructure = [];
         try {
-          parsedData = session.description ? JSON.parse(session.description) : {};
+          workoutStructure = template.workout_structure ? JSON.parse(template.workout_structure) : [];
         } catch (e) {
-          parsedData = { description: session.description || "" };
+          workoutStructure = [];
         }
         
         return {
-          id: session.id,
-          name: session.name,
-          description: parsedData.description || session.description || "",
-          difficulty: parsedData.difficulty || "",
-          duration_weeks: parsedData.duration_weeks || null,
-          goals: parsedData.goals || "",
-          exercises: parsedData.exercises || [],
-          created_at: session.created_at,
-          trainee_id: session.trainee_id,
-          trainer_id: session.trainer_id
+          id: template.id,
+          name: template.name,
+          description: template.description || "",
+          difficulty: template.difficulty || "",
+          category: template.category || "",
+          duration_minutes: template.duration_minutes || null,
+          equipment_needed: template.equipment_needed || "",
+          exercises: workoutStructure,
+          notes: template.notes || "",
+          created_at: template.created_at
         };
       });
       
@@ -58,9 +58,9 @@ export const useProgramsStore = defineStore("programs", {
         );
       }
       
-      if (state.filters.duration) {
+      if (state.filters.category) {
         filtered = filtered.filter(program => 
-          program.duration_weeks === parseInt(state.filters.duration)
+          program.category === state.filters.category
         );
       }
       
@@ -72,32 +72,18 @@ export const useProgramsStore = defineStore("programs", {
     // Get unique values for filter options
     difficulties: (state) => {
       const difficulties = state.programs
-        .map(session => {
-          try {
-            const parsedData = session.description ? JSON.parse(session.description) : {};
-            return parsedData.difficulty;
-          } catch (e) {
-            return null;
-          }
-        })
+        .map(template => template.difficulty)
         .filter(Boolean)
         .filter((value, index, self) => self.indexOf(value) === index);
       return difficulties.sort();
     },
     
-    durations: (state) => {
-      const durations = state.programs
-        .map(session => {
-          try {
-            const parsedData = session.description ? JSON.parse(session.description) : {};
-            return parsedData.duration_weeks;
-          } catch (e) {
-            return null;
-          }
-        })
+    categories: (state) => {
+      const categories = state.programs
+        .map(template => template.category)
         .filter(Boolean)
         .filter((value, index, self) => self.indexOf(value) === index);
-      return durations.sort((a, b) => a - b);
+      return categories.sort();
     }
   },
 
@@ -112,7 +98,7 @@ export const useProgramsStore = defineStore("programs", {
           limit: this.pagination.limit,
         };
 
-        const response = await api.getSessions(params);
+        const response = await api.getSessionTemplates(params);
         
         // Handle different API response structures
         if (Array.isArray(response.data)) {
@@ -126,8 +112,8 @@ export const useProgramsStore = defineStore("programs", {
           this.pagination.total = 0;
         }
       } catch (error) {
-        this.error = error.response?.data?.detail || "Failed to fetch programs";
-        console.error("Error fetching programs:", error);
+        this.error = error.response?.data?.detail || "Failed to fetch session templates";
+        console.error("Error fetching session templates:", error);
         this.programs = [];
       } finally {
         this.loading = false;
@@ -140,11 +126,33 @@ export const useProgramsStore = defineStore("programs", {
       this.programDetail = null;
 
       try {
-        const response = await api.getSession(id);
-        this.programDetail = response.data;
+        const response = await api.getSessionTemplate(id);
+        const template = response.data;
+        
+        // Transform the template data to match our expected format
+        let workoutStructure = [];
+        try {
+          workoutStructure = template.workout_structure ? JSON.parse(template.workout_structure) : [];
+        } catch (e) {
+          workoutStructure = [];
+        }
+        
+        this.programDetail = {
+          id: template.id,
+          name: template.name,
+          description: template.description || "",
+          difficulty: template.difficulty || "",
+          category: template.category || "",
+          duration_minutes: template.duration_minutes || null,
+          equipment_needed: template.equipment_needed || "",
+          exercises: workoutStructure,
+          notes: template.notes || "",
+          created_at: template.created_at,
+          updated_at: template.updated_at
+        };
       } catch (error) {
-        this.error = error.response?.data?.detail || "Failed to fetch session details";
-        console.error("Error fetching session details:", error);
+        this.error = error.response?.data?.detail || "Failed to fetch session template details";
+        console.error("Error fetching session template details:", error);
       } finally {
         this.loading = false;
       }
@@ -155,26 +163,19 @@ export const useProgramsStore = defineStore("programs", {
       this.error = null;
 
       try {
-        // Transform program data to training session format
-        const sessionData = {
-          trainee_id: 0, // Use 0 for template sessions (not assigned to specific trainee)
-          trainer_id: 1, // TODO: Get from auth store
+        // Transform program data to session template format
+        const templateData = {
           name: programData.name,
           description: programData.description || null,
-          scheduled_time: null, // Templates don't have scheduled times
-          // Store additional program data in description as JSON
-          ...(programData.difficulty || programData.goals || programData.duration_weeks ? {
-            description: JSON.stringify({
-              description: programData.description || "",
-              difficulty: programData.difficulty,
-              goals: programData.goals,
-              duration_weeks: programData.duration_weeks,
-              exercises: programData.exercises || []
-            })
-          } : {})
+          category: programData.category || null,
+          difficulty: programData.difficulty || null,
+          duration_minutes: programData.duration_minutes || null,
+          equipment_needed: programData.equipment_needed || null,
+          workout_structure: programData.exercises ? JSON.stringify(programData.exercises) : null,
+          notes: programData.notes || null
         };
 
-        const response = await api.createSession(sessionData);
+        const response = await api.createSessionTemplate(templateData);
         this.programs.push(response.data);
         return response.data;
       } catch (error) {
@@ -191,19 +192,19 @@ export const useProgramsStore = defineStore("programs", {
       this.error = null;
 
       try {
-        // Transform program data to training session format
-        const sessionData = {
+        // Transform program data to session template format
+        const templateData = {
           name: programData.name,
-          description: JSON.stringify({
-            description: programData.description || "",
-            difficulty: programData.difficulty,
-            goals: programData.goals,
-            duration_weeks: programData.duration_weeks,
-            exercises: programData.exercises || []
-          })
+          description: programData.description || null,
+          category: programData.category || null,
+          difficulty: programData.difficulty || null,
+          duration_minutes: programData.duration_minutes || null,
+          equipment_needed: programData.equipment_needed || null,
+          workout_structure: programData.exercises ? JSON.stringify(programData.exercises) : null,
+          notes: programData.notes || null
         };
 
-        const response = await api.updateSession(id, sessionData);
+        const response = await api.updateSessionTemplate(id, templateData);
         const index = this.programs.findIndex(p => p.id === id);
         if (index !== -1) {
           this.programs[index] = response.data;
@@ -226,7 +227,7 @@ export const useProgramsStore = defineStore("programs", {
       this.error = null;
 
       try {
-        await api.deleteSession(id);
+        await api.deleteSessionTemplate(id);
         this.programs = this.programs.filter(p => p.id !== id);
         return true;
       } catch (error) {
@@ -246,7 +247,7 @@ export const useProgramsStore = defineStore("programs", {
       this.filters = {
         search: "",
         difficulty: "",
-        duration: "",
+        category: "",
       };
     },
 

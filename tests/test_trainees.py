@@ -15,11 +15,11 @@ def get_auth_token():
         "/auth/jwt/login", data={"username": email, "password": password}
     )
     assert response.status_code == 200
-    return response.json()["access_token"], email
+    return response.json()["access_token"]
 
 
 def test_create_and_list_trainees():
-    token, email = get_auth_token()
+    token = get_auth_token()
     headers = {"Authorization": f"Bearer {token}"}
     # Create trainee
     trainee_data = {

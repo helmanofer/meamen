@@ -10,6 +10,7 @@ from meamen.models import (
     trainee, # noqa: F401  # pyright: ignore[reportUnusedImport]
     trainer, # noqa: F401  # pyright: ignore[reportUnusedImport]
     training_session, # noqa: F401  # pyright: ignore[reportUnusedImport]
+    session_template, # noqa: F401  # pyright: ignore[reportUnusedImport]
     user, # noqa: F401  # pyright: ignore[reportUnusedImport]
 )
 

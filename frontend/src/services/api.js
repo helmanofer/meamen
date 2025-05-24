@@ -122,6 +122,23 @@ export default {
     return axios.delete(`/training-sessions/${id}`);
   },
 
+  // Session templates endpoints
+  getSessionTemplates(params) {
+    return axios.get("/session-templates/", { params });
+  },
+  getSessionTemplate(id) {
+    return axios.get(`/session-templates/${id}`);
+  },
+  createSessionTemplate(templateData) {
+    return axios.post("/session-templates/", templateData);
+  },
+  updateSessionTemplate(id, templateData) {
+    return axios.put(`/session-templates/${id}`, templateData);
+  },
+  deleteSessionTemplate(id) {
+    return axios.delete(`/session-templates/${id}`);
+  },
+
   // Session records endpoints
   getSessionRecords(params) {
     return axios.get("/session-records", { params });
@@ -136,16 +153,6 @@ export default {
     return axios.put(`/session-records/${id}`, recordData);
   },
 
-  // Messages endpoints
-  getMessages(params) {
-    return axios.get("/messages", { params });
-  },
-  sendMessage(messageData) {
-    return axios.post("/messages", messageData);
-  },
-  markMessageRead(id) {
-    return axios.patch(`/messages/${id}/read`);
-  },
 
   // Notifications endpoints
   getNotifications() {

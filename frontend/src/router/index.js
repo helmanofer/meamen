@@ -49,6 +49,14 @@ const routes = [
     },
   },
   {
+    path: "/trainees/add",
+    name: "AddTrainee",
+    component: () => import("../views/trainees/AddTraineeView.vue"),
+    meta: {
+      requiresAuth: true,
+    },
+  },
+  {
     path: "/trainees/:id",
     name: "TraineeDetail",
     component: () => import("../views/trainees/TraineeDetailView.vue"),
@@ -132,14 +140,6 @@ const routes = [
     path: "/calendar",
     name: "Calendar",
     component: () => import("../views/CalendarView.vue"),
-    meta: {
-      requiresAuth: true,
-    },
-  },
-  {
-    path: "/messages",
-    name: "Messages",
-    component: () => import("../views/MessagesView.vue"),
     meta: {
       requiresAuth: true,
     },
