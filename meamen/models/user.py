@@ -1,17 +1,15 @@
 from uuid import uuid4
-from sqlalchemy import Column, String, Boolean
-from sqlalchemy.dialects.postgresql import UUID as PG_UUID
-from sqlalchemy.orm import declarative_base
+from typing import Optional
+from sqlmodel import SQLModel, Field
 
-Base = declarative_base()
+def uuid4_str():
+    return str(uuid4())
 
-
-class User(Base):
-    __tablename__ = "user"
-    id = Column(PG_UUID(as_uuid=True), primary_key=True, default=uuid4, index=True)
-    email = Column(String, unique=True, nullable=False, index=True)
-    hashed_password = Column(String, nullable=False)
-    is_active = Column(Boolean, default=True)
-    is_superuser = Column(Boolean, default=False)
-    is_verified = Column(Boolean, default=False)
-    # avatar_url = Column(Text, nullable=True)
+class User(SQLModel, table=True):
+    id: Optional[str] = Field(default_factory=uuid4_str, primary_key=True, index=True)
+    email: str = Field(index=True, unique=True, nullable=False)
+    hashed_password: str = Field(nullable=False)
+    is_active: bool = Field(default=True)
+    is_superuser: bool = Field(default=False)
+    is_verified: bool = Field(default=False)
+    # avatar_url: Optional[str] = Field(default=None, nullable=True)
