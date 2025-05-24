@@ -1,7 +1,7 @@
 <template>
-  <div class="flex h-screen">
+  <div class="flex h-screen overflow-hidden">
     <!-- Sidebar Navigation (hidden on mobile) -->
-    <aside class="hidden md:flex md:w-64 bg-white shadow-md flex-col">
+    <aside class="hidden lg:flex lg:w-64 bg-white shadow-md flex-col border-r border-gray-200">
       <div class="p-4 border-b">
         <h1 class="text-xl font-bold text-primary-blue">
           Meamen
@@ -184,7 +184,7 @@
       <header class="bg-white shadow-sm">
         <div class="flex items-center justify-between p-4">
           <!-- Mobile Menu Button -->
-          <button class="md:hidden rounded-md p-2 hover:bg-light-blue">
+          <button class="lg:hidden rounded-md p-2 hover:bg-light-blue">
             <svg
               xmlns="http://www.w3.org/2000/svg"
               class="h-6 w-6"
@@ -201,34 +201,32 @@
             </svg>
           </button>
           
-          <div class="md:hidden">
+          <div class="lg:hidden">
             <h1 class="text-xl font-bold text-primary-blue">
               Meamen
             </h1>
           </div>
 
           <!-- Search Bar (hidden on small screens) -->
-          <div class="hidden md:flex items-center flex-1 mx-4">
-            <div class="relative w-full max-w-md">
+          <div class="hidden lg:flex flex-1 mx-4">
+            <div class="search-container">
               <input 
                 type="text" 
                 placeholder="Search..." 
-                class="w-full pl-10 pr-4 py-2 rounded-md border border-medium-gray focus:outline-none focus:ring-2 focus:ring-primary-blue"
+                class="search-input"
               >
-              <div class="absolute left-3 top-2.5">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  class="h-5 w-5 text-medium-gray"
-                  viewBox="0 0 20 20"
-                  fill="currentColor"
-                >
-                  <path
-                    fill-rule="evenodd"
-                    d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z"
-                    clip-rule="evenodd"
-                  />
-                </svg>
-              </div>
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                class="search-icon"
+                viewBox="0 0 20 20"
+                fill="currentColor"
+              >
+                <path
+                  fill-rule="evenodd"
+                  d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z"
+                  clip-rule="evenodd"
+                />
+              </svg>
             </div>
           </div>
 
@@ -262,10 +260,10 @@
                   alt="Profile"
                   class="h-8 w-8 rounded-full object-cover"
                 >
-                <span class="hidden md:block ml-2">John Doe</span>
+                <span class="hidden lg:block ml-2">John Doe</span>
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
-                  class="hidden md:block h-5 w-5 ml-1"
+                  class="hidden lg:block h-5 w-5 ml-1"
                   viewBox="0 0 20 20"
                   fill="currentColor"
                 >
@@ -283,8 +281,10 @@
       </header>
 
       <!-- Page Content -->
-      <main class="flex-1 overflow-y-auto bg-light-gray p-4">
-        <slot />
+      <main class="flex-1 overflow-y-auto bg-light-gray p-2 sm:p-4 lg:p-6">
+        <div class="max-w-7xl mx-auto">
+          <slot />
+        </div>
       </main>
     </div>
   </div>
