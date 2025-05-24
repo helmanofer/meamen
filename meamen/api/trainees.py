@@ -4,17 +4,17 @@ from typing import List
 from meamen.db.session import get_session
 from meamen.models.trainee import Trainee
 from meamen.schemas.trainee import (
-    TraineeCreate, 
-    TraineeRead, 
-    TraineeUpdate, 
-    MeasurementRecord, 
+    TraineeCreate,
+    TraineeRead,
+    TraineeUpdate,
+    MeasurementRecord,
     ProgressPhoto
 )
 from meamen.crud.trainee import (
-    get_trainees, 
-    get_trainee_by_id, 
-    create_trainee, 
-    update_trainee, 
+    get_trainees,
+    get_trainee_by_id,
+    create_trainee,
+    update_trainee,
     delete_trainee,
     add_measurement_record,
     add_progress_photo
@@ -50,10 +50,11 @@ async def read_trainee(
     return trainee
 
 
-@router.post("/", response_model=TraineeRead)
+
+@router.post("/", response_model=TraineeRead, status_code=status.HTTP_201_CREATED)
 async def add_trainee(
-    trainee: TraineeCreate, 
-    trainer_id: int, 
+    trainee: TraineeCreate,
+    trainer_id: int,
     session: AsyncSession = Depends(get_session)
 ):
     """Create a new trainee"""

@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, status
 from sqlmodel import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from typing import List, Any
@@ -24,7 +24,7 @@ async def read_trainers(
     return await get_trainers(session, skip, limit)
 
 
-@router.post("/", response_model=TrainerRead)
+@router.post("/", response_model=TrainerRead, status_code=status.HTTP_201_CREATED)
 async def add_trainer(trainer: TrainerCreate, session: AsyncSession = Depends(get_session)):
     db_trainer = Trainer(**trainer.model_dump())
     return await create_trainer(session, db_trainer)
