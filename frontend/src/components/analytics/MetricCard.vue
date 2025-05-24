@@ -7,18 +7,31 @@
           class="rounded-full p-3"
           :class="iconClasses"
         >
-          <component :is="iconComponent" class="h-6 w-6" />
+          <component
+            :is="iconComponent"
+            class="h-6 w-6"
+          />
         </div>
         
         <div>
-          <h3 class="text-sm font-medium text-medium-gray">{{ title }}</h3>
+          <h3 class="text-sm font-medium text-medium-gray">
+            {{ title }}
+          </h3>
           <div class="flex items-baseline space-x-2">
-            <p class="text-2xl font-bold text-dark-gray">{{ formattedValue }}</p>
-            <span v-if="unit" class="text-sm text-medium-gray">{{ unit }}</span>
+            <p class="text-2xl font-bold text-dark-gray">
+              {{ formattedValue }}
+            </p>
+            <span
+              v-if="unit"
+              class="text-sm text-medium-gray"
+            >{{ unit }}</span>
           </div>
           
           <!-- Trend Indicator -->
-          <div v-if="trend" class="flex items-center mt-1">
+          <div
+            v-if="trend"
+            class="flex items-center mt-1"
+          >
             <svg 
               v-if="trend.direction === 'up'" 
               xmlns="http://www.w3.org/2000/svg" 
@@ -26,7 +39,11 @@
               viewBox="0 0 20 20" 
               fill="currentColor"
             >
-              <path fill-rule="evenodd" d="M3.293 9.707a1 1 0 010-1.414l6-6a1 1 0 011.414 0l6 6a1 1 0 01-1.414 1.414L10 4.414 4.707 9.707a1 1 0 01-1.414 0z" clip-rule="evenodd" />
+              <path
+                fill-rule="evenodd"
+                d="M3.293 9.707a1 1 0 010-1.414l6-6a1 1 0 011.414 0l6 6a1 1 0 01-1.414 1.414L10 4.414 4.707 9.707a1 1 0 01-1.414 0z"
+                clip-rule="evenodd"
+              />
             </svg>
             <svg 
               v-else-if="trend.direction === 'down'" 
@@ -35,7 +52,11 @@
               viewBox="0 0 20 20" 
               fill="currentColor"
             >
-              <path fill-rule="evenodd" d="M16.707 10.293a1 1 0 010 1.414l-6 6a1 1 0 01-1.414 0l-6-6a1 1 0 111.414-1.414L10 15.586l5.293-5.293a1 1 0 011.414 0z" clip-rule="evenodd" />
+              <path
+                fill-rule="evenodd"
+                d="M16.707 10.293a1 1 0 010 1.414l-6 6a1 1 0 01-1.414 0l-6-6a1 1 0 111.414-1.414L10 15.586l5.293-5.293a1 1 0 011.414 0z"
+                clip-rule="evenodd"
+              />
             </svg>
             <svg 
               v-else 
@@ -44,7 +65,11 @@
               viewBox="0 0 20 20" 
               fill="currentColor"
             >
-              <path fill-rule="evenodd" d="M3 10a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z" clip-rule="evenodd" />
+              <path
+                fill-rule="evenodd"
+                d="M3 10a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z"
+                clip-rule="evenodd"
+              />
             </svg>
             
             <span 
@@ -62,19 +87,28 @@
       </div>
 
       <!-- Right Section - Action Button -->
-      <div v-if="actionButton" class="flex-shrink-0">
+      <div
+        v-if="actionButton"
+        class="flex-shrink-0"
+      >
         <button
-          @click="$emit('action')"
           class="p-2 text-medium-gray hover:text-primary-blue hover:bg-light-blue rounded-md transition-colors"
           :title="actionButton.tooltip"
+          @click="$emit('action')"
         >
-          <component :is="actionButton.icon" class="h-5 w-5" />
+          <component
+            :is="actionButton.icon"
+            class="h-5 w-5"
+          />
         </button>
       </div>
     </div>
 
     <!-- Progress Bar (optional) -->
-    <div v-if="progress" class="mt-4">
+    <div
+      v-if="progress"
+      class="mt-4"
+    >
       <div class="flex justify-between text-xs text-medium-gray mb-1">
         <span>{{ progress.label }}</span>
         <span>{{ progress.current }} / {{ progress.target }}</span>
@@ -84,12 +118,15 @@
           class="h-2 rounded-full transition-all duration-300"
           :class="progressBarColor"
           :style="{ width: `${progressPercentage}%` }"
-        ></div>
+        />
       </div>
     </div>
 
     <!-- Mini Chart (optional) -->
-    <div v-if="chartData" class="mt-4">
+    <div
+      v-if="chartData"
+      class="mt-4"
+    >
       <MiniChart 
         :data="chartData" 
         :type="chartType"
@@ -98,8 +135,13 @@
     </div>
 
     <!-- Additional Info -->
-    <div v-if="subtitle" class="mt-3 pt-3 border-t border-gray-100">
-      <p class="text-xs text-medium-gray">{{ subtitle }}</p>
+    <div
+      v-if="subtitle"
+      class="mt-3 pt-3 border-t border-gray-100"
+    >
+      <p class="text-xs text-medium-gray">
+        {{ subtitle }}
+      </p>
     </div>
   </div>
 </template>

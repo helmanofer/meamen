@@ -1,5 +1,8 @@
 <template>
-  <div class="mini-chart" :style="{ height: `${height}px` }">
+  <div
+    class="mini-chart"
+    :style="{ height: `${height}px` }"
+  >
     <svg 
       :width="width" 
       :height="height" 
@@ -9,7 +12,10 @@
       <!-- Line Chart -->
       <template v-if="type === 'line'">
         <!-- Grid lines -->
-        <g v-if="showGrid" opacity="0.1">
+        <g
+          v-if="showGrid"
+          opacity="0.1"
+        >
           <line
             v-for="i in 3"
             :key="`h-${i}`"
@@ -53,9 +59,23 @@
         
         <!-- Gradient definition -->
         <defs v-if="showArea">
-          <linearGradient :id="`gradient-${chartId}`" x1="0%" y1="0%" x2="0%" y2="100%">
-            <stop offset="0%" :stop-color="strokeColor" stop-opacity="0.3"/>
-            <stop offset="100%" :stop-color="strokeColor" stop-opacity="0"/>
+          <linearGradient
+            :id="`gradient-${chartId}`"
+            x1="0%"
+            y1="0%"
+            x2="0%"
+            y2="100%"
+          >
+            <stop
+              offset="0%"
+              :stop-color="strokeColor"
+              stop-opacity="0.3"
+            />
+            <stop
+              offset="100%"
+              :stop-color="strokeColor"
+              stop-opacity="0"
+            />
           </linearGradient>
         </defs>
       </template>

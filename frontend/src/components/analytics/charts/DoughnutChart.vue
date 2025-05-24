@@ -1,6 +1,6 @@
 <template>
   <div class="doughnut-chart-container">
-    <canvas ref="chartCanvas"></canvas>
+    <canvas ref="chartCanvas" />
   </div>
 </template>
 
