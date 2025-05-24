@@ -6,10 +6,10 @@ from meamen.api.trainers import router as trainers_router
 from meamen.api.exercise import router as exercise_router
 from meamen.api.training_session import router as training_session_router
 from sqlmodel import SQLModel
-from meamen.db.session import engine
 from fastapi.middleware.cors import CORSMiddleware
 from meamen.middleware.logging import RequestLoggingMiddleware
 from contextlib import asynccontextmanager
+from meamen.db.session import async_engine
 
 # Configure root logger
 logging.basicConfig(
@@ -20,7 +20,7 @@ logging.basicConfig(
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    async with engine.begin() as conn:
+    async with async_engine.begin() as conn:
         await conn.run_sync(SQLModel.metadata.create_all)
     yield
 
