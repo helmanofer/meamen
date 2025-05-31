@@ -196,8 +196,6 @@
         <p class="text-lg text-medium-gray">Select a trainee to view their workout.</p>
       </div>
 
-      <div
-        v-if="!activeTraineeWorkout && Object.keys(workoutStore.activeWorkout).length === 0 && selectedTrainees.length === 0"
       <!-- No Active Workout State (Original message, shown if no workouts active at all AND no selection process happening) -->
       <div
         v-if="!activeTraineeWorkout && Object.keys(workoutStore.activeWorkout).length === 0 && selectedTrainees.length === 0"
@@ -221,14 +219,9 @@
           No active workout
         </h3>
         <p class="text-medium-gray mb-4">
-          Select a session template to start your workout
+          Select trainees and assign plans above to start a session, or select an active trainee.
         </p>
-        <router-link
-          to="/programs"
-          class="btn btn-primary"
-        >
-          Browse Session Templates
-        </router-link>
+        <!-- Removed router-link to /programs -->
       </div>
 
       <!-- Active Workout (for currentTraineeId) -->
@@ -275,12 +268,13 @@
         </div>
 
         <!-- Rest Timer -->
+        <!-- Global rest timer for now -->
         <RestTimer
-          v-if="workoutStore.restTimer.isActive" <!-- Global rest timer for now -->
+          v-if="workoutStore.restTimer.isActive"
           :duration="workoutStore.restTimer.duration"
           :remaining="workoutStore.restTimer.remaining"
-          @pause="workoutStore.pauseRestTimer" <!-- Global -->
-          @reset="workoutStore.resetRestTimer" <!-- Global -->
+          @pause="workoutStore.pauseRestTimer"
+          @reset="workoutStore.resetRestTimer"
         />
       </div>
     </main>
