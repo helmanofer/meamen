@@ -620,43 +620,6 @@ const loadWorkoutFromRoute = async () => {
   }
   */
 };
-    } else {
-      return;
-    }
-  }
-  router.push("/dashboard");
-};
-
-const loadWorkoutFromRoute = async () => {
-  const templateId = route.params.templateId;
-  if (templateId && !workoutStore.activeWorkout) {
-    try {
-      // Load session template and start workout
-      await programsStore.fetchProgramDetail(templateId);
-      if (programsStore.programDetail) {
-        // Parse the session template data
-        let parsedData = {};
-        try {
-          parsedData = JSON.parse(programsStore.programDetail.description || '{}');
-        } catch (e) {
-          parsedData = {};
-        }
-
-        const sessionTemplate = {
-          id: programsStore.programDetail.id,
-          name: programsStore.programDetail.name,
-          description: parsedData.description || "",
-          exercises: parsedData.exercises || []
-        };
-
-        await workoutStore.startWorkout(sessionTemplate);
-      }
-    } catch (error) {
-      console.error("Failed to load workout template:", error);
-      router.push("/programs");
-    }
-  }
-};
 
 // Lifecycle
 onMounted(async () => {
