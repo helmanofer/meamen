@@ -626,49 +626,43 @@ const currentTraineeAssignedPrograms = computed(() => traineesStore.currentTrain
 const assignedPrograms = computed(() => {
   if (!currentTraineeAssignedPrograms.value || currentTraineeAssignedPrograms.value.length === 0) return [];
   
-  return currentTraineeAssignedPrograms.value.map(program => {
-    // Assuming the API now returns programs with assignment details nested
-    // and workout_structure is already part of the program object or needs parsing.
-    // Adjust this transformation based on the actual structure of data from fetchTraineePrograms.
-    
-    let workoutStructure = [];
-    if (program.workout_structure && typeof program.workout_structure === 'string') {
-      try {
-        workoutStructure = JSON.parse(program.workout_structure);
-      } catch (e) {
-        console.error('Error parsing workout_structure for program:', program.id, e);
-        workoutStructure = [];
-      }
-    } else if (Array.isArray(program.workout_structure)) {
-      workoutStructure = program.workout_structure;
+  return currentTraineeAssignedPrograms.value.map(assignment_item => {
+    if (!assignment_item || !assignment_item.program) {
+      // If assignment_item or its nested program is null/undefined, filter it out.
+      return null;
     }
 
-    // Ensure 'assignment' object exists, as the template uses program.assignment.assigned_at etc.
-    // If the API returns assignment details at the top level of the program object,
-    // or if it's already nested as 'assignment', this might need adjustment.
-    // For this example, let's assume the backend for getTraineePrograms returns
-    // program objects that include an `assignment` sub-object.
-    // If not, we might need to synthesize it or adjust the template.
-    // Example: if assignment details are top-level:
-    // const assignmentDetails = { assigned_at: program.assigned_at, status: program.assignment_status };
+    const programDetails = assignment_item.program;
+    let parsedWorkoutStructure = [];
+
+    if (programDetails.workout_structure && typeof programDetails.workout_structure === 'string') {
+      try {
+        parsedWorkoutStructure = JSON.parse(programDetails.workout_structure);
+      } catch (e) {
+        console.error('Error parsing workout_structure for program:', programDetails.id, e);
+        parsedWorkoutStructure = []; // Default to empty array on parsing error
+      }
+    } else if (Array.isArray(programDetails.workout_structure)) {
+      parsedWorkoutStructure = programDetails.workout_structure;
+    }
 
     return {
-      id: program.id,
-      name: program.name || "Unnamed Program",
-      description: program.description || "",
-      difficulty: program.difficulty || "",
-      category: program.category || "",
-      duration_minutes: program.duration_minutes || null,
-      equipment_needed: program.equipment_needed || "",
-      exercises: workoutStructure,
-      notes: program.notes || "",
-      // Assuming program object from currentTraineeAssignedPrograms includes an 'assignment' object
-      // If 'assignment' details are directly on the program object, adjust accordingly.
-      // e.g., assignment: { assigned_at: program.assigned_at, status: program.status }
-      // For now, let's expect program.assignment to exist as per the original template structure.
-      assignment: program.assignment || { assigned_at: new Date().toISOString(), status: 'active' } // Fallback if not provided
+      id: programDetails.id,
+      name: programDetails.name || "Unnamed Program",
+      description: programDetails.description || "",
+      difficulty: programDetails.difficulty || "",
+      category: programDetails.category || "",
+      duration_minutes: programDetails.duration_minutes || null,
+      equipment_needed: programDetails.equipment_needed || "",
+      exercises: parsedWorkoutStructure,
+      notes: programDetails.notes || "", // Program notes
+      assignment: {
+        assigned_at: assignment_item.assigned_at || new Date().toISOString(), // Fallback for assigned_at
+        status: assignment_item.status || "active", // Fallback for status
+        // notes: assignment_item.notes // Include if assignment has its own notes field
+      }
     };
-  }).filter(Boolean);
+  }).filter(Boolean); // filter(Boolean) removes any null items from the array
 });
 
 // Get next session for this trainee
