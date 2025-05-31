@@ -762,7 +762,7 @@ const editProfile = () => {
   showEditModal.value = true;
 };
 
-const handleTraineeUpdated = () => {
+const handleTraineeUpdated = async () => {
   // Refresh trainee data after update
   const traineeId = route.params.id;
   if (traineeId) {
