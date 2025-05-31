@@ -18,7 +18,8 @@ export const useTraineesStore = defineStore("trainees", {
       page: 1,
       limit: 10,
       total: 0
-    }
+    },
+    currentTraineeAssignedPrograms: []
   }),
 
   getters: {
@@ -294,14 +295,17 @@ export const useTraineesStore = defineStore("trainees", {
     async fetchTraineePrograms(traineeId) {
       this.loading = true;
       this.error = null;
+      this.currentTraineeAssignedPrograms = [];
 
       try {
         const trainerId = 1; // Default trainer ID
         const response = await api.getTraineePrograms(traineeId, trainerId);
+        this.currentTraineeAssignedPrograms = response.data;
         return response.data;
       } catch (error) {
         this.error = error.response?.data?.detail || "Failed to fetch trainee programs";
         console.error("Error fetching trainee programs:", error);
+        this.currentTraineeAssignedPrograms = []; // Also clear on error
         throw error;
       } finally {
         this.loading = false;

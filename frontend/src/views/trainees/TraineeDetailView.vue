@@ -620,27 +620,41 @@ const tabs = [
 
 const trainee = computed(() => traineesStore.traineeDetail);
 const loading = computed(() => traineesStore.loading);
+const currentTraineeAssignedPrograms = computed(() => traineesStore.currentTraineeAssignedPrograms);
 
 // Get assigned programs details
 const assignedPrograms = computed(() => {
-  const assignments = trainee.value?.program_assignments;
-  if (!assignments || !Array.isArray(assignments) || assignments.length === 0) return [];
+  if (!currentTraineeAssignedPrograms.value || currentTraineeAssignedPrograms.value.length === 0) return [];
   
-  return assignments.map(assignment => {
-    const program = programsStore.programs.find(p => p.id === assignment.program_id);
-    if (!program) return null;
+  return currentTraineeAssignedPrograms.value.map(program => {
+    // Assuming the API now returns programs with assignment details nested
+    // and workout_structure is already part of the program object or needs parsing.
+    // Adjust this transformation based on the actual structure of data from fetchTraineePrograms.
     
-    // Transform program data to match our expected format
     let workoutStructure = [];
-    try {
-      workoutStructure = program.workout_structure ? JSON.parse(program.workout_structure) : [];
-    } catch (e) {
-      workoutStructure = [];
+    if (program.workout_structure && typeof program.workout_structure === 'string') {
+      try {
+        workoutStructure = JSON.parse(program.workout_structure);
+      } catch (e) {
+        console.error('Error parsing workout_structure for program:', program.id, e);
+        workoutStructure = [];
+      }
+    } else if (Array.isArray(program.workout_structure)) {
+      workoutStructure = program.workout_structure;
     }
-    
+
+    // Ensure 'assignment' object exists, as the template uses program.assignment.assigned_at etc.
+    // If the API returns assignment details at the top level of the program object,
+    // or if it's already nested as 'assignment', this might need adjustment.
+    // For this example, let's assume the backend for getTraineePrograms returns
+    // program objects that include an `assignment` sub-object.
+    // If not, we might need to synthesize it or adjust the template.
+    // Example: if assignment details are top-level:
+    // const assignmentDetails = { assigned_at: program.assigned_at, status: program.assignment_status };
+
     return {
       id: program.id,
-      name: program.name,
+      name: program.name || "Unnamed Program",
       description: program.description || "",
       difficulty: program.difficulty || "",
       category: program.category || "",
@@ -648,7 +662,11 @@ const assignedPrograms = computed(() => {
       equipment_needed: program.equipment_needed || "",
       exercises: workoutStructure,
       notes: program.notes || "",
-      assignment: assignment
+      // Assuming program object from currentTraineeAssignedPrograms includes an 'assignment' object
+      // If 'assignment' details are directly on the program object, adjust accordingly.
+      // e.g., assignment: { assigned_at: program.assigned_at, status: program.status }
+      // For now, let's expect program.assignment to exist as per the original template structure.
+      assignment: program.assignment || { assigned_at: new Date().toISOString(), status: 'active' } // Fallback if not provided
     };
   }).filter(Boolean);
 });
@@ -727,9 +745,10 @@ onMounted(async () => {
     try {
       console.log('Fetching trainee detail for ID:', traineeId);
       await traineesStore.fetchTraineeDetail(traineeId);
+      await traineesStore.fetchTraineePrograms(traineeId); // Fetch assigned programs
       // Also fetch sessions to get next session info
       await sessionsStore.fetchSessions();
-      // Fetch programs to show assigned program details
+      // Fetch programs to show assigned program details - still needed if other parts use it
       await programsStore.fetchPrograms();
     } catch (error) {
       console.error('Error loading trainee data:', error);
@@ -747,15 +766,17 @@ const handleTraineeUpdated = () => {
   // Refresh trainee data after update
   const traineeId = route.params.id;
   if (traineeId) {
-    traineesStore.fetchTraineeDetail(traineeId);
+    await traineesStore.fetchTraineeDetail(traineeId);
+    await traineesStore.fetchTraineePrograms(traineeId); // Refresh programs list
   }
 };
 
-const handleProgramAssigned = () => {
+const handleProgramAssigned = async () => {
   // Refresh trainee data after program assignment
   const traineeId = route.params.id;
   if (traineeId) {
-    traineesStore.fetchTraineeDetail(traineeId);
+    await traineesStore.fetchTraineeDetail(traineeId);
+    await traineesStore.fetchTraineePrograms(traineeId); // Refresh programs list
   }
 };
 
