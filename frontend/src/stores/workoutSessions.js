@@ -1,15 +1,12 @@
 import { defineStore } from "pinia";
 import api from "../services/api";
+// import { useAuthStore } from './auth'; // TODO: Uncomment and ensure this path is correct
 
 export const useWorkoutSessionsStore = defineStore("workoutSessions", {
   state: () => ({
-    activeWorkout: null,
+    activeWorkout: {}, // Changed from null to {}
     workoutHistory: [],
-    currentExerciseIndex: 0,
-    currentSetIndex: 0,
-    isWorkoutActive: false,
-    workoutStartTime: null,
-    exerciseStartTime: null,
+    // currentExerciseIndex, currentSetIndex, isWorkoutActive, workoutStartTime, exerciseStartTime MOVED to activeWorkout[traineeId]
     restTimer: {
       isActive: false,
       remaining: 0,
@@ -20,73 +17,81 @@ export const useWorkoutSessionsStore = defineStore("workoutSessions", {
   }),
 
   getters: {
-    currentExercise: (state) => {
-      if (!state.activeWorkout || !state.activeWorkout.exercises) return null;
-      return state.activeWorkout.exercises[state.currentExerciseIndex] || null;
+    currentExercise: (state) => (traineeId) => {
+      const traineeWorkout = state.activeWorkout[traineeId];
+      if (!traineeWorkout || !traineeWorkout.exercises) return null;
+      return traineeWorkout.exercises[traineeWorkout.currentExerciseIndex] || null;
     },
 
-    currentSet: (state) => {
-      const exercise = state.activeWorkout?.exercises?.[state.currentExerciseIndex];
+    currentSet: (state) => (traineeId) => {
+      const traineeWorkout = state.activeWorkout[traineeId];
+      if (!traineeWorkout) return null;
+      const exercise = traineeWorkout.exercises?.[traineeWorkout.currentExerciseIndex];
       if (!exercise || !exercise.recordedSets) return null;
-      return exercise.recordedSets[state.currentSetIndex] || null;
+      return exercise.recordedSets[traineeWorkout.currentSetIndex] || null;
     },
 
-    workoutProgress: (state) => {
-      if (!state.activeWorkout?.exercises) return 0;
+    workoutProgress: (state) => (traineeId) => {
+      const traineeWorkout = state.activeWorkout[traineeId];
+      if (!traineeWorkout?.exercises) return 0;
       
-      const totalSets = state.activeWorkout.exercises.reduce((total, exercise) => {
+      const totalSets = traineeWorkout.exercises.reduce((total, exercise) => {
         return total + (exercise.sets || 0);
       }, 0);
       
-      const completedSets = state.activeWorkout.exercises.reduce((total, exercise) => {
+      const completedSets = traineeWorkout.exercises.reduce((total, exercise) => {
         return total + (exercise.recordedSets?.filter(set => set.completed).length || 0);
       }, 0);
       
       return totalSets > 0 ? (completedSets / totalSets) * 100 : 0;
     },
 
-    totalExercises: (state) => {
-      return state.activeWorkout?.exercises?.length || 0;
+    totalExercises: (state) => (traineeId) => {
+      const traineeWorkout = state.activeWorkout[traineeId];
+      return traineeWorkout?.exercises?.length || 0;
     },
 
-    completedExercises: (state) => {
-      if (!state.activeWorkout?.exercises) return 0;
-      return state.activeWorkout.exercises.filter(exercise => 
+    completedExercises: (state) => (traineeId) => {
+      const traineeWorkout = state.activeWorkout[traineeId];
+      if (!traineeWorkout?.exercises) return 0;
+      return traineeWorkout.exercises.filter(exercise =>
         exercise.recordedSets?.every(set => set.completed)
       ).length;
     },
 
-    workoutDuration: (state) => {
-      if (!state.workoutStartTime) return 0;
-      return Math.floor((Date.now() - state.workoutStartTime) / 1000);
+    workoutDuration: (state) => (traineeId) => {
+      const traineeWorkout = state.activeWorkout[traineeId];
+      if (!traineeWorkout?.workoutStartTime) return 0;
+      return Math.floor((Date.now() - traineeWorkout.workoutStartTime) / 1000);
     }
   },
 
   actions: {
-    async startWorkout(sessionTemplate) {
+    async startWorkout(sessionTemplate, traineeId) { // Added traineeId
       this.loading = true;
       this.error = null;
 
       try {
         // Initialize workout from session template
-        const workout = {
+        const workoutData = {
           id: sessionTemplate.id,
           name: sessionTemplate.name,
           description: sessionTemplate.description,
           templateId: sessionTemplate.id,
           exercises: this.initializeExercises(sessionTemplate.exercises || []),
           startTime: new Date().toISOString(),
-          status: 'in_progress'
+          status: 'in_progress',
+          // Trainee-specific state
+          currentExerciseIndex: 0,
+          currentSetIndex: 0,
+          isWorkoutActive: true,
+          workoutStartTime: Date.now(),
+          exerciseStartTime: Date.now(),
         };
 
-        this.activeWorkout = workout;
-        this.isWorkoutActive = true;
-        this.workoutStartTime = Date.now();
-        this.currentExerciseIndex = 0;
-        this.currentSetIndex = 0;
-        this.exerciseStartTime = Date.now();
+        this.activeWorkout[traineeId] = workoutData;
 
-        return workout;
+        return workoutData;
       } catch (error) {
         this.error = "Failed to start workout";
         console.error("Error starting workout:", error);
@@ -118,10 +123,11 @@ export const useWorkoutSessionsStore = defineStore("workoutSessions", {
       }));
     },
 
-    completeSet(exerciseIndex, setIndex, setData) {
-      if (!this.activeWorkout?.exercises) return;
+    completeSet(traineeId, exerciseIndex, setIndex, setData) { // Added traineeId
+      const traineeWorkout = this.activeWorkout[traineeId];
+      if (!traineeWorkout?.exercises) return;
 
-      const exercise = this.activeWorkout.exercises[exerciseIndex];
+      const exercise = traineeWorkout.exercises[exerciseIndex];
       if (!exercise?.recordedSets?.[setIndex]) return;
 
       // Update the set with recorded data
@@ -133,17 +139,20 @@ export const useWorkoutSessionsStore = defineStore("workoutSessions", {
       };
 
       // Auto-advance to next set or exercise
-      this.advanceWorkout();
+      this.advanceWorkout(traineeId); // Added traineeId
     },
 
-    advanceWorkout() {
-      const currentExercise = this.currentExercise;
+    advanceWorkout(traineeId) { // Added traineeId
+      const traineeWorkout = this.activeWorkout[traineeId];
+      if (!traineeWorkout) return;
+
+      const currentExercise = this.currentExercise(traineeId); // Needs traineeId
       if (!currentExercise) return;
 
       // Check if there are more sets in current exercise
-      const nextSetIndex = this.currentSetIndex + 1;
+      const nextSetIndex = traineeWorkout.currentSetIndex + 1;
       if (nextSetIndex < currentExercise.recordedSets.length) {
-        this.currentSetIndex = nextSetIndex;
+        traineeWorkout.currentSetIndex = nextSetIndex;
         return;
       }
 
@@ -151,28 +160,29 @@ export const useWorkoutSessionsStore = defineStore("workoutSessions", {
       currentExercise.endTime = new Date().toISOString();
 
       // Move to next exercise
-      const nextExerciseIndex = this.currentExerciseIndex + 1;
-      if (nextExerciseIndex < this.activeWorkout.exercises.length) {
-        this.currentExerciseIndex = nextExerciseIndex;
-        this.currentSetIndex = 0;
-        this.exerciseStartTime = Date.now();
+      const nextExerciseIndex = traineeWorkout.currentExerciseIndex + 1;
+      if (nextExerciseIndex < traineeWorkout.exercises.length) {
+        traineeWorkout.currentExerciseIndex = nextExerciseIndex;
+        traineeWorkout.currentSetIndex = 0;
+        traineeWorkout.exerciseStartTime = Date.now();
         
         // Mark new exercise as started
-        this.activeWorkout.exercises[nextExerciseIndex].startTime = new Date().toISOString();
+        traineeWorkout.exercises[nextExerciseIndex].startTime = new Date().toISOString();
       }
     },
 
-    skipSet(exerciseIndex, setIndex) {
-      if (!this.activeWorkout?.exercises) return;
+    skipSet(traineeId, exerciseIndex, setIndex) { // Added traineeId
+      const traineeWorkout = this.activeWorkout[traineeId];
+      if (!traineeWorkout?.exercises) return;
 
-      const exercise = this.activeWorkout.exercises[exerciseIndex];
+      const exercise = traineeWorkout.exercises[exerciseIndex];
       if (!exercise?.recordedSets?.[setIndex]) return;
 
       exercise.recordedSets[setIndex].completed = true;
       exercise.recordedSets[setIndex].endTime = new Date().toISOString();
       exercise.recordedSets[setIndex].notes = "Skipped";
 
-      this.advanceWorkout();
+      this.advanceWorkout(traineeId); // Added traineeId
     },
 
     startRestTimer(duration) {
@@ -204,45 +214,52 @@ export const useWorkoutSessionsStore = defineStore("workoutSessions", {
       };
     },
 
-    async pauseWorkout() {
-      if (this.activeWorkout) {
-        this.activeWorkout.status = 'paused';
-        this.isWorkoutActive = false;
-        this.resetRestTimer();
+    async pauseWorkout(traineeId) { // Added traineeId
+      const traineeWorkout = this.activeWorkout[traineeId];
+      if (traineeWorkout) {
+        traineeWorkout.status = 'paused';
+        traineeWorkout.isWorkoutActive = false; // Updated for trainee
+        this.resetRestTimer(); // Global timer reset
       }
     },
 
-    async resumeWorkout() {
-      if (this.activeWorkout) {
-        this.activeWorkout.status = 'in_progress';
-        this.isWorkoutActive = true;
+    async resumeWorkout(traineeId) { // Added traineeId
+      const traineeWorkout = this.activeWorkout[traineeId];
+      if (traineeWorkout) {
+        traineeWorkout.status = 'in_progress';
+        traineeWorkout.isWorkoutActive = true; // Updated for trainee
       }
     },
 
-    async completeWorkout() {
-      if (!this.activeWorkout) return;
+    async completeWorkout(traineeId) { // Added traineeId
+      // const authStore = useAuthStore(); // TODO: Import and use actual auth store
+      // const trainerId = authStore.user?.id;
+      const trainerId = 1; // Placeholder for trainer_id
+
+      const traineeWorkout = this.activeWorkout[traineeId];
+      if (!traineeWorkout) return;
 
       this.loading = true;
       this.error = null;
 
       try {
         // Mark workout as completed
-        this.activeWorkout.status = 'completed';
-        this.activeWorkout.endTime = new Date().toISOString();
-        this.activeWorkout.duration = this.workoutDuration;
+        traineeWorkout.status = 'completed';
+        traineeWorkout.endTime = new Date().toISOString();
+        traineeWorkout.duration = this.workoutDuration(traineeId); // Pass traineeId
 
         // Save workout session to backend
         const workoutData = {
-          trainee_id: 1, // TODO: Get from auth store
-          trainer_id: 1, // TODO: Get from auth store  
-          name: `${this.activeWorkout.name} - Completed`,
+          trainee_id: traineeId, // Use passed traineeId
+          trainer_id: trainerId, // TODO: Get from auth store (e.g., useAuthStore().user.id)
+          name: `${traineeWorkout.name} - Completed`,
           description: JSON.stringify({
-            templateId: this.activeWorkout.templateId,
-            exercises: this.activeWorkout.exercises,
-            startTime: this.activeWorkout.startTime,
-            endTime: this.activeWorkout.endTime,
-            duration: this.activeWorkout.duration,
-            summary: this.getWorkoutSummary()
+            templateId: traineeWorkout.templateId,
+            exercises: traineeWorkout.exercises,
+            startTime: traineeWorkout.startTime,
+            endTime: traineeWorkout.endTime,
+            duration: traineeWorkout.duration,
+            summary: this.getWorkoutSummary(traineeId) // Pass traineeId
           }),
           scheduled_time: new Date().toISOString()
         };
@@ -251,12 +268,12 @@ export const useWorkoutSessionsStore = defineStore("workoutSessions", {
         
         // Add to workout history
         this.workoutHistory.unshift({
-          ...this.activeWorkout,
+          ...traineeWorkout, // Use traineeWorkout
           id: response.data.id
         });
 
-        // Reset active workout
-        this.resetWorkout();
+        // Reset active workout for the specific trainee
+        this.resetWorkout(traineeId); // Pass traineeId
 
         return response.data;
       } catch (error) {
@@ -268,53 +285,60 @@ export const useWorkoutSessionsStore = defineStore("workoutSessions", {
       }
     },
 
-    async cancelWorkout() {
-      this.resetWorkout();
+    async cancelWorkout(traineeId) { // Added traineeId
+      this.resetWorkout(traineeId); // Pass traineeId
     },
 
-    resetWorkout() {
-      this.activeWorkout = null;
-      this.isWorkoutActive = false;
-      this.workoutStartTime = null;
-      this.exerciseStartTime = null;
-      this.currentExerciseIndex = 0;
-      this.currentSetIndex = 0;
-      this.resetRestTimer();
+    resetWorkout(traineeId) { // Added traineeId
+      if (this.activeWorkout[traineeId]) {
+        delete this.activeWorkout[traineeId]; // Remove specific trainee's workout
+      }
+      // Global states like isWorkoutActive, workoutStartTime etc. are now part of activeWorkout[traineeId]
+      // So, no need to reset them here individually for the global state.
+      this.resetRestTimer(); // Reset global rest timer
     },
 
-    goToExercise(exerciseIndex) {
-      if (exerciseIndex >= 0 && exerciseIndex < this.totalExercises) {
-        this.currentExerciseIndex = exerciseIndex;
-        this.currentSetIndex = 0;
-        this.exerciseStartTime = Date.now();
+    goToExercise(traineeId, exerciseIndex) { // Added traineeId
+      const traineeWorkout = this.activeWorkout[traineeId];
+      if (!traineeWorkout) return;
+
+      // Use totalExercises getter with traineeId
+      if (exerciseIndex >= 0 && exerciseIndex < this.totalExercises(traineeId)) {
+        traineeWorkout.currentExerciseIndex = exerciseIndex;
+        traineeWorkout.currentSetIndex = 0;
+        traineeWorkout.exerciseStartTime = Date.now();
         
         // Mark exercise as started if not already
-        const exercise = this.activeWorkout.exercises[exerciseIndex];
+        const exercise = traineeWorkout.exercises[exerciseIndex];
         if (!exercise.startTime) {
           exercise.startTime = new Date().toISOString();
         }
       }
     },
 
-    goToSet(setIndex) {
-      const currentExercise = this.currentExercise;
+    goToSet(traineeId, setIndex) { // Added traineeId
+      const traineeWorkout = this.activeWorkout[traineeId];
+      if (!traineeWorkout) return;
+
+      const currentExercise = this.currentExercise(traineeId); // Pass traineeId
       if (currentExercise && setIndex >= 0 && setIndex < currentExercise.recordedSets.length) {
-        this.currentSetIndex = setIndex;
+        traineeWorkout.currentSetIndex = setIndex;
       }
     },
 
-    getWorkoutSummary() {
-      if (!this.activeWorkout?.exercises) return {};
+    getWorkoutSummary(traineeId) { // Added traineeId
+      const traineeWorkout = this.activeWorkout[traineeId];
+      if (!traineeWorkout?.exercises) return {};
 
-      const totalSets = this.activeWorkout.exercises.reduce((total, exercise) => {
+      const totalSets = traineeWorkout.exercises.reduce((total, exercise) => {
         return total + exercise.recordedSets.length;
       }, 0);
 
-      const completedSets = this.activeWorkout.exercises.reduce((total, exercise) => {
+      const completedSets = traineeWorkout.exercises.reduce((total, exercise) => {
         return total + exercise.recordedSets.filter(set => set.completed).length;
       }, 0);
 
-      const totalVolume = this.activeWorkout.exercises.reduce((total, exercise) => {
+      const totalVolume = traineeWorkout.exercises.reduce((total, exercise) => {
         return total + exercise.recordedSets.reduce((exerciseVolume, set) => {
           if (set.completed && set.actualWeight && set.actualReps) {
             return exerciseVolume + (set.actualWeight * set.actualReps);
@@ -324,12 +348,12 @@ export const useWorkoutSessionsStore = defineStore("workoutSessions", {
       }, 0);
 
       return {
-        totalExercises: this.totalExercises,
-        completedExercises: this.completedExercises,
+        totalExercises: this.totalExercises(traineeId), // Pass traineeId
+        completedExercises: this.completedExercises(traineeId), // Pass traineeId
         totalSets,
         completedSets,
         totalVolume,
-        duration: this.workoutDuration
+        duration: this.workoutDuration(traineeId) // Pass traineeId
       };
     },
 

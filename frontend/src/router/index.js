@@ -34,8 +34,8 @@ const routes = [
   },
   {
     path: "/dashboard",
-    name: "Dashboard",
-    component: () => import("../views/DashboardView.vue"),
+    name: "WorkoutSessionDashboard", // Changed name
+    component: () => import("../views/workout/WorkoutSessionView.vue"), // Changed component
     meta: {
       requiresAuth: true,
     },
