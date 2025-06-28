@@ -43,9 +43,9 @@ export const useTraineesStore = defineStore("trainees", {
       this.error = null;
 
       try {
-        // For now, use a default trainer_id of 1
+        // For now, use a default trainer_id (Alex Johnson from seed data)
         // In a real app, this would come from the authenticated user
-        const trainerId = 1;
+        const trainerId = "9d5eb8f5-cdb5-4332-a649-de8fec1c4b83";
         
         const params = {
           skip: (this.pagination.page - 1) * this.pagination.limit,
@@ -73,7 +73,7 @@ export const useTraineesStore = defineStore("trainees", {
       this.traineeDetail = null;
 
       try {
-        const trainerId = 1; // Default trainer ID
+        const trainerId = "9d5eb8f5-cdb5-4332-a649-de8fec1c4b83"; // Default trainer ID (Alex Johnson)
         const response = await api.getTrainee(id, trainerId);
         this.traineeDetail = response.data;
       } catch (error) {
@@ -104,9 +104,9 @@ export const useTraineesStore = defineStore("trainees", {
       this.error = null;
 
       try {
-        // For now, use a default trainer_id of 1
+        // For now, use a default trainer_id (Alex Johnson from seed data)
         // In a real app, this would come from the authenticated user
-        const trainerId = 1;
+        const trainerId = "9d5eb8f5-cdb5-4332-a649-de8fec1c4b83";
         const response = await api.createTrainee(traineeData, trainerId);
         // Add the new trainee to the list
         this.trainees.push(response.data);
@@ -125,7 +125,7 @@ export const useTraineesStore = defineStore("trainees", {
       this.error = null;
 
       try {
-        const trainerId = 1; // Default trainer ID
+        const trainerId = "9d5eb8f5-cdb5-4332-a649-de8fec1c4b83"; // Default trainer ID (Alex Johnson)
         const response = await api.updateTrainee(id, traineeData, trainerId);
         // Update the trainee in the list
         const index = this.trainees.findIndex(t => t.id === id);
@@ -151,7 +151,7 @@ export const useTraineesStore = defineStore("trainees", {
       this.error = null;
 
       try {
-        const trainerId = 1; // Default trainer ID
+        const trainerId = "9d5eb8f5-cdb5-4332-a649-de8fec1c4b83"; // Default trainer ID (Alex Johnson)
         await api.deleteTrainee(id, trainerId);
         // Remove the trainee from the list
         this.trainees = this.trainees.filter(t => t.id !== id);
@@ -170,7 +170,7 @@ export const useTraineesStore = defineStore("trainees", {
       this.error = null;
 
       try {
-        const trainerId = 1; // Default trainer ID
+        const trainerId = "9d5eb8f5-cdb5-4332-a649-de8fec1c4b83"; // Default trainer ID (Alex Johnson)
         const response = await api.addTraineeMeasurement(traineeId, measurementData, trainerId);
         // Update the trainee's measurement history
         if (this.traineeDetail && this.traineeDetail.id === traineeId) {
@@ -191,7 +191,7 @@ export const useTraineesStore = defineStore("trainees", {
       this.error = null;
 
       try {
-        const trainerId = 1; // Default trainer ID
+        const trainerId = "9d5eb8f5-cdb5-4332-a649-de8fec1c4b83"; // Default trainer ID (Alex Johnson)
         const response = await api.addTraineeProgressPhoto(traineeId, photoData, trainerId);
         // Update the trainee's progress photos
         if (this.traineeDetail && this.traineeDetail.id === traineeId) {
@@ -238,7 +238,7 @@ export const useTraineesStore = defineStore("trainees", {
       this.error = null;
 
       try {
-        const trainerId = 1; // Default trainer ID
+        const trainerId = "9d5eb8f5-cdb5-4332-a649-de8fec1c4b83"; // Default trainer ID (Alex Johnson)
         const response = await api.assignProgramToTrainee(traineeId, programId, trainerId);
         
         // Update the trainee in the list
@@ -267,7 +267,7 @@ export const useTraineesStore = defineStore("trainees", {
       this.error = null;
 
       try {
-        const trainerId = 1; // Default trainer ID
+        const trainerId = "9d5eb8f5-cdb5-4332-a649-de8fec1c4b83"; // Default trainer ID (Alex Johnson)
         const response = await api.unassignProgramFromTrainee(traineeId, programId, trainerId);
         
         // Update the trainee in the list
@@ -296,9 +296,10 @@ export const useTraineesStore = defineStore("trainees", {
       this.error = null;
 
       try {
-        const trainerId = 1; // Default trainer ID
+        const trainerId = "9d5eb8f5-cdb5-4332-a649-de8fec1c4b83"; // Default trainer ID (Alex Johnson)
         const response = await api.getTraineePrograms(traineeId, trainerId);
-        return response.data;
+        // The API returns {data: [...]} structure, so we need to access the data property
+        return response.data.data || [];
       } catch (error) {
         this.error = error.response?.data?.detail || "Failed to fetch trainee programs";
         console.error("Error fetching trainee programs:", error);
