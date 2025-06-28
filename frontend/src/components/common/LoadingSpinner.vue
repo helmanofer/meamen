@@ -1,6 +1,6 @@
 <template>
   <div class="flex justify-center items-center p-8">
-    <div class="loading-spinner h-8 w-8"></div>
+    <div class="loading-spinner h-8 w-8" />
   </div>
 </template>
 

@@ -6,15 +6,15 @@
       class="fixed inset-0 z-50 lg:hidden"
       @click="mobileMenuOpen = false"
     >
-      <div class="absolute inset-0 bg-gray-600 opacity-75"></div>
+      <div class="absolute inset-0 bg-gray-600 opacity-75" />
       <nav class="relative flex flex-col w-64 h-full bg-white shadow-xl">
         <div class="flex items-center justify-between p-4 border-b">
           <h1 class="text-xl font-bold text-primary-blue">
             Meamen
           </h1>
           <button 
-            @click="mobileMenuOpen = false"
             class="p-2 rounded-md hover:bg-light-blue"
+            @click="mobileMenuOpen = false"
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -420,8 +420,8 @@
           <!-- Mobile Menu Button -->
           <button 
             class="lg:hidden rounded-md p-2 hover:bg-light-blue min-h-[44px] min-w-[44px] flex items-center justify-center"
-            @click="mobileMenuOpen = true"
             aria-label="Open mobile menu"
+            @click="mobileMenuOpen = true"
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"

@@ -137,6 +137,14 @@ const routes = [
     },
   },
   {
+    path: "/live-training",
+    name: "LiveTraining",
+    component: () => import("../views/LiveTrainingView.vue"),
+    meta: {
+      requiresAuth: true,
+    },
+  },
+  {
     path: "/calendar",
     name: "Calendar",
     component: () => import("../views/CalendarView.vue"),

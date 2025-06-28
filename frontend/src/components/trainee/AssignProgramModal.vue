@@ -6,7 +6,7 @@
   >
     <div class="flex items-center justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:block sm:p-0">
       <!-- Background overlay -->
-      <div class="fixed inset-0 transition-opacity bg-gray-500 bg-opacity-75"></div>
+      <div class="fixed inset-0 transition-opacity bg-gray-500 bg-opacity-75" />
 
       <!-- Modal panel -->
       <div
@@ -19,17 +19,30 @@
             Assign Program to {{ trainee?.name }}
           </h3>
           <button
-            @click="closeModal"
             class="text-gray-400 hover:text-gray-600"
+            @click="closeModal"
           >
-            <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+            <svg
+              class="h-6 w-6"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M6 18L18 6M6 6l12 12"
+              />
             </svg>
           </button>
         </div>
 
         <!-- Current Assignments -->
-        <div v-if="currentAssignments.length > 0" class="mb-4 p-3 bg-blue-50 rounded-md">
+        <div
+          v-if="Array.isArray(currentAssignments) && currentAssignments.length > 0"
+          class="mb-4 p-3 bg-blue-50 rounded-md"
+        >
           <p class="text-sm text-blue-800 mb-2">
             <strong>Currently assigned programs:</strong>
           </p>
@@ -41,9 +54,9 @@
             >
               <span class="text-sm">{{ getProgramName(assignment.program_id) }}</span>
               <button
-                @click="unassignProgram(assignment.program_id)"
                 :disabled="loading"
                 class="text-xs text-red-600 hover:text-red-800 underline"
+                @click="unassignProgram(assignment.program_id)"
               >
                 Remove
               </button>
@@ -58,12 +71,18 @@
           </label>
           
           <!-- Loading state -->
-          <div v-if="programsLoading" class="text-center py-4">
-            <div class="loading-spinner h-6 w-6 mx-auto"></div>
+          <div
+            v-if="programsLoading"
+            class="text-center py-4"
+          >
+            <div class="loading-spinner h-6 w-6 mx-auto" />
           </div>
           
           <!-- Programs list -->
-          <div v-else class="space-y-2 max-h-64 overflow-y-auto">
+          <div
+            v-else
+            class="space-y-2 max-h-64 overflow-y-auto"
+          >
             <div
               v-for="program in availablePrograms"
               :key="program.id"
@@ -77,21 +96,36 @@
             >
               <div class="flex items-start justify-between">
                 <div class="flex-1">
-                  <h4 class="font-medium text-gray-900">{{ program.name }}</h4>
-                  <p class="text-sm text-gray-600 mt-1">{{ program.description }}</p>
+                  <h4 class="font-medium text-gray-900">
+                    {{ program.name }}
+                  </h4>
+                  <p class="text-sm text-gray-600 mt-1">
+                    {{ program.description }}
+                  </p>
                   <div class="flex items-center mt-2 text-xs text-gray-500 space-x-4">
                     <span v-if="program.difficulty">{{ program.difficulty }}</span>
                     <span v-if="program.duration_minutes">{{ program.duration_minutes }} min</span>
                     <span v-if="program.category">{{ program.category }}</span>
-                    <span v-if="isProgramAssigned(program.id)" class="text-blue-600 font-medium">Already Assigned</span>
+                    <span
+                      v-if="isProgramAssigned(program.id)"
+                      class="text-blue-600 font-medium"
+                    >Already Assigned</span>
                   </div>
                 </div>
                 <div
                   v-if="selectedProgramId === program.id"
                   class="ml-3 text-primary-blue"
                 >
-                  <svg class="h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
-                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+                  <svg
+                    class="h-5 w-5"
+                    fill="currentColor"
+                    viewBox="0 0 20 20"
+                  >
+                    <path
+                      fill-rule="evenodd"
+                      d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                      clip-rule="evenodd"
+                    />
                   </svg>
                 </div>
               </div>
@@ -99,34 +133,46 @@
           </div>
 
           <!-- Empty state -->
-          <div v-if="!programsLoading && availablePrograms.length === 0" class="text-center py-8 text-gray-500">
+          <div
+            v-if="!programsLoading && availablePrograms.length === 0"
+            class="text-center py-8 text-gray-500"
+          >
             <p>No programs available</p>
-            <router-link to="/programs" class="text-primary-blue hover:text-dark-blue text-sm mt-2 inline-block">
+            <router-link
+              to="/programs"
+              class="text-primary-blue hover:text-dark-blue text-sm mt-2 inline-block"
+            >
               Create a program first
             </router-link>
           </div>
         </div>
 
         <!-- Error message -->
-        <div v-if="error" class="mb-4 p-3 bg-red-50 text-red-800 text-sm rounded-md">
+        <div
+          v-if="error"
+          class="mb-4 p-3 bg-red-50 text-red-800 text-sm rounded-md"
+        >
           {{ error }}
         </div>
 
         <!-- Action buttons -->
         <div class="flex justify-end space-x-3">
           <button
-            @click="closeModal"
             class="btn btn-secondary"
             :disabled="loading"
+            @click="closeModal"
           >
             Cancel
           </button>
           <button
-            @click="assignProgram"
             :disabled="!selectedProgramId || loading"
             class="btn btn-primary"
+            @click="assignProgram"
           >
-            <div v-if="loading" class="loading-spinner h-4 w-4 mr-2"></div>
+            <div
+              v-if="loading"
+              class="loading-spinner h-4 w-4 mr-2"
+            />
             Assign Program
           </button>
         </div>
@@ -136,7 +182,7 @@
 </template>
 
 <script setup>
-import { ref, computed, watch, onMounted } from 'vue';
+import { ref, computed, watch } from 'vue';
 import { useProgramsStore } from '@/stores/programs';
 import { useTraineesStore } from '@/stores/trainees';
 import { useToast } from '@/composables/useToast';
@@ -167,7 +213,8 @@ const currentAssignments = ref([]);
 const availablePrograms = computed(() => programsStore.programs || []);
 
 const isProgramAssigned = (programId) => {
-  return currentAssignments.value.some(assignment => assignment.program_id === programId);
+  return Array.isArray(currentAssignments.value) && 
+         currentAssignments.value.some(assignment => assignment.program_id === programId);
 };
 
 const getProgramName = (programId) => {
@@ -226,9 +273,17 @@ const loadCurrentAssignments = async () => {
   if (!props.trainee) return;
   
   try {
-    currentAssignments.value = await traineesStore.fetchTraineePrograms(props.trainee.id);
+    const programs = await traineesStore.fetchTraineePrograms(props.trainee.id);
+    // The store now returns the actual programs array, so we can use it directly
+    currentAssignments.value = Array.isArray(programs) ? programs.map(program => ({
+      id: program.id,
+      program_id: program.id,
+      assigned_at: program.assigned_at,
+      status: program.assignment_status || 'active'
+    })) : [];
   } catch (err) {
     console.error('Failed to load current assignments:', err);
+    currentAssignments.value = []; // Ensure it's always an array
   }
 };
 

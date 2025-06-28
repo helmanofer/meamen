@@ -140,6 +140,29 @@ export default {
     return axios.delete(`/training-sessions/${id}`);
   },
 
+  // Live training session endpoints
+  startTrainingSession(sessionData) {
+    return axios.post("/training-sessions/start", sessionData);
+  },
+  getActiveSessions() {
+    return axios.get("/training-sessions/active");
+  },
+  getSessionRecord(recordId) {
+    return axios.get(`/training-sessions/records/${recordId}`);
+  },
+  pauseSession(recordId) {
+    return axios.patch(`/training-sessions/records/${recordId}/pause`);
+  },
+  resumeSession(recordId) {
+    return axios.patch(`/training-sessions/records/${recordId}/resume`);
+  },
+  completeSession(recordId) {
+    return axios.patch(`/training-sessions/records/${recordId}/complete`);
+  },
+  updateSessionRecord(recordId, recordData) {
+    return axios.patch(`/training-sessions/records/${recordId}`, recordData);
+  },
+
   // Session templates endpoints
   getSessionTemplates(params) {
     return axios.get("/session-templates/", { params });
@@ -161,13 +184,13 @@ export default {
   getSessionRecords(params) {
     return axios.get("/session-records", { params });
   },
-  getSessionRecord(id) {
+  getSessionRecordDetails(id) {
     return axios.get(`/session-records/${id}`);
   },
   createSessionRecord(recordData) {
     return axios.post("/session-records", recordData);
   },
-  updateSessionRecord(id, recordData) {
+  updateSessionRecordDetails(id, recordData) {
     return axios.put(`/session-records/${id}`, recordData);
   },
 
@@ -178,6 +201,40 @@ export default {
   },
   markNotificationRead(id) {
     return axios.patch(`/notifications/${id}/read`);
+  },
+
+  // Exercise records endpoints
+  createExerciseRecord(exerciseRecordData) {
+    return axios.post("/exercise-records/", exerciseRecordData);
+  },
+  getExerciseRecord(id) {
+    return axios.get(`/exercise-records/${id}`);
+  },
+  getExerciseRecordsBySession(sessionRecordId) {
+    return axios.get(`/exercise-records/session/${sessionRecordId}`);
+  },
+  getExerciseRecordsByTraineeAndSession(sessionRecordId, traineeId) {
+    return axios.get(`/exercise-records/session/${sessionRecordId}/trainee/${traineeId}`);
+  },
+  updateExerciseRecord(id, exerciseRecordData) {
+    return axios.patch(`/exercise-records/${id}`, exerciseRecordData);
+  },
+  recordSet(exerciseRecordId, setData) {
+    return axios.patch(`/exercise-records/${exerciseRecordId}/sets`, setData);
+  },
+  recordBulkSets(exerciseRecordId, setsData) {
+    return axios.patch(`/exercise-records/${exerciseRecordId}/sets/bulk`, setsData);
+  },
+  completeExercise(exerciseRecordId) {
+    return axios.patch(`/exercise-records/${exerciseRecordId}/complete`);
+  },
+  skipExercise(exerciseRecordId) {
+    return axios.patch(`/exercise-records/${exerciseRecordId}/skip`);
+  },
+  getPreviousPerformance(traineeId, exerciseId, limit = 5) {
+    return axios.get(`/exercise-records/trainee/${traineeId}/exercise/${exerciseId}/history`, {
+      params: { limit }
+    });
   },
 
   // System endpoints

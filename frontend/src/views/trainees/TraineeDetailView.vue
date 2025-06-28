@@ -161,7 +161,7 @@
                 <div>
                   <label class="text-sm text-medium-gray">Phone</label>
                   <p class="text-dark-gray">
-                    {{ trainee.phone_number || 'Not provided' }}
+                    {{ trainee.phone || 'Not provided' }}
                   </p>
                 </div>
                 <div>
@@ -354,7 +354,10 @@
             </div>
             
             <!-- Assigned Programs -->
-            <div v-if="assignedPrograms.length > 0" class="space-y-4">
+            <div
+              v-if="assignedPrograms.length > 0"
+              class="space-y-4"
+            >
               <div 
                 v-for="program in assignedPrograms" 
                 :key="program.id"
@@ -362,23 +365,30 @@
               >
                 <div class="flex justify-between items-start">
                   <div class="flex-1">
-                    <h4 class="font-medium text-dark-gray">{{ program.name }}</h4>
-                    <p class="text-sm text-medium-gray mt-1">{{ program.description }}</p>
+                    <h4 class="font-medium text-dark-gray">
+                      {{ program.name }}
+                    </h4>
+                    <p class="text-sm text-medium-gray mt-1">
+                      {{ program.description }}
+                    </p>
                     <div class="flex items-center mt-2 text-xs text-medium-gray space-x-4">
                       <span v-if="program.difficulty">{{ program.difficulty }}</span>
                       <span v-if="program.duration_minutes">{{ program.duration_minutes }} min</span>
                       <span v-if="program.category">{{ program.category }}</span>
                     </div>
-                    <div v-if="program.exercises && program.exercises.length > 0" class="mt-3">
-                      <p class="text-xs text-medium-gray">{{ program.exercises.length }} exercises</p>
-                    </div>
                     <div class="mt-2 text-xs text-medium-gray">
-                      Assigned: {{ new Date(program.assignment.assigned_at).toLocaleDateString() }}
+                      Assigned: {{ program.assigned_at ? new Date(program.assigned_at).toLocaleDateString() : 'Unknown' }}
+                    </div>
+                    <div
+                      v-if="program.assignment_notes"
+                      class="mt-2 text-xs text-gray-600"
+                    >
+                      Notes: {{ program.assignment_notes }}
                     </div>
                   </div>
                   <div class="ml-3 flex flex-col items-end space-y-1">
                     <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                      {{ program.assignment.status }}
+                      {{ program.assignment_status || 'active' }}
                     </span>
                   </div>
                 </div>
@@ -386,12 +396,29 @@
             </div>
             
             <!-- No Program Assigned -->
-            <div v-else class="text-center py-8 text-medium-gray">
-              <svg class="mx-auto h-12 w-12 text-gray-400 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+            <div
+              v-else
+              class="text-center py-8 text-medium-gray"
+            >
+              <svg
+                class="mx-auto h-12 w-12 text-gray-400 mb-4"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                />
               </svg>
-              <p class="text-lg">No programs assigned</p>
-              <p class="text-sm mt-2">Assign training programs to get this trainee started</p>
+              <p class="text-lg">
+                No programs assigned
+              </p>
+              <p class="text-sm mt-2">
+                Assign training programs to get this trainee started
+              </p>
             </div>
           </div>
         </div>
@@ -590,7 +617,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, computed } from 'vue';
+import { ref, onMounted, computed, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { useTraineesStore } from '@/stores/trainees';
 import { useSessionsStore } from '@/stores/sessions';
@@ -621,37 +648,20 @@ const tabs = [
 const trainee = computed(() => traineesStore.traineeDetail);
 const loading = computed(() => traineesStore.loading);
 
-// Get assigned programs details
-const assignedPrograms = computed(() => {
-  const assignments = trainee.value?.program_assignments;
-  if (!assignments || !Array.isArray(assignments) || assignments.length === 0) return [];
+// Get assigned programs details - use the new API endpoint
+const assignedPrograms = ref([]);
+
+const fetchTraineePrograms = async () => {
+  if (!trainee.value?.id) return;
   
-  return assignments.map(assignment => {
-    const program = programsStore.programs.find(p => p.id === assignment.program_id);
-    if (!program) return null;
-    
-    // Transform program data to match our expected format
-    let workoutStructure = [];
-    try {
-      workoutStructure = program.workout_structure ? JSON.parse(program.workout_structure) : [];
-    } catch (e) {
-      workoutStructure = [];
-    }
-    
-    return {
-      id: program.id,
-      name: program.name,
-      description: program.description || "",
-      difficulty: program.difficulty || "",
-      category: program.category || "",
-      duration_minutes: program.duration_minutes || null,
-      equipment_needed: program.equipment_needed || "",
-      exercises: workoutStructure,
-      notes: program.notes || "",
-      assignment: assignment
-    };
-  }).filter(Boolean);
-});
+  try {
+    const programs = await traineesStore.fetchTraineePrograms(trainee.value.id);
+    assignedPrograms.value = programs;
+  } catch (error) {
+    console.error('Error fetching trainee programs:', error);
+    assignedPrograms.value = [];
+  }
+};
 
 // Get next session for this trainee
 const nextSession = computed(() => {
@@ -719,6 +729,13 @@ const recentSessions = computed(() => {
     .slice(0, 5);
 });
 
+// Watch for trainee changes to fetch programs
+watch(trainee, (newTrainee) => {
+  if (newTrainee?.id) {
+    fetchTraineePrograms();
+  }
+}, { immediate: true });
+
 onMounted(async () => {
   const traineeId = route.params.id;
   console.log('TraineeDetailView mounted with ID:', traineeId);
@@ -731,6 +748,8 @@ onMounted(async () => {
       await sessionsStore.fetchSessions();
       // Fetch programs to show assigned program details
       await programsStore.fetchPrograms();
+      // Fetch trainee's assigned programs
+      await fetchTraineePrograms();
     } catch (error) {
       console.error('Error loading trainee data:', error);
     }
@@ -751,11 +770,12 @@ const handleTraineeUpdated = () => {
   }
 };
 
-const handleProgramAssigned = () => {
+const handleProgramAssigned = async () => {
   // Refresh trainee data after program assignment
   const traineeId = route.params.id;
   if (traineeId) {
-    traineesStore.fetchTraineeDetail(traineeId);
+    await traineesStore.fetchTraineeDetail(traineeId);
+    await fetchTraineePrograms();
   }
 };
 

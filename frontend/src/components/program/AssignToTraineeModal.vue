@@ -6,7 +6,7 @@
   >
     <div class="flex items-center justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:block sm:p-0">
       <!-- Background overlay -->
-      <div class="fixed inset-0 transition-opacity bg-gray-500 bg-opacity-75"></div>
+      <div class="fixed inset-0 transition-opacity bg-gray-500 bg-opacity-75" />
 
       <!-- Modal panel -->
       <div
@@ -19,11 +19,21 @@
             Assign "{{ program?.name }}" to Trainee
           </h3>
           <button
-            @click="closeModal"
             class="text-gray-400 hover:text-gray-600"
+            @click="closeModal"
           >
-            <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+            <svg
+              class="h-6 w-6"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M6 18L18 6M6 6l12 12"
+              />
             </svg>
           </button>
         </div>
@@ -33,7 +43,10 @@
           <p class="text-sm text-blue-800">
             <strong>Program:</strong> {{ program?.name }}
           </p>
-          <p v-if="program?.description" class="text-sm text-blue-700 mt-1">
+          <p
+            v-if="program?.description"
+            class="text-sm text-blue-700 mt-1"
+          >
             {{ program.description }}
           </p>
           <div class="flex items-center mt-2 text-xs text-blue-600 space-x-4">
@@ -50,12 +63,18 @@
           </label>
           
           <!-- Loading state -->
-          <div v-if="traineesLoading" class="text-center py-4">
-            <div class="loading-spinner h-6 w-6 mx-auto"></div>
+          <div
+            v-if="traineesLoading"
+            class="text-center py-4"
+          >
+            <div class="loading-spinner h-6 w-6 mx-auto" />
           </div>
           
           <!-- Trainees list -->
-          <div v-else class="space-y-2 max-h-64 overflow-y-auto">
+          <div
+            v-else
+            class="space-y-2 max-h-64 overflow-y-auto"
+          >
             <div
               v-for="trainee in availableTrainees"
               :key="trainee.id"
@@ -68,13 +87,23 @@
             >
               <div class="flex items-center justify-between">
                 <div class="flex-1">
-                  <h4 class="font-medium text-gray-900">{{ trainee.name }}</h4>
-                  <p class="text-sm text-gray-600 mt-1">{{ trainee.email }}</p>
+                  <h4 class="font-medium text-gray-900">
+                    {{ trainee.name }}
+                  </h4>
+                  <p class="text-sm text-gray-600 mt-1">
+                    {{ trainee.email }}
+                  </p>
                   <div class="text-xs text-gray-500 mt-1">
-                    <span v-if="trainee.assigned_program_id" class="text-yellow-600">
+                    <span
+                      v-if="trainee.assigned_program_id"
+                      class="text-yellow-600"
+                    >
                       ⚠️ Already has a program assigned
                     </span>
-                    <span v-else class="text-green-600">
+                    <span
+                      v-else
+                      class="text-green-600"
+                    >
                       ✓ Available for assignment
                     </span>
                   </div>
@@ -83,8 +112,16 @@
                   v-if="selectedTraineeId === trainee.id"
                   class="ml-3 text-primary-blue"
                 >
-                  <svg class="h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
-                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+                  <svg
+                    class="h-5 w-5"
+                    fill="currentColor"
+                    viewBox="0 0 20 20"
+                  >
+                    <path
+                      fill-rule="evenodd"
+                      d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                      clip-rule="evenodd"
+                    />
                   </svg>
                 </div>
               </div>
@@ -92,34 +129,46 @@
           </div>
 
           <!-- Empty state -->
-          <div v-if="!traineesLoading && availableTrainees.length === 0" class="text-center py-8 text-gray-500">
+          <div
+            v-if="!traineesLoading && availableTrainees.length === 0"
+            class="text-center py-8 text-gray-500"
+          >
             <p>No trainees found</p>
-            <router-link to="/trainees/add" class="text-primary-blue hover:text-dark-blue text-sm mt-2 inline-block">
+            <router-link
+              to="/trainees/add"
+              class="text-primary-blue hover:text-dark-blue text-sm mt-2 inline-block"
+            >
               Add a trainee first
             </router-link>
           </div>
         </div>
 
         <!-- Error message -->
-        <div v-if="error" class="mb-4 p-3 bg-red-50 text-red-800 text-sm rounded-md">
+        <div
+          v-if="error"
+          class="mb-4 p-3 bg-red-50 text-red-800 text-sm rounded-md"
+        >
           {{ error }}
         </div>
 
         <!-- Action buttons -->
         <div class="flex justify-end space-x-3">
           <button
-            @click="closeModal"
             class="btn btn-secondary"
             :disabled="loading"
+            @click="closeModal"
           >
             Cancel
           </button>
           <button
-            @click="assignProgram"
             :disabled="!selectedTraineeId || loading"
             class="btn btn-primary"
+            @click="assignProgram"
           >
-            <div v-if="loading" class="loading-spinner h-4 w-4 mr-2"></div>
+            <div
+              v-if="loading"
+              class="loading-spinner h-4 w-4 mr-2"
+            />
             Assign Program
           </button>
         </div>

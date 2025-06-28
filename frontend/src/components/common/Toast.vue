@@ -77,18 +77,25 @@
       
       <!-- Content -->
       <div class="flex-1">
-        <h3 v-if="title" class="text-sm font-medium mb-1" :class="titleClasses">
+        <h3
+          v-if="title"
+          class="text-sm font-medium mb-1"
+          :class="titleClasses"
+        >
           {{ title }}
         </h3>
-        <p class="text-sm" :class="messageClasses">
+        <p
+          class="text-sm"
+          :class="messageClasses"
+        >
           {{ message }}
         </p>
       </div>
       
       <!-- Close Button -->
       <button
-        @click="close"
         class="flex-shrink-0 ml-3 p-1 rounded-md hover:bg-gray-100 transition-colors"
+        @click="close"
       >
         <svg
           class="h-4 w-4 text-gray-400"

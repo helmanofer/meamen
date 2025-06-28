@@ -63,12 +63,12 @@ export const useSessionsStore = defineStore('sessions', {
       this.loading = true
       this.error = null
       try {
-        const response = await api.get('/training_sessions/')
+        const response = await api.getSessions()
         this.sessions = response.data || []
       } catch (error) {
         console.error('Error fetching sessions:', error)
         this.error = 'Failed to load sessions'
-        this.sessions = this.getMockSessions()
+        this.sessions = []
       } finally {
         this.loading = false
       }
@@ -78,12 +78,12 @@ export const useSessionsStore = defineStore('sessions', {
       this.loading = true
       this.error = null
       try {
-        // TODO: Replace with actual API call when templates endpoint exists
-        this.sessionTemplates = this.getMockTemplates()
+        const response = await api.getSessionTemplates()
+        this.sessionTemplates = response.data || []
       } catch (error) {
         console.error('Error fetching session templates:', error)
         this.error = 'Failed to load session templates'
-        this.sessionTemplates = this.getMockTemplates()
+        this.sessionTemplates = []
       } finally {
         this.loading = false
       }
@@ -93,22 +93,13 @@ export const useSessionsStore = defineStore('sessions', {
       this.loading = true
       this.error = null
       try {
-        const response = await api.post('/training_sessions/', sessionData)
+        const response = await api.createSession(sessionData)
         this.sessions.push(response.data)
         return response.data
       } catch (error) {
         console.error('Error creating session:', error)
         this.error = 'Failed to create session'
-        
-        // Mock creation for development
-        const mockSession = {
-          id: Date.now(),
-          ...sessionData,
-          created_at: new Date().toISOString(),
-          status: 'scheduled'
-        }
-        this.sessions.push(mockSession)
-        return mockSession
+        return null
       } finally {
         this.loading = false
       }
@@ -118,7 +109,7 @@ export const useSessionsStore = defineStore('sessions', {
       this.loading = true
       this.error = null
       try {
-        const response = await api.put(`/training_sessions/${sessionId}`, sessionData)
+        const response = await api.updateSession(sessionId, sessionData)
         const index = this.sessions.findIndex(s => s.id === sessionId)
         if (index !== -1) {
           this.sessions[index] = response.data
@@ -127,12 +118,7 @@ export const useSessionsStore = defineStore('sessions', {
       } catch (error) {
         console.error('Error updating session:', error)
         this.error = 'Failed to update session'
-        
-        // Mock update for development
-        const index = this.sessions.findIndex(s => s.id === sessionId)
-        if (index !== -1) {
-          this.sessions[index] = { ...this.sessions[index], ...sessionData }
-        }
+        return null
       } finally {
         this.loading = false
       }
@@ -142,14 +128,13 @@ export const useSessionsStore = defineStore('sessions', {
       this.loading = true
       this.error = null
       try {
-        await api.delete(`/training_sessions/${sessionId}`)
+        await api.deleteSession(sessionId)
         this.sessions = this.sessions.filter(s => s.id !== sessionId)
+        return true
       } catch (error) {
         console.error('Error deleting session:', error)
         this.error = 'Failed to delete session'
-        
-        // Mock deletion for development
-        this.sessions = this.sessions.filter(s => s.id !== sessionId)
+        return false
       } finally {
         this.loading = false
       }
@@ -165,90 +150,6 @@ export const useSessionsStore = defineStore('sessions', {
 
     clearError() {
       this.error = null
-    },
-
-    // Mock data methods for development
-    getMockSessions() {
-      const now = new Date()
-      return [
-        {
-          id: 1,
-          trainee_id: 1,
-          trainee_name: 'Sarah Johnson',
-          title: 'Morning Strength Training',
-          description: 'Upper body focus with compound movements',
-          scheduled_at: new Date(now.getTime() + 2 * 60 * 60 * 1000).toISOString(), // 2 hours from now
-          duration: 60,
-          status: 'scheduled',
-          location: 'Gym - Area A',
-          notes: 'Focus on form and progressive overload'
-        },
-        {
-          id: 2,
-          trainee_id: 2,
-          trainee_name: 'Michael Chen',
-          title: 'HIIT Cardio Session',
-          description: 'High-intensity interval training',
-          scheduled_at: new Date(now.getTime() + 24 * 60 * 60 * 1000).toISOString(), // Tomorrow
-          duration: 45,
-          status: 'scheduled',
-          location: 'Gym - Cardio Zone',
-          notes: 'Monitor heart rate zones'
-        },
-        {
-          id: 3,
-          trainee_id: 3,
-          trainee_name: 'Emily Rodriguez',
-          title: 'Recovery & Mobility',
-          description: 'Stretching and foam rolling session',
-          scheduled_at: new Date(now.getTime() + 48 * 60 * 60 * 1000).toISOString(), // Day after tomorrow
-          duration: 30,
-          status: 'scheduled',
-          location: 'Studio B',
-          notes: 'Focus on tight hip flexors'
-        }
-      ]
-    },
-
-    getMockTemplates() {
-      return [
-        {
-          id: 1,
-          name: 'Strength Training - Upper Body',
-          description: 'Comprehensive upper body workout focusing on compound movements',
-          duration: 60,
-          exercises: [
-            { name: 'Bench Press', sets: 3, reps: '8-10', rest: 90 },
-            { name: 'Pull-ups', sets: 3, reps: '6-8', rest: 90 },
-            { name: 'Overhead Press', sets: 3, reps: '8-10', rest: 90 },
-            { name: 'Rows', sets: 3, reps: '10-12', rest: 60 }
-          ]
-        },
-        {
-          id: 2,
-          name: 'HIIT Cardio',
-          description: 'High-intensity interval training for cardiovascular fitness',
-          duration: 45,
-          exercises: [
-            { name: 'Burpees', sets: 4, reps: '30s work / 30s rest', rest: 0 },
-            { name: 'Mountain Climbers', sets: 4, reps: '30s work / 30s rest', rest: 0 },
-            { name: 'Jump Squats', sets: 4, reps: '30s work / 30s rest', rest: 0 },
-            { name: 'High Knees', sets: 4, reps: '30s work / 30s rest', rest: 0 }
-          ]
-        },
-        {
-          id: 3,
-          name: 'Lower Body Strength',
-          description: 'Leg day focused on building strength and power',
-          duration: 75,
-          exercises: [
-            { name: 'Squats', sets: 4, reps: '6-8', rest: 120 },
-            { name: 'Deadlifts', sets: 4, reps: '5-6', rest: 120 },
-            { name: 'Lunges', sets: 3, reps: '10 each leg', rest: 90 },
-            { name: 'Calf Raises', sets: 3, reps: '15-20', rest: 60 }
-          ]
-        }
-      ]
     }
   }
 })

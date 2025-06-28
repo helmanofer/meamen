@@ -202,7 +202,7 @@ const equipmentCount = computed(() => {
 
 const equipmentList = computed(() => {
   if (!props.program.equipment_needed) return [];
-  return props.program.equipment_needed.split(",").map(equipment => equipment.trim()).filter(Boolean);
+  return String(props.program.equipment_needed).split(",").map(equipment => equipment.trim()).filter(Boolean);
 });
 
 // Methods

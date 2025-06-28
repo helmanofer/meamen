@@ -154,7 +154,10 @@
 
     <section class="trainees-list">
       <!-- Loading State -->
-      <LoadingSkeleton v-if="traineesStore.loading" :count="6" />
+      <LoadingSkeleton
+        v-if="traineesStore.loading"
+        :count="6"
+      />
       
       <!-- Error State -->
       <div
@@ -176,8 +179,12 @@
               d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.996-.833-2.464 0L4.35 16.5c-.77.833.192 2.5 1.732 2.5z"
             />
           </svg>
-          <p class="text-lg font-medium">Failed to load trainees</p>
-          <p class="text-sm text-gray-600 mt-1">{{ traineesStore.error }}</p>
+          <p class="text-lg font-medium">
+            Failed to load trainees
+          </p>
+          <p class="text-sm text-gray-600 mt-1">
+            {{ traineesStore.error }}
+          </p>
         </div>
         <button
           class="btn btn-primary"
