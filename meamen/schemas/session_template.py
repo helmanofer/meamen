@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import Optional, Dict, Any
 from datetime import datetime
 from pydantic import BaseModel
 
@@ -9,7 +9,7 @@ class SessionTemplateBase(BaseModel):
     category: Optional[str] = None
     difficulty: Optional[str] = None
     duration_minutes: Optional[int] = None
-    equipment_needed: Optional[str] = None
+    equipment_needed: Optional[Dict[str, Any]] = None
     workout_structure: Optional[str] = None
     notes: Optional[str] = None
 
@@ -24,13 +24,15 @@ class SessionTemplateUpdate(BaseModel):
     category: Optional[str] = None
     difficulty: Optional[str] = None
     duration_minutes: Optional[int] = None
-    equipment_needed: Optional[str] = None
+    equipment_needed: Optional[Dict[str, Any]] = None
     workout_structure: Optional[str] = None
     notes: Optional[str] = None
 
 
 class SessionTemplateRead(SessionTemplateBase):
-    id: int
+    id: str
+    trainer_id: str
+    is_default: bool = False
     created_at: datetime
     updated_at: datetime
 

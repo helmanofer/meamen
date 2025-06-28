@@ -1,9 +1,14 @@
 import json
+from datetime import date
 from sqlmodel import Session, select
 from meamen.models.exercise import Exercise
 from meamen.models.session_template import SessionTemplate
+from meamen.models.trainee import Trainee
+from meamen.models.trainer import Trainer
 from meamen.crud.exercise import create_exercise
 from meamen.crud.session_template import create_session_template
+from meamen.crud.trainee import create_trainee
+from meamen.crud.trainer import create_trainer
 
 
 DEFAULT_EXERCISES = [
@@ -240,7 +245,7 @@ DEFAULT_SESSION_TEMPLATES = [
         "category": "Full Body",
         "difficulty": "Beginner",
         "duration_minutes": 45,
-        "equipment_needed": "Dumbbells,Bench",
+        "equipment_needed": {"equipment": ["Dumbbells", "Bench"]},
         "workout_structure": json.dumps([
             {"exercise": "Squats", "sets": 3, "reps": "12-15", "rest_seconds": 60},
             {"exercise": "Push-ups", "sets": 3, "reps": "8-12", "rest_seconds": 60},
@@ -257,7 +262,7 @@ DEFAULT_SESSION_TEMPLATES = [
         "category": "Strength",
         "difficulty": "Intermediate",
         "duration_minutes": 60,
-        "equipment_needed": "Barbell,Dumbbells,Bench,Pull-up Bar",
+        "equipment_needed": {"equipment": ["Barbell", "Dumbbells", "Bench", "Pull-up Bar"]},
         "workout_structure": json.dumps([
             {"exercise": "Bench Press", "sets": 4, "reps": "6-8", "rest_seconds": 120},
             {"exercise": "Pull-ups", "sets": 4, "reps": "6-10", "rest_seconds": 120},
@@ -274,7 +279,7 @@ DEFAULT_SESSION_TEMPLATES = [
         "category": "Strength",
         "difficulty": "Intermediate",
         "duration_minutes": 55,
-        "equipment_needed": "Barbell,Leg Press Machine",
+        "equipment_needed": {"equipment": ["Barbell", "Leg Press Machine"]},
         "workout_structure": json.dumps([
             {"exercise": "Squats", "sets": 4, "reps": "6-8", "rest_seconds": 150},
             {"exercise": "Deadlifts", "sets": 4, "reps": "5-6", "rest_seconds": 180},
@@ -290,7 +295,7 @@ DEFAULT_SESSION_TEMPLATES = [
         "category": "Cardio",
         "difficulty": "Intermediate",
         "duration_minutes": 30,
-        "equipment_needed": "None",
+        "equipment_needed": {"equipment": []},
         "workout_structure": json.dumps([
             {"exercise": "Jumping Jacks", "sets": 4, "reps": "30 seconds", "rest_seconds": 30},
             {"exercise": "Burpees", "sets": 4, "reps": "20 seconds", "rest_seconds": 40},
@@ -306,7 +311,7 @@ DEFAULT_SESSION_TEMPLATES = [
         "category": "Flexibility",
         "difficulty": "Beginner",
         "duration_minutes": 35,
-        "equipment_needed": "None",
+        "equipment_needed": {"equipment": []},
         "workout_structure": json.dumps([
             {"exercise": "Plank", "sets": 3, "reps": "45-60 seconds", "rest_seconds": 60},
             {"exercise": "Russian Twists", "sets": 3, "reps": "20 each side", "rest_seconds": 45},
@@ -323,7 +328,7 @@ DEFAULT_SESSION_TEMPLATES = [
         "category": "Strength",
         "difficulty": "Advanced",
         "duration_minutes": 70,
-        "equipment_needed": "Barbell,Dumbbells,Bench,Cable Machine",
+        "equipment_needed": {"equipment": ["Barbell", "Dumbbells", "Bench", "Cable Machine"]},
         "workout_structure": json.dumps([
             {"exercise": "Bench Press", "sets": 4, "reps": "4-6", "rest_seconds": 180},
             {"exercise": "Overhead Press", "sets": 4, "reps": "6-8", "rest_seconds": 150},
@@ -340,7 +345,7 @@ DEFAULT_SESSION_TEMPLATES = [
         "category": "Full Body",
         "difficulty": "Advanced",
         "duration_minutes": 50,
-        "equipment_needed": "None",
+        "equipment_needed": {"equipment": []},
         "workout_structure": json.dumps([
             {"exercise": "Burpees", "sets": 4, "reps": "8-10", "rest_seconds": 90},
             {"exercise": "Jump Squats", "sets": 4, "reps": "10-12", "rest_seconds": 90},
@@ -357,7 +362,7 @@ DEFAULT_SESSION_TEMPLATES = [
         "category": "Flexibility",
         "difficulty": "Beginner",
         "duration_minutes": 25,
-        "equipment_needed": "None",
+        "equipment_needed": {"equipment": []},
         "workout_structure": json.dumps([
             {"exercise": "Cat-Cow Stretch", "sets": 2, "reps": "10 slow reps", "rest_seconds": 30},
             {"exercise": "Downward Dog", "sets": 3, "reps": "45 seconds hold", "rest_seconds": 30},
@@ -369,6 +374,165 @@ DEFAULT_SESSION_TEMPLATES = [
         "notes": "Perfect for rest days or after intense workouts. Focus on relaxation and gentle movement."
     }
 ]
+
+
+DEFAULT_TRAINERS = [
+    {
+        "name": "Alex Johnson",
+        "email": "alex@example.com",
+        "hashed_password": "$2b$12$example.hashed.password.for.demo",  # placeholder hash
+        "phone": "+1-555-0123",
+        "address": "123 Fitness St, Gym City, GC 12345",
+        "is_active": True
+    },
+    {
+        "name": "Maria Garcia",
+        "email": "maria@example.com",
+        "hashed_password": "$2b$12$example.hashed.password.for.demo",  # placeholder hash
+        "phone": "+1-555-0134",
+        "address": "456 Training Blvd, Fitness City, FC 54321",
+        "is_active": True
+    },
+    {
+        "name": "James Wilson",
+        "email": "james@example.com",
+        "hashed_password": "$2b$12$example.hashed.password.for.demo",  # placeholder hash
+        "phone": "+1-555-0135",
+        "address": "789 Coach Ave, Strength Town, ST 98765",
+        "is_active": True
+    }
+]
+
+
+DEFAULT_TRAINEES = [
+    {
+        "name": "Sarah Johnson",
+        "email": "sarah.johnson@example.com",
+        "phone": "+1-555-0124",
+        "date_of_birth": date(1992, 5, 15),
+        "gender": "Female",
+        "address": "456 Health Ave, Fit Town, FT 67890",
+        "emergency_contact": "John Johnson - +1-555-0125",
+        "height": 165.0,
+        "current_weight": 68.5,
+        "body_fat_percentage": 22.0,
+        "resting_heart_rate": 65,
+        "fitness_level": "Intermediate",
+        "goals": ["Weight Loss", "Strength Building", "Endurance"],
+        "injuries": [],
+        "medical_notes": "No known medical conditions"
+    },
+    {
+        "name": "Michael Chen",
+        "email": "michael.chen@example.com",
+        "phone": "+1-555-0126",
+        "date_of_birth": date(1988, 11, 22),
+        "gender": "Male",
+        "address": "789 Strong Blvd, Muscle City, MC 13579",
+        "emergency_contact": "Lisa Chen - +1-555-0127",
+        "height": 178.0,
+        "current_weight": 82.0,
+        "body_fat_percentage": 15.5,
+        "resting_heart_rate": 58,
+        "fitness_level": "Advanced",
+        "goals": ["Muscle Building", "Strength Training"],
+        "injuries": ["Previous shoulder injury (recovered)"],
+        "medical_notes": "Cleared for all activities"
+    },
+    {
+        "name": "Emily Rodriguez",
+        "email": "emily.rodriguez@example.com",
+        "phone": "+1-555-0128",
+        "date_of_birth": date(1995, 3, 8),
+        "gender": "Female",
+        "address": "321 Cardio Lane, Endurance Town, ET 24680",
+        "emergency_contact": "Carlos Rodriguez - +1-555-0129",
+        "height": 160.0,
+        "current_weight": 58.0,
+        "body_fat_percentage": 18.0,
+        "resting_heart_rate": 62,
+        "fitness_level": "Beginner",
+        "goals": ["General Fitness", "Flexibility", "Stress Relief"],
+        "injuries": [],
+        "medical_notes": "No known medical conditions"
+    },
+    {
+        "name": "David Park",
+        "email": "david.park@example.com",
+        "phone": "+1-555-0130",
+        "date_of_birth": date(1990, 8, 30),
+        "gender": "Male",
+        "address": "654 Power St, Strength City, SC 97531",
+        "emergency_contact": "Amy Park - +1-555-0131",
+        "height": 185.0,
+        "current_weight": 90.5,
+        "body_fat_percentage": 12.0,
+        "resting_heart_rate": 55,
+        "fitness_level": "Advanced",
+        "goals": ["Powerlifting", "Competition Prep"],
+        "injuries": ["Minor knee strain (monitoring)"],
+        "medical_notes": "Regular medical checkups, cleared for training"
+    },
+    {
+        "name": "Jennifer Williams",
+        "email": "jennifer.williams@example.com",
+        "phone": "+1-555-0132",
+        "date_of_birth": date(1987, 12, 14),
+        "gender": "Female",
+        "address": "987 Wellness Way, Health Hills, HH 86420",
+        "emergency_contact": "Mark Williams - +1-555-0133",
+        "height": 172.0,
+        "current_weight": 70.0,
+        "body_fat_percentage": 20.5,
+        "resting_heart_rate": 68,
+        "fitness_level": "Intermediate",
+        "goals": ["Marathon Training", "Endurance", "Weight Maintenance"],
+        "injuries": [],
+        "medical_notes": "Excellent cardiovascular health"
+    }
+]
+
+
+def seed_default_trainers(session: Session) -> None:
+    """Seed the database with default trainers, skipping existing ones by email."""
+    print("Seeding default trainers...")
+    for trainer_data in DEFAULT_TRAINERS:
+        # Check if trainer with this email already exists
+        existing_trainer = session.exec(select(Trainer).where(Trainer.email == trainer_data["email"])).first()
+        if existing_trainer:
+            print(f"Trainer with email {trainer_data['email']} already exists. Skipping.")
+            continue
+        
+        trainer = Trainer(**trainer_data)
+        create_trainer(session, trainer)
+        print(f"Seeded trainer: {trainer.name}")
+    print("Finished seeding default trainers.")
+
+
+def seed_default_trainees(session: Session) -> None:
+    """Seed the database with default trainees, skipping existing ones by email."""
+    # Get the first trainer to assign trainees to
+    trainer_statement = select(Trainer)
+    trainer_result = session.exec(trainer_statement)
+    trainer = trainer_result.first()
+    
+    if not trainer:
+        print("No trainers found. Cannot seed trainees without a trainer. Please seed trainers first.")
+        return
+
+    print("Seeding default trainees...")
+    for trainee_data in DEFAULT_TRAINEES:
+        # Check if trainee with this email already exists
+        existing_trainee = session.exec(select(Trainee).where(Trainee.email == trainee_data["email"])).first()
+        if existing_trainee:
+            print(f"Trainee with email {trainee_data['email']} already exists. Skipping.")
+            continue
+
+        trainee_data_with_trainer = {**trainee_data, "trainer_id": trainer.id}
+        trainee = Trainee(**trainee_data_with_trainer)
+        create_trainee(session, trainee)
+        print(f"Seeded trainee: {trainee.name}")
+    print("Finished seeding default trainees.")
 
 
 def seed_default_exercises(session: Session) -> None:
@@ -413,11 +577,21 @@ def seed_default_session_templates(session: Session) -> None:
         print(f"Database already contains {len(existing_templates)} session templates. Skipping seed.")
         return
 
+    # Get the first trainer to assign templates to
+    trainer_statement = select(Trainer)
+    trainer_result = session.exec(trainer_statement)
+    trainer = trainer_result.first()
+    
+    if not trainer:
+        print("No trainers found. Cannot seed session templates without a trainer.")
+        return
+
     print("Seeding database with default session templates...")
 
     # Create all default session templates
     for template_data in DEFAULT_SESSION_TEMPLATES:
-        template = SessionTemplate(**template_data)  #  type: ignore
+        template_data_with_trainer = {**template_data, "trainer_id": trainer.id}
+        template = SessionTemplate(**template_data_with_trainer)  #  type: ignore
         create_session_template(session, template)
 
     print(f"Successfully seeded {len(DEFAULT_SESSION_TEMPLATES)} default session templates.")

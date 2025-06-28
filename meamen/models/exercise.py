@@ -1,10 +1,13 @@
 from typing import Optional
-from sqlmodel import SQLModel, Field
 from datetime import datetime, UTC
+from uuid import uuid4
+from sqlmodel import SQLModel, Field
 
+def uuid4_str():
+    return str(uuid4())
 
 class Exercise(SQLModel, table=True):
-    id: Optional[int] = Field(default=None, primary_key=True)
+    id: Optional[str] = Field(default_factory=uuid4_str, primary_key=True)
     name: str
     description: Optional[str] = None
     category: Optional[str] = None  # Strength, Cardio, Flexibility, Balance

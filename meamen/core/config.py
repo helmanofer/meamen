@@ -12,7 +12,7 @@ class Settings(BaseSettings):
     log_health_checks: bool = False
 
     # Database configuration
-    database_url: str = "sqlite:///./fitness_trainer.db"
+    database_url: str = "sqlite:///./test.db"
 
     # JWT configuration
     secret_key: str = "your-secret-key-here"
@@ -22,6 +22,8 @@ class Settings(BaseSettings):
     class Config:
         env_file = ".env"
         case_sensitive = False
+        extra = 'allow'
+
 
 
 settings = Settings()

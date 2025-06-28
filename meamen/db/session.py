@@ -11,6 +11,9 @@ from meamen.models import (
     user,  # noqa: F401  #  type: ignore
     training_session,  # noqa: F401  #  type: ignore
     session_template,  # noqa: F401  #  type: ignore
+    exercise_record,  # noqa: F401  #  type: ignore
+    program,  # noqa: F401  #  type: ignore
+    exercise_template,  # noqa: F401  #  type: ignore
 )
 
 DB_FILE = "./test.db"
