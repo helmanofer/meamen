@@ -1,13 +1,13 @@
-from typing import Optional, Any
+from typing import Optional, Any, Sequence
+from uuid import UUID
 from datetime import datetime, timezone
 from sqlmodel import select, Session
+from sqlalchemy.orm import selectinload
 from meamen.models.trainee import Trainee, TraineeProgramAssignment
 from meamen.schemas.trainee import TraineeUpdate
 
-from typing import Sequence
-
 def get_trainees(
-    session: Session, trainer_id: int, skip: int = 0, limit: int = 100
+    session: Session, trainer_id: str, skip: int = 0, limit: int = 100
 ) -> Sequence[Trainee]:
     statement = (
         select(Trainee)
@@ -19,8 +19,8 @@ def get_trainees(
     return result.all()
 
 
-def get_trainee_by_id(session: Session, trainee_id: int, trainer_id: int) -> Optional[Trainee]:
-    statement = select(Trainee).where(
+def get_trainee_by_id(session: Session, trainee_id: str, trainer_id: str) -> Optional[Trainee]:
+    statement = select(Trainee).options(selectinload(Trainee.program_assignments)).where(
         Trainee.id == trainee_id,
         Trainee.trainer_id == trainer_id
     )
@@ -36,7 +36,7 @@ def create_trainee(session: Session, trainee: Trainee) -> Trainee:
 
 
 def update_trainee(
-    session: Session, trainee_id: int, trainer_id: int, trainee_update: TraineeUpdate
+    session: Session, trainee_id: str, trainer_id: str, trainee_update: TraineeUpdate
 ) -> Optional[Trainee]:
     trainee = get_trainee_by_id(session, trainee_id, trainer_id)
     if not trainee:
@@ -52,7 +52,7 @@ def update_trainee(
     return trainee
 
 
-def delete_trainee(session: Session, trainee_id: int, trainer_id: int) -> bool:
+def delete_trainee(session: Session, trainee_id: str, trainer_id: str) -> bool:
     trainee = get_trainee_by_id(session, trainee_id, trainer_id)
     if not trainee:
         return False
@@ -63,7 +63,7 @@ def delete_trainee(session: Session, trainee_id: int, trainer_id: int) -> bool:
 
 
 def add_measurement_record(
-    session: Session, trainee_id: int, trainer_id: int, measurement_data: dict[str, Any]
+    session: Session, trainee_id: str, trainer_id: str, measurement_data: dict[str, Any]
 ) -> Optional[Trainee]:
     trainee = get_trainee_by_id(session, trainee_id, trainer_id)
     if not trainee:
@@ -80,7 +80,7 @@ def add_measurement_record(
 
 
 def add_progress_photo(
-    session: Session, trainee_id: int, trainer_id: int, photo_data: dict[str, Any]
+    session: Session, trainee_id: str, trainer_id: str, photo_data: dict[str, Any]
 ) -> Optional[Trainee]:
     trainee = get_trainee_by_id(session, trainee_id, trainer_id)
     if not trainee:
@@ -97,7 +97,7 @@ def add_progress_photo(
 
 
 def assign_program_to_trainee(
-    session: Session, trainee_id: int, trainer_id: int, program_id: int
+    session: Session, trainee_id: str, trainer_id: str, program_id: str
 ) -> Optional[Trainee]:
     """Assign a program to a trainee"""
     trainee = get_trainee_by_id(session, trainee_id, trainer_id)
@@ -140,7 +140,7 @@ def assign_program_to_trainee(
 
 
 def unassign_program_from_trainee(
-    session: Session, trainee_id: int, trainer_id: int, program_id: int
+    session: Session, trainee_id: str, trainer_id: str, program_id: UUID
 ) -> Optional[Trainee]:
     """Unassign a specific program from a trainee"""
     trainee = get_trainee_by_id(session, trainee_id, trainer_id)
@@ -166,16 +166,40 @@ def unassign_program_from_trainee(
 
 
 def get_trainee_programs(
-    session: Session, trainee_id: int, trainer_id: int
-) -> list[TraineeProgramAssignment]:
-    """Get all program assignments for a trainee"""
+    session: Session, trainee_id: str, trainer_id: str
+) -> list[dict]:
+    """Get all program assignments for a trainee with full program details"""
     trainee = get_trainee_by_id(session, trainee_id, trainer_id)
     if not trainee:
         return []
 
-    stmt = select(TraineeProgramAssignment).where(
-        TraineeProgramAssignment.trainee_id == trainee_id,
-        TraineeProgramAssignment.status == "active"
+    from meamen.models.session_template import SessionTemplate
+    stmt = (
+        select(TraineeProgramAssignment, SessionTemplate)
+        .join(SessionTemplate, TraineeProgramAssignment.program_id == SessionTemplate.id)
+        .where(
+            TraineeProgramAssignment.trainee_id == trainee_id,
+            TraineeProgramAssignment.status == "active"
+        )
     )
     result = session.exec(stmt)
-    return list(result.all())
+    
+    programs = []
+    for assignment, program in result.all():
+        programs.append({
+            "id": program.id,
+            "name": program.name,
+            "description": program.description,
+            "category": program.category,
+            "difficulty": program.difficulty,
+            "duration_minutes": program.duration_minutes,
+            "duration_weeks": None,  # This could be calculated or stored separately
+            "equipment_needed": program.equipment_needed,
+            "workout_structure": None,  # Not available in SessionTemplate model
+            "notes": program.notes,
+            "assigned_at": assignment.assigned_at.isoformat() if assignment.assigned_at else None,
+            "assignment_status": assignment.status,
+            "assignment_notes": assignment.notes
+        })
+    
+    return programs
