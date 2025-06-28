@@ -1,6 +1,8 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status, Query
 from sqlmodel import Session
 from typing import List
+from uuid import UUID
+
 from meamen.db.session import get_session
 from meamen.models.trainee import Trainee
 from meamen.schemas.trainee import (
@@ -9,7 +11,8 @@ from meamen.schemas.trainee import (
     TraineeUpdate,
     MeasurementRecord,
     ProgressPhoto,
-    ProgramAssignment
+    ProgramAssignment,
+    ProgramAssignmentRequest
 )
 from meamen.crud.trainee import (
     get_trainees,
@@ -29,9 +32,9 @@ router = APIRouter(prefix="/trainees", tags=["trainees"])
 
 @router.get("/", response_model=List[TraineeRead])
 def read_trainees(
-    trainer_id: int,
     skip: int = 0,
     limit: int = 100,
+    trainer_id: str = Query(..., description="The ID of the trainer"),
     session: Session = Depends(get_session),
 ):
     """Get all trainees for a specific trainer"""
@@ -40,8 +43,8 @@ def read_trainees(
 
 @router.get("/{trainee_id}", response_model=TraineeRead)
 def read_trainee(
-    trainee_id: int,
-    trainer_id: int,
+    trainee_id: str,
+    trainer_id: str = Query(..., description="The ID of the trainer"),
     session: Session = Depends(get_session),
 ):
     """Get a specific trainee by ID"""
@@ -54,11 +57,10 @@ def read_trainee(
     return trainee
 
 
-
 @router.post("/", response_model=TraineeRead, status_code=status.HTTP_201_CREATED)
 def add_trainee(
     trainee: TraineeCreate,
-    trainer_id: int,
+    trainer_id: str = Query(..., description="The ID of the trainer"),
     session: Session = Depends(get_session)
 ):
     """Create a new trainee"""
@@ -68,9 +70,9 @@ def add_trainee(
 
 @router.put("/{trainee_id}", response_model=TraineeRead)
 def modify_trainee(
-    trainee_id: int,
-    trainer_id: int,
+    trainee_id: str,
     trainee_update: TraineeUpdate,
+    trainer_id: str = Query(..., description="The ID of the trainer"),
     session: Session = Depends(get_session),
 ):
     """Update a trainee's information"""
@@ -85,8 +87,8 @@ def modify_trainee(
 
 @router.delete("/{trainee_id}")
 def remove_trainee(
-    trainee_id: int,
-    trainer_id: int,
+    trainee_id: str,
+    trainer_id: str = Query(..., description="The ID of the trainer"),
     session: Session = Depends(get_session),
 ):
     """Delete a trainee"""
@@ -101,9 +103,9 @@ def remove_trainee(
 
 @router.post("/{trainee_id}/measurements", response_model=TraineeRead)
 def add_trainee_measurement(
-    trainee_id: int,
-    trainer_id: int,
+    trainee_id: str,
     measurement: MeasurementRecord,
+    trainer_id: str = Query(..., description="The ID of the trainer"),
     session: Session = Depends(get_session),
 ):
     """Add a new measurement record for a trainee"""
@@ -120,9 +122,9 @@ def add_trainee_measurement(
 
 @router.post("/{trainee_id}/photos", response_model=TraineeRead)
 def add_trainee_photo(
-    trainee_id: int,
-    trainer_id: int,
+    trainee_id: str,
     photo: ProgressPhoto,
+    trainer_id: str = Query(..., description="The ID of the trainer"),
     session: Session = Depends(get_session),
 ):
     """Add a new progress photo for a trainee"""
@@ -139,9 +141,9 @@ def add_trainee_photo(
 
 @router.post("/{trainee_id}/assign-program", response_model=TraineeRead)
 def assign_program_to_trainee_endpoint(
-    trainee_id: int,
-    trainer_id: int,
-    assignment: ProgramAssignment,
+    trainee_id: str,
+    assignment: ProgramAssignmentRequest,
+    trainer_id: str = Query(..., description="The ID of the trainer"),
     session: Session = Depends(get_session),
 ):
     """Assign a program to a trainee"""
@@ -156,9 +158,9 @@ def assign_program_to_trainee_endpoint(
 
 @router.delete("/{trainee_id}/unassign-program/{program_id}", response_model=TraineeRead)
 def unassign_program_from_trainee_endpoint(
-    trainee_id: int,
-    program_id: int,
-    trainer_id: int,
+    trainee_id: str,
+    program_id: str,
+    trainer_id: str = Query(..., description="The ID of the trainer"),
     session: Session = Depends(get_session),
 ):
     """Unassign a specific program from a trainee"""
@@ -173,10 +175,10 @@ def unassign_program_from_trainee_endpoint(
 
 @router.get("/{trainee_id}/programs")
 def get_trainee_programs_endpoint(
-    trainee_id: int,
-    trainer_id: int,
+    trainee_id: str,
+    trainer_id: str = Query(..., description="The ID of the trainer"),
     session: Session = Depends(get_session),
 ):
     """Get all programs assigned to a trainee"""
     programs = get_trainee_programs(session, trainee_id, trainer_id)
-    return programs
+    return {"data": programs}
