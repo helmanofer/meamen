@@ -26,7 +26,7 @@ interface Template {
   exercises: TemplateExercise[]
 }
 
-function AddExerciseForm({ templateId, order, onDone }: { templateId: string; order: number; onDone: () => void }) {
+function AddExerciseForm({ templateId, onDone }: { templateId: string; order?: number; onDone: () => void }) {
   const [name, setName] = useState('')
   const [sets, setSets] = useState('3')
   const [reps, setReps] = useState('')
