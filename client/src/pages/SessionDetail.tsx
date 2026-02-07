@@ -361,7 +361,7 @@ export default function SessionDetail() {
                       <div className="space-y-1">
                         {ex.logs.map((log) => (
                           <div key={log.id} className="text-xs text-muted-foreground flex gap-3">
-                            <span>{new Date(log.completedAt).toLocaleDateString()}</span>
+                            <span>{new Date(log.completedAt).toLocaleDateString('en-GB')}</span>
                             {log.setsCompleted != null && <span>{log.setsCompleted} sets</span>}
                             {log.repsCompleted != null && <span>{log.repsCompleted} reps</span>}
                             {log.weightUsed != null && <span>{log.weightUsed}kg</span>}

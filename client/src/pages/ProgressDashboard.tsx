@@ -102,7 +102,7 @@ function ExerciseProgressCard({ exercise, sessionName }: { exercise: Exercise; s
                   {[...logs].reverse().map((log) => (
                     <tr key={log.id} className="border-b last:border-0">
                       <td className="py-2 pr-4 whitespace-nowrap">
-                        {new Date(log.completedAt).toLocaleDateString()}
+                        {new Date(log.completedAt).toLocaleDateString('en-GB')}
                       </td>
                       <td className="py-2 pr-4">{log.setsCompleted ?? '-'}</td>
                       <td className="py-2 pr-4">{log.repsCompleted ?? '-'}</td>
