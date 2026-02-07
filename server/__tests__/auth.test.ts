@@ -3,7 +3,7 @@ import { PrismaClient } from '@prisma/client'
 // Import setup FIRST to set DATABASE_URL before app loads PrismaClient
 import { setupTestDB, teardownTestDB, cleanDB } from './helpers/setup.js'
 import { app } from '../index.js'
-import { createTrainer, createTrainee, loginAs, authRequest } from './helpers/auth-helper.js'
+import { createTrainer, loginAs, authRequest } from './helpers/auth-helper.js'
 
 let db: PrismaClient
 
