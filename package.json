@@ -1,0 +1,31 @@
+{
+  "name": "meamen",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "dev:server": "bun run --watch server/index.ts",
+    "dev:client": "cd client && bun run dev",
+    "dev": "bun run dev:server & bun run dev:client",
+    "db:generate": "bunx prisma generate",
+    "db:push": "bunx prisma db push",
+    "db:seed": "bun run prisma/seed.ts",
+    "db:studio": "bunx prisma studio"
+  },
+  "dependencies": {
+    "@hono/node-server": "^1.19.9",
+    "@prisma/client": "6",
+    "bcryptjs": "^3.0.3",
+    "dotenv": "^17.2.4",
+    "hono": "^4.11.8",
+    "jsonwebtoken": "^9.0.3",
+    "prisma": "6"
+  },
+  "devDependencies": {
+    "@types/bcryptjs": "^3.0.0",
+    "@types/bun": "latest",
+    "@types/jsonwebtoken": "^9.0.10"
+  },
+  "peerDependencies": {
+    "typescript": "^5"
+  }
+}

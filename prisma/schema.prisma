@@ -1,0 +1,104 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id           String   @id @default(cuid())
+  email        String   @unique
+  passwordHash String
+  name         String
+  role         String   @default("TRAINEE") // TRAINER or TRAINEE
+  createdAt    DateTime @default(now())
+
+  trainees         TrainerTrainee[]  @relation("TrainerRelation")
+  trainers         TrainerTrainee[]  @relation("TraineeRelation")
+  createdSessions  Session[]         @relation("TrainerSessions")
+  assignedSessions Session[]         @relation("TraineeSessions")
+  exerciseLogs     ExerciseLog[]
+  templates        SessionTemplate[]
+}
+
+model TrainerTrainee {
+  id        String   @id @default(cuid())
+  trainerId String
+  traineeId String
+  createdAt DateTime @default(now())
+
+  trainer User @relation("TrainerRelation", fields: [trainerId], references: [id])
+  trainee User @relation("TraineeRelation", fields: [traineeId], references: [id])
+
+  @@unique([trainerId, traineeId])
+}
+
+model Session {
+  id        String   @id @default(cuid())
+  name      String
+  trainerId String
+  traineeId String
+  order     Int      @default(0)
+  createdAt DateTime @default(now())
+
+  trainer   User       @relation("TrainerSessions", fields: [trainerId], references: [id])
+  trainee   User       @relation("TraineeSessions", fields: [traineeId], references: [id])
+  exercises Exercise[]
+}
+
+model Exercise {
+  id         String  @id @default(cuid())
+  sessionId  String
+  name       String
+  sets       Int     @default(3)
+  reps       Int?
+  weight     Float?
+  duration   Int?
+  youtubeUrl String?
+  order      Int     @default(0)
+  notes      String?
+
+  session Session       @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  logs    ExerciseLog[]
+}
+
+model ExerciseLog {
+  id            String   @id @default(cuid())
+  exerciseId    String
+  traineeId     String
+  setsCompleted Int?
+  repsCompleted Int?
+  weightUsed    Float?
+  notes         String?
+  completedAt   DateTime @default(now())
+
+  exercise Exercise @relation(fields: [exerciseId], references: [id], onDelete: Cascade)
+  trainee  User     @relation(fields: [traineeId], references: [id])
+}
+
+model SessionTemplate {
+  id        String   @id @default(cuid())
+  name      String
+  trainerId String
+  createdAt DateTime @default(now())
+
+  trainer   User               @relation(fields: [trainerId], references: [id])
+  exercises TemplateExercise[]
+}
+
+model TemplateExercise {
+  id         String  @id @default(cuid())
+  templateId String
+  name       String
+  sets       Int     @default(3)
+  reps       Int?
+  weight     Float?
+  duration   Int?
+  youtubeUrl String?
+  order      Int     @default(0)
+  notes      String?
+
+  template SessionTemplate @relation(fields: [templateId], references: [id], onDelete: Cascade)
+}
