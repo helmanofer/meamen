@@ -16,6 +16,7 @@ primary_region = 'iad'
 
 [deploy]
   strategy = 'immediate'
+  release_command = 'bunx prisma db push --skip-generate'
 
 [[vm]]
   size = 'shared-cpu-1x'
