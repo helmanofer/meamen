@@ -1,0 +1,10 @@
+node_modules
+client/node_modules
+prisma/*.db
+prisma/*.db-journal
+.env
+.claude
+.playwright-mcp
+_bmad
+_bmad-output
+.git
