@@ -83,9 +83,10 @@ exercises.delete('/:id', trainerOnly, async (c) => {
   return c.json({ ok: true })
 })
 
-// Log exercise performance (trainee)
+// Log exercise performance (trainee or trainer on behalf of trainee)
 exercises.post('/:id/log', async (c) => {
-  const traineeId = c.get('userId')
+  const userId = c.get('userId')
+  const role = c.get('role')
   const exerciseId = c.req.param('id')
   const data = await c.req.json()
 
@@ -93,9 +94,20 @@ exercises.post('/:id/log', async (c) => {
     where: { id: exerciseId },
     include: { session: true },
   })
-  if (!exercise || exercise.session.traineeId !== traineeId) {
+  if (!exercise) {
     return c.json({ error: 'Not found' }, 404)
   }
+
+  // Trainee can only log their own exercises
+  if (role === 'TRAINEE' && exercise.session.traineeId !== userId) {
+    return c.json({ error: 'Forbidden' }, 403)
+  }
+  // Trainer can only log for sessions they own
+  if (role === 'TRAINER' && exercise.session.trainerId !== userId) {
+    return c.json({ error: 'Forbidden' }, 403)
+  }
+
+  const traineeId = exercise.session.traineeId
 
   const log = await prisma.exerciseLog.create({
     data: {

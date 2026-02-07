@@ -316,17 +316,15 @@ export default function SessionDetail() {
                     {ex.notes && <p className="text-sm text-muted-foreground mt-1">{ex.notes}</p>}
                   </div>
                   <div className="flex gap-2">
-                    {!isTrainer && (
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() =>
-                          setLoggingExerciseId(loggingExerciseId === ex.id ? null : ex.id)
-                        }
-                      >
-                        {loggingExerciseId === ex.id ? 'Cancel' : 'Log'}
-                      </Button>
-                    )}
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() =>
+                        setLoggingExerciseId(loggingExerciseId === ex.id ? null : ex.id)
+                      }
+                    >
+                      {loggingExerciseId === ex.id ? 'Cancel' : 'Log'}
+                    </Button>
                     {isTrainer && (
                       <>
                         <Button
