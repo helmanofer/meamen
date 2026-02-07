@@ -13,10 +13,10 @@ FROM deps AS build-client
 COPY client/ ./client/
 RUN cd client && bun run build
 
-# Generate Prisma client
+# Generate Prisma client (postgresql schema for production)
 FROM deps AS build-server
 COPY prisma/ ./prisma/
-RUN bunx prisma generate
+RUN bunx prisma generate --schema prisma/schema.prisma
 
 # Production image
 FROM base AS production
@@ -31,9 +31,6 @@ COPY --from=build-client /app/client/dist ./client/dist
 COPY server/ ./server/
 COPY prisma/ ./prisma/
 COPY start.ts ./
-
-# Create data directory for SQLite (will be mounted as a volume)
-RUN mkdir -p /data
 
 EXPOSE 8080
 CMD ["bun", "run", "start.ts"]

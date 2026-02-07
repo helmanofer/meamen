@@ -35,6 +35,8 @@ if (process.env.NODE_ENV === 'production') {
   app.get('*', serveStatic({ path: './client/dist/index.html' }))
 }
 
+export { app }
+
 const port = Number(process.env.PORT) || 8080
 const hostname = process.env.HOSTNAME || '0.0.0.0'
 console.log(`Server running on http://${hostname}:${port}`)

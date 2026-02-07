@@ -6,10 +6,13 @@
     "dev:server": "bun run --watch server/index.ts",
     "dev:client": "cd client && bun run dev",
     "dev": "bun run dev:server & bun run dev:client",
-    "db:generate": "bunx prisma generate",
-    "db:push": "bunx prisma db push",
+    "db:generate": "bunx prisma generate --schema prisma/schema.sqlite.prisma",
+    "db:push": "bunx prisma db push --schema prisma/schema.sqlite.prisma",
     "db:seed": "bun run prisma/seed.ts",
-    "db:studio": "bunx prisma studio"
+    "db:studio": "bunx prisma studio --schema prisma/schema.sqlite.prisma",
+    "lint": "bunx eslint .",
+    "lint:client": "cd client && bunx eslint .",
+    "test": "bun test"
   },
   "dependencies": {
     "@hono/node-server": "^1.19.9",
@@ -21,9 +24,13 @@
     "prisma": "6"
   },
   "devDependencies": {
+    "@eslint/js": "^10.0.1",
     "@types/bcryptjs": "^3.0.0",
     "@types/bun": "latest",
-    "@types/jsonwebtoken": "^9.0.10"
+    "@types/jsonwebtoken": "^9.0.10",
+    "eslint": "^10.0.0",
+    "globals": "^17.3.0",
+    "typescript-eslint": "^8.54.0"
   },
   "peerDependencies": {
     "typescript": "^5"

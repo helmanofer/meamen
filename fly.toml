@@ -6,7 +6,6 @@ primary_region = 'iad'
 [env]
   NODE_ENV = 'production'
   PORT = '8080'
-  DATABASE_URL = 'file:/data/meamen.db'
 
 [http_service]
   internal_port = 8080
@@ -17,10 +16,6 @@ primary_region = 'iad'
 
 [deploy]
   strategy = 'immediate'
-
-[mounts]
-  source = 'meamen_data'
-  destination = '/data'
 
 [[vm]]
   size = 'shared-cpu-1x'

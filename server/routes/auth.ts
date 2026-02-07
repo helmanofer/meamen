@@ -1,5 +1,4 @@
 import { Hono } from 'hono'
-import type { Context, Next } from 'hono'
 import { setCookie, deleteCookie } from 'hono/cookie'
 import bcrypt from 'bcryptjs'
 import { prisma } from '../db.js'
