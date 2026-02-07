@@ -190,11 +190,13 @@ export default function Templates() {
   }
 
   const handleDeleteTemplate = async (id: string) => {
+    if (!window.confirm('Delete this template? This will also delete all its exercises.')) return
     await api.deleteTemplate(id)
     loadTemplates()
   }
 
   const handleDeleteExercise = async (templateId: string, exerciseId: string) => {
+    if (!window.confirm('Delete this exercise from the template?')) return
     await api.deleteTemplateExercise(templateId, exerciseId)
     loadTemplates()
   }

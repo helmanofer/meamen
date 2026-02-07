@@ -91,6 +91,7 @@ export default function TraineeSessions() {
   }
 
   const handleDelete = async (id: string) => {
+    if (!window.confirm('Delete this session? This will also delete all its exercises.')) return
     await api.deleteSession(id)
     loadSessions()
   }

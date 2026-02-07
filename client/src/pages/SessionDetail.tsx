@@ -251,6 +251,7 @@ export default function SessionDetail() {
   useEffect(() => { loadSession() }, [loadSession])
 
   const handleDeleteExercise = async (id: string) => {
+    if (!window.confirm('Delete this exercise?')) return
     await api.deleteExercise(id)
     loadSession()
   }
