@@ -1,5 +1,5 @@
 import { useState, useEffect, type FormEvent } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import { useAuth } from '@/lib/auth'
 import { api } from '@/lib/api'
 import { Button } from '@/components/ui/button'
@@ -143,19 +143,25 @@ export default function TrainerDashboard() {
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {trainees.map((t) => (
-              <Link key={t.id} to={`/trainees/${t.id}/sessions`}>
-                <Card className="hover:shadow-md transition-shadow cursor-pointer">
-                  <CardHeader>
-                    <div className="flex items-start justify-between">
-                      <div className="flex-1">
-                        <CardTitle>{t.name}</CardTitle>
-                        <p className="text-sm text-muted-foreground">{t.email}</p>
-                      </div>
+              <Card
+                key={t.id}
+                className="hover:shadow-md transition-shadow cursor-pointer"
+                onClick={() => {
+                  if (editingId !== t.id) navigate(`/trainees/${t.id}/sessions`)
+                }}
+              >
+                <CardHeader>
+                  <div className="flex items-start justify-between gap-2">
+                    <div className="min-w-0 flex-1">
+                      <CardTitle className="truncate">{t.name}</CardTitle>
+                      <p className="text-sm text-muted-foreground truncate">{t.email}</p>
+                    </div>
+                    <div className="flex shrink-0 gap-1">
                       <Button
                         variant="ghost"
                         size="sm"
                         onClick={(e) => {
-                          e.preventDefault()
+                          e.stopPropagation()
                           setEditingId(editingId === t.id ? null : t.id)
                         }}
                       >
@@ -165,22 +171,22 @@ export default function TrainerDashboard() {
                         variant="destructive"
                         size="sm"
                         onClick={(e) => {
-                          e.preventDefault()
+                          e.stopPropagation()
                           handleDelete(t)
                         }}
                       >
                         Delete
                       </Button>
                     </div>
-                    {editingId === t.id && (
-                      <EditTraineeForm
-                        trainee={t}
-                        onDone={() => { setEditingId(null); loadTrainees() }}
-                      />
-                    )}
-                  </CardHeader>
-                </Card>
-              </Link>
+                  </div>
+                  {editingId === t.id && (
+                    <EditTraineeForm
+                      trainee={t}
+                      onDone={() => { setEditingId(null); loadTrainees() }}
+                    />
+                  )}
+                </CardHeader>
+              </Card>
             ))}
           </div>
         )}

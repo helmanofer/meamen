@@ -1,5 +1,2 @@
-- github actions
-  - linter
-  - unit tests
-  - deploy to flt.io (main branch)
-- postgresql in production
+- bug: when trying to edit trainee, clicking edit, trying to click the editable input, but it clicks and goes into the trainee
+- bug: My Trainees page. it seems like the edit delete botton is pulling to the right if the email is too long.
