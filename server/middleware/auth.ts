@@ -20,7 +20,7 @@ export function verifyToken(token: string): JwtPayload {
 export async function authMiddleware(c: Context<{ Variables: { userId: string; role: string } }>, next: Next) {
   const token = getCookie(c, 'token')
   if (!token) {
-    return c.json({ error: 'Unauthorized' }, 401)
+    return c.text('Unauthorized', 401)
   }
 
   try {
@@ -29,16 +29,13 @@ export async function authMiddleware(c: Context<{ Variables: { userId: string; r
     c.set('role', payload.role)
     await next()
   } catch {
-    return c.json({ error: 'Invalid token' }, 401)
+    return c.text('Invalid token', 401)
   }
 }
 
 export function trainerOnly(c: Context<{ Variables: { userId: string; role: string } }>, next: Next) {
   if (c.get('role') !== 'TRAINER') {
-    return new Response(JSON.stringify({ error: 'Trainers only' }), {
-      status: 403,
-      headers: { 'Content-Type': 'application/json' },
-    })
+    return c.text('Trainers only', 403)
   }
   return next()
 }

@@ -4,14 +4,12 @@ import bcrypt from 'bcryptjs'
 const prisma = new PrismaClient()
 
 async function main() {
-  // Clean existing data
-  await prisma.templateExercise.deleteMany()
-  await prisma.sessionTemplate.deleteMany()
-  await prisma.exerciseLog.deleteMany()
-  await prisma.exercise.deleteMany()
-  await prisma.session.deleteMany()
-  await prisma.trainerTrainee.deleteMany()
-  await prisma.user.deleteMany()
+  // Check if data already exists - skip seeding if it does
+  const existingUsers = await prisma.user.count()
+  if (existingUsers > 0) {
+    console.log('Database already seeded, skipping...')
+    return
+  }
 
   const passwordHash = await bcrypt.hash('password123', 10)
 

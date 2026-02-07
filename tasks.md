@@ -1,0 +1,5 @@
+- github actions
+  - linter
+  - unit tests
+  - deploy to flt.io (main branch)
+- postgresql in production

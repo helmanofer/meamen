@@ -35,10 +35,12 @@ if (process.env.NODE_ENV === 'production') {
   app.get('*', serveStatic({ path: './client/dist/index.html' }))
 }
 
-const port = Number(process.env.PORT) || 3000
-console.log(`Server running on http://localhost:${port}`)
+const port = Number(process.env.PORT) || 8080
+const hostname = process.env.HOSTNAME || '0.0.0.0'
+console.log(`Server running on http://${hostname}:${port}`)
 
 export default {
   port,
+  hostname,
   fetch: app.fetch,
 }

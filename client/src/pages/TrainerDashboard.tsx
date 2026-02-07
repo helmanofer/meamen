@@ -30,7 +30,7 @@ function EditTraineeForm({ trainee, onDone }: { trainee: Trainee; onDone: () => 
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-3" onClick={(e) => e.preventDefault()}>
+    <form onSubmit={handleSubmit} className="space-y-3" onClick={(e) => e.stopPropagation()}>
       <div className="space-y-2">
         <Label className="text-xs">Name</Label>
         <Input value={name} onChange={(e) => setName(e.target.value)} required />

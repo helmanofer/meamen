@@ -26,11 +26,16 @@ trainees.get('/', async (c) => {
 // Add a new trainee
 trainees.post('/', async (c) => {
   const trainerId = c.get('userId')
-  const { name, email, password } = await c.req.json()
+  const body = await c.req.json()
+  const { name, email, password } = body
+
+  if (!name || !email || !password) {
+    return c.text('Missing required fields', 400)
+  }
 
   const existing = await prisma.user.findUnique({ where: { email } })
   if (existing) {
-    return c.json({ error: 'Email already in use' }, 400)
+    return c.text('Email already in use', 400)
   }
 
   const passwordHash = await bcrypt.hash(password, 10)
@@ -43,9 +48,9 @@ trainees.post('/', async (c) => {
     data: { trainerId, traineeId: trainee.id },
   })
 
+  c.status(201)
   return c.json(
-    { id: trainee.id, name: trainee.name, email: trainee.email },
-    201
+    { id: trainee.id, name: trainee.name, email: trainee.email }
   )
 })
 
