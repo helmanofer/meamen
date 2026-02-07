@@ -1,5 +1,7 @@
 # Meamen
 
+**Live**: [https://meamen.fly.dev/](https://meamen.fly.dev/)
+
 A fitness training management platform built with Bun, Hono.js, React, and Prisma.
 
 ## Overview
