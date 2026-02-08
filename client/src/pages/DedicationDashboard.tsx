@@ -67,31 +67,34 @@ export default function DedicationDashboard() {
   const [newFrequency, setNewFrequency] = useState('')
 
   const loadData = useCallback(async () => {
-    try {
-      const [s, b, c] = await Promise.all([
-        api.getDedicationStats(targetTraineeId),
-        api.getBadgeDefinitions(),
-        api.getDedicationConfig(),
-      ])
-      setStats(s)
-      setAllBadges(b)
-      setConfig(c)
+    const [s, b, c] = await Promise.all([
+      api.getDedicationStats(targetTraineeId),
+      api.getBadgeDefinitions(),
+      api.getDedicationConfig(),
+    ])
+    setStats(s)
+    setAllBadges(b)
+    setConfig(c)
 
-      const r = await api.getRewards(targetTraineeId)
-      setRewards(r)
+    const r = await api.getRewards(targetTraineeId)
+    setRewards(r)
 
-      if (c.leaderboardEnabled) {
-        try {
-          const lb = await api.getLeaderboard()
-          setLeaderboard(lb)
-        } catch { /* leaderboard may fail if disabled */ }
-      }
-    } catch (err) {
-      console.error('Failed to load dedication data:', err)
+    if (c.leaderboardEnabled) {
+      try {
+        const lb = await api.getLeaderboard()
+        setLeaderboard(lb)
+      } catch { /* leaderboard may fail if disabled */ }
     }
   }, [targetTraineeId])
 
-  useEffect(() => { loadData() }, [loadData])
+  useEffect(() => {
+    let mounted = true
+    const init = async () => {
+      if (mounted) await loadData()
+    }
+    init()
+    return () => { mounted = false }
+  }, [targetTraineeId, loadData])
 
   const handleCreateReward = async (e: FormEvent) => {
     e.preventDefault()
