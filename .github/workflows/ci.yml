@@ -49,8 +49,13 @@ jobs:
       - name: Trigger Render deploy
         id: trigger
         run: |
-          RESPONSE=$(curl -s "${{ secrets.RENDER_DEPLOY_HOOK_URL }}")
-          DEPLOY_ID=$(echo "$RESPONSE" | jq -r '.deploy.id')
+          RESPONSE=$(curl -sf "${{ secrets.RENDER_DEPLOY_HOOK_URL }}" || true)
+          echo "Response: $RESPONSE"
+          DEPLOY_ID=$(echo "$RESPONSE" | jq -r '.deploy.id // empty')
+          if [ -z "$DEPLOY_ID" ]; then
+            echo "::error::Failed to trigger deploy. Response: $RESPONSE"
+            exit 1
+          fi
           echo "deploy_id=$DEPLOY_ID" >> "$GITHUB_OUTPUT"
           echo "Triggered deploy: $DEPLOY_ID"
       - name: Wait for deploy to complete
