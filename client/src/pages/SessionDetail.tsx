@@ -364,7 +364,7 @@ export default function SessionDetail() {
         {session.exercises.length === 0 ? (
           <p className="text-muted-foreground text-center py-12">No exercises yet.</p>
         ) : (
-          <div className="space-y-4">
+          <div className="space-y-3">
             {session.exercises.map((ex) => (
               <Card key={ex.id}>
                 <CardHeader className="flex flex-row items-start justify-between">
@@ -404,62 +404,64 @@ export default function SessionDetail() {
                     )}
                   </div>
                 </CardHeader>
-                <CardContent>
-                  {ex.youtubeUrl && <YouTubeEmbed url={ex.youtubeUrl} />}
+                {(ex.youtubeUrl || editingExerciseId === ex.id || loggingExerciseId === ex.id || ex.logs.length > 0) && (
+                  <CardContent>
+                    {ex.youtubeUrl && <YouTubeEmbed url={ex.youtubeUrl} />}
 
-                  {editingExerciseId === ex.id && (
-                    <EditExerciseForm
-                      exercise={ex}
-                      onDone={() => { setEditingExerciseId(null); loadSession() }}
-                    />
-                  )}
+                    {editingExerciseId === ex.id && (
+                      <EditExerciseForm
+                        exercise={ex}
+                        onDone={() => { setEditingExerciseId(null); loadSession() }}
+                      />
+                    )}
 
-                  {loggingExerciseId === ex.id && (
-                    <LogForm exerciseId={ex.id} lastLog={ex.logs[0]} onDone={(newBadges) => {
-                      setLoggingExerciseId(null)
-                      loadSession()
-                      if (newBadges && newBadges.length > 0) setBadgeAlert(newBadges)
-                    }} />
-                  )}
+                    {loggingExerciseId === ex.id && (
+                      <LogForm exerciseId={ex.id} lastLog={ex.logs[0]} onDone={(newBadges) => {
+                        setLoggingExerciseId(null)
+                        loadSession()
+                        if (newBadges && newBadges.length > 0) setBadgeAlert(newBadges)
+                      }} />
+                    )}
 
-                  {ex.logs.length > 0 && (
-                    <div className="mt-3">
-                      <p className="text-xs font-medium text-muted-foreground mb-1">Recent Logs</p>
-                      <div className="space-y-1">
-                        {ex.logs.map((log) => (
-                          <div key={log.id}>
-                            <div className="text-xs text-muted-foreground flex items-center gap-3">
-                              <span>{new Date(log.completedAt).toLocaleDateString('en-GB')}</span>
-                              {log.setsCompleted != null && <span>{log.setsCompleted} sets</span>}
-                              {log.repsCompleted != null && <span>{log.repsCompleted} reps</span>}
-                              {log.weightUsed != null && <span>{log.weightUsed}kg</span>}
-                              {log.notes && <span>- {log.notes}</span>}
-                              <span className="ml-auto flex gap-1">
-                                <button
-                                  onClick={() => setEditingLogId(editingLogId === log.id ? null : log.id)}
-                                  className="hover:text-foreground"
-                                  title="Edit log"
-                                >
-                                  &#9998;
-                                </button>
-                                <button
-                                  onClick={() => handleDeleteLog(log.id)}
-                                  className="hover:text-destructive"
-                                  title="Delete log"
-                                >
-                                  &#128465;
-                                </button>
-                              </span>
+                    {ex.logs.length > 0 && (
+                      <div className="mt-3">
+                        <p className="text-xs font-medium text-muted-foreground mb-1">Recent Logs</p>
+                        <div className="space-y-1">
+                          {ex.logs.map((log) => (
+                            <div key={log.id}>
+                              <div className="text-xs text-muted-foreground flex items-center gap-3">
+                                <span>{new Date(log.completedAt).toLocaleDateString('en-GB')}</span>
+                                {log.setsCompleted != null && <span>{log.setsCompleted} sets</span>}
+                                {log.repsCompleted != null && <span>{log.repsCompleted} reps</span>}
+                                {log.weightUsed != null && <span>{log.weightUsed}kg</span>}
+                                {log.notes && <span>- {log.notes}</span>}
+                                <span className="ml-auto flex gap-1">
+                                  <button
+                                    onClick={() => setEditingLogId(editingLogId === log.id ? null : log.id)}
+                                    className="hover:text-foreground"
+                                    title="Edit log"
+                                  >
+                                    &#9998;
+                                  </button>
+                                  <button
+                                    onClick={() => handleDeleteLog(log.id)}
+                                    className="hover:text-destructive"
+                                    title="Delete log"
+                                  >
+                                    &#128465;
+                                  </button>
+                                </span>
+                              </div>
+                              {editingLogId === log.id && (
+                                <EditLogForm log={log} onDone={() => { setEditingLogId(null); loadSession() }} />
+                              )}
                             </div>
-                            {editingLogId === log.id && (
-                              <EditLogForm log={log} onDone={() => { setEditingLogId(null); loadSession() }} />
-                            )}
-                          </div>
-                        ))}
+                          ))}
+                        </div>
                       </div>
-                    </div>
-                  )}
-                </CardContent>
+                    )}
+                  </CardContent>
+                )}
               </Card>
             ))}
           </div>

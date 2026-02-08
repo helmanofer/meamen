@@ -152,43 +152,41 @@ export default function DedicationDashboard() {
           <p className="text-muted-foreground text-center py-12">Loading...</p>
         ) : (
           <>
-            {/* Streak Display */}
+            {/* Streak + Heatmap */}
             <Card>
-              <CardContent className="pt-6">
-                <div className="flex items-center gap-6 flex-wrap">
+              <CardContent className="!pt-4">
+                <div className="flex items-center gap-5 flex-wrap">
                   <div className="text-center">
-                    <div className="text-4xl font-bold">{stats.currentStreakWeeks > 0 ? '🔥' : '💤'}</div>
-                    <div className="text-3xl font-bold mt-1">{stats.currentStreakWeeks}</div>
-                    <div className="text-sm text-muted-foreground">week streak</div>
+                    <div className="text-3xl">{stats.currentStreakWeeks > 0 ? '🔥' : '💤'}</div>
+                    <div className="text-2xl font-bold">{stats.currentStreakWeeks}</div>
+                    <div className="text-xs text-muted-foreground">week streak</div>
                   </div>
-                  <div className="flex-1 grid grid-cols-2 sm:grid-cols-4 gap-4">
+                  <div className="flex-1 grid grid-cols-2 sm:grid-cols-4 gap-3 text-center">
                     <div>
-                      <div className="text-lg font-semibold">{stats.longestStreakWeeks}</div>
-                      <div className="text-xs text-muted-foreground">longest streak</div>
+                      <div className="text-base font-semibold">{stats.longestStreakWeeks}</div>
+                      <div className="text-[11px] text-muted-foreground">longest streak</div>
                     </div>
                     <div>
-                      <div className="text-lg font-semibold">{stats.perfectWeeks}</div>
-                      <div className="text-xs text-muted-foreground">perfect weeks</div>
+                      <div className="text-base font-semibold">{stats.perfectWeeks}</div>
+                      <div className="text-[11px] text-muted-foreground">perfect weeks</div>
                     </div>
                     <div>
-                      <div className="text-lg font-semibold">{stats.totalWorkoutDays}</div>
-                      <div className="text-xs text-muted-foreground">workout days</div>
+                      <div className="text-base font-semibold">{stats.totalWorkoutDays}</div>
+                      <div className="text-[11px] text-muted-foreground">workout days</div>
                     </div>
-                    <div className="flex items-center gap-2">
-                      <div>
-                        <div className="text-lg font-semibold">{stats.minWeeklyFrequency}x</div>
-                        <div className="text-xs text-muted-foreground">per week goal</div>
-                      </div>
+                    <div>
+                      <div className="text-base font-semibold">{stats.minWeeklyFrequency}x</div>
+                      <div className="text-[11px] text-muted-foreground">per week goal</div>
                       {isTrainer && traineeId && (
-                        <Button variant="ghost" size="sm" onClick={() => { setNewFrequency(String(stats.minWeeklyFrequency)); setEditingFrequency(!editingFrequency) }}>
-                          Edit
-                        </Button>
+                        <button className="text-[10px] text-muted-foreground underline mt-0.5" onClick={() => { setNewFrequency(String(stats.minWeeklyFrequency)); setEditingFrequency(!editingFrequency) }}>
+                          edit
+                        </button>
                       )}
                     </div>
                   </div>
                 </div>
                 {editingFrequency && (
-                  <form onSubmit={handleUpdateFrequency} className="mt-4 flex gap-2 items-end">
+                  <form onSubmit={handleUpdateFrequency} className="mt-3 flex gap-2 items-end">
                     <div>
                       <Label className="text-xs">Weekly goal</Label>
                       <Input type="number" min="1" max="7" value={newFrequency} onChange={(e) => setNewFrequency(e.target.value)} className="w-20" />
@@ -197,16 +195,9 @@ export default function DedicationDashboard() {
                     <Button type="button" variant="ghost" size="sm" onClick={() => setEditingFrequency(false)}>Cancel</Button>
                   </form>
                 )}
-              </CardContent>
-            </Card>
-
-            {/* Activity Heatmap */}
-            <Card>
-              <CardHeader>
-                <CardTitle>Activity</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <WorkoutHeatmap activityDays={stats.activityDays} />
+                <div className="mt-4 pt-3 border-t border-border/40">
+                  <WorkoutHeatmap activityDays={stats.activityDays} />
+                </div>
               </CardContent>
             </Card>
 
@@ -216,7 +207,7 @@ export default function DedicationDashboard() {
                 <CardTitle>Badges</CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-3">
+                <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-6 gap-3">
                   {allBadges.map((b) => (
                     <BadgeIcon
                       key={b.key}

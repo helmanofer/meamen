@@ -6,7 +6,6 @@ import { api } from '@/lib/api'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card'
-import { StreakBadge } from '@/components/StreakBadge'
 import { WorkoutHeatmap } from '@/components/WorkoutHeatmap'
 
 interface Session {
@@ -131,16 +130,16 @@ export default function TraineeSessions() {
       </header>
 
       <main className="max-w-4xl mx-auto px-4 py-6 space-y-6">
-        <div className="flex items-center justify-between">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
           <h2 className="text-2xl font-semibold">
             {isTrainer ? `${traineeName}'s Sessions` : 'My Sessions'}
           </h2>
-          <div className="flex gap-2">
+          <div className="flex gap-2 flex-wrap">
             <Link to={isTrainer ? `/trainees/${traineeId}/dedication` : '/dedication'}>
-              <Button variant="outline">Dedication</Button>
+              <Button variant="outline" size="sm">Dedication</Button>
             </Link>
             <Link to={isTrainer ? `/trainees/${traineeId}/progress` : '/progress'}>
-              <Button variant="outline">View Progress</Button>
+              <Button variant="outline" size="sm">Progress</Button>
             </Link>
             {isTrainer && (
               showForm ? (
@@ -157,30 +156,25 @@ export default function TraineeSessions() {
 
         {dedicationStats && (
           <Link to={isTrainer ? `/trainees/${traineeId}/dedication` : '/dedication'} className="block">
-            <Card className="hover:shadow-md transition-shadow">
-              <CardContent className="py-3 flex items-center gap-4">
-                <div className="text-center min-w-[56px]">
-                  <div className="text-2xl">{dedicationStats.currentStreakWeeks > 0 ? '🔥' : '💤'}</div>
-                  <div className="text-lg font-bold leading-tight">{dedicationStats.currentStreakWeeks}w</div>
+            <Card className="hover:shadow transition-shadow">
+              <CardContent className="!p-3 flex items-center gap-3">
+                <div className="flex items-center gap-1.5 min-w-[52px]">
+                  <span className="text-xl">{dedicationStats.currentStreakWeeks > 0 ? '🔥' : '💤'}</span>
+                  <span className="text-sm font-bold">{dedicationStats.currentStreakWeeks}w</span>
                 </div>
-                <div className="h-8 w-px bg-border" />
-                <div className="flex-1 flex items-center gap-4 text-sm">
-                  <span className="text-muted-foreground">
-                    <span className="font-medium text-foreground">{dedicationStats.totalWorkoutDays}</span> workout days
-                  </span>
-                  <span className="text-muted-foreground">
-                    <span className="font-medium text-foreground">{dedicationStats.badges.length}</span> badges
-                  </span>
+                <div className="h-6 w-px bg-border/60" />
+                <div className="flex items-center gap-3 text-xs text-muted-foreground">
+                  <span><span className="font-semibold text-foreground">{dedicationStats.totalWorkoutDays}</span> days</span>
+                  <span><span className="font-semibold text-foreground">{dedicationStats.badges.length}</span> badges</span>
                   {dedicationStats.badges.length > 0 && (
-                    <span className="hidden sm:inline text-base">
+                    <span className="hidden sm:inline text-sm">
                       {dedicationStats.badges.slice(0, 5).map((b) => b.icon).join(' ')}
                     </span>
                   )}
                 </div>
-                <div className="hidden sm:block">
+                <div className="hidden sm:flex ml-auto">
                   <WorkoutHeatmap activityDays={dedicationStats.activityDays} compact />
                 </div>
-                <StreakBadge weeks={dedicationStats.currentStreakWeeks} />
               </CardContent>
             </Card>
           </Link>
@@ -200,7 +194,7 @@ export default function TraineeSessions() {
 
         {showForm === 'template' && (
           <Card>
-            <CardContent className="pt-6 space-y-4">
+            <CardContent className="!pt-4 space-y-4">
               <p className="text-sm font-medium">Choose a template</p>
               {templates.length === 0 ? (
                 <p className="text-sm text-muted-foreground">No templates available. <Link to="/templates" className="underline">Create one</Link></p>
