@@ -72,7 +72,7 @@ export default function TrainerDashboard() {
     trainees.forEach((t) => {
       api.getDedicationStats(t.id).then((s) => {
         setTraineeStats((prev) => ({ ...prev, [t.id]: { streak: s.currentStreakWeeks, badges: s.badges.length } }))
-      }).catch(() => {})
+      }).catch(() => { })
     })
   }, [trainees])
 
@@ -101,7 +101,9 @@ export default function TrainerDashboard() {
     <div className="min-h-screen bg-background">
       <header className="border-b">
         <div className="max-w-4xl mx-auto px-4 py-3 flex items-center justify-between">
-          <h1 className="text-xl font-bold">Meamen</h1>
+          <div className="flex items-center">
+            <img src="/logo.png" alt="Meamen" className="h-16 w-auto object-contain" />
+          </div>
           <div className="flex items-center gap-3">
             <span className="text-sm text-muted-foreground">{user?.name}</span>
             <Button variant="ghost" size="sm" onClick={logout}>

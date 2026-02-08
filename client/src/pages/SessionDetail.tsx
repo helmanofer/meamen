@@ -317,14 +317,14 @@ export default function SessionDetail() {
   return (
     <div className="min-h-screen bg-background">
       <header className="border-b">
-        <div className="max-w-4xl mx-auto px-4 py-3 flex items-center justify-between">
-          <div className="flex items-center gap-3">
+        <div className="relative max-w-4xl mx-auto px-4 py-3 flex items-center justify-between">
+          <div className="flex items-center gap-2 relative z-20">
             <Link to={backPath}>
               <Button variant="ghost" size="sm">&larr; Back</Button>
             </Link>
-            <h1 className="text-xl font-bold">Meamen</h1>
+            <img src="/logo.png" alt="Meamen" className="h-12 w-auto object-contain" />
           </div>
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-3 relative z-20">
             <span className="text-sm text-muted-foreground">{user?.name}</span>
             <Button variant="ghost" size="sm" onClick={logout}>Sign Out</Button>
           </div>

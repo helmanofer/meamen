@@ -3,7 +3,7 @@ import { useAuth } from '@/lib/auth'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card'
+import { Card, CardHeader, CardContent } from '@/components/ui/card'
 
 export default function Login() {
   const { login } = useAuth()
@@ -29,7 +29,9 @@ export default function Login() {
     <div className="min-h-screen flex items-center justify-center p-4">
       <Card className="w-full max-w-sm">
         <CardHeader>
-          <CardTitle className="text-2xl text-center">Meamen</CardTitle>
+          <div className="flex flex-col items-center justify-center mb-2">
+            <img src="/logo.png" alt="Meamen" className="h-32 w-auto object-contain" />
+          </div>
           <p className="text-sm text-muted-foreground text-center">
             Sign in to your account
           </p>

@@ -352,7 +352,9 @@ export default function ProgressDashboard() {
             <Link to={backPath}>
               <Button variant="ghost" size="sm">&larr; Back</Button>
             </Link>
-            <h1 className="text-xl font-bold">Meamen</h1>
+            <div className="flex items-center">
+              <img src="/logo.png" alt="Meamen" className="h-16 w-auto object-contain" />
+            </div>
           </div>
           <div className="flex items-center gap-3">
             <span className="text-sm text-muted-foreground">{user?.name}</span>
