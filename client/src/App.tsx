@@ -6,6 +6,7 @@ import TraineeSessions from '@/pages/TraineeSessions'
 import SessionDetail from '@/pages/SessionDetail'
 import ProgressDashboard from '@/pages/ProgressDashboard'
 import Templates from '@/pages/Templates'
+import DedicationDashboard from '@/pages/DedicationDashboard'
 
 function AppRoutes() {
   const { user, loading } = useAuth()
@@ -27,6 +28,7 @@ function AppRoutes() {
         <Route path="/templates" element={<Templates />} />
         <Route path="/trainees/:traineeId/sessions" element={<TraineeSessions />} />
         <Route path="/trainees/:traineeId/progress" element={<ProgressDashboard />} />
+        <Route path="/trainees/:traineeId/dedication" element={<DedicationDashboard />} />
         <Route path="/sessions/:sessionId" element={<SessionDetail />} />
         <Route path="*" element={<Navigate to="/" />} />
       </Routes>
@@ -40,6 +42,7 @@ function AppRoutes() {
       <Route path="/sessions" element={<TraineeSessions />} />
       <Route path="/sessions/:sessionId" element={<SessionDetail />} />
       <Route path="/progress" element={<ProgressDashboard />} />
+      <Route path="/dedication" element={<DedicationDashboard />} />
       <Route path="*" element={<Navigate to="/sessions" />} />
     </Routes>
   )

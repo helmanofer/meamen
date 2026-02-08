@@ -15,19 +15,24 @@ model User {
   role         String   @default("TRAINEE") // TRAINER or TRAINEE
   createdAt    DateTime @default(now())
 
+  leaderboardOptOut Boolean  @default(false)
+
   trainees         TrainerTrainee[]  @relation("TrainerRelation")
   trainers         TrainerTrainee[]  @relation("TraineeRelation")
   createdSessions  Session[]         @relation("TrainerSessions")
   assignedSessions Session[]         @relation("TraineeSessions")
   exerciseLogs     ExerciseLog[]
   templates        SessionTemplate[]
+  badges           TraineeBadge[]
+  rewards          Reward[]
 }
 
 model TrainerTrainee {
   id        String   @id @default(cuid())
-  trainerId String
-  traineeId String
-  createdAt DateTime @default(now())
+  trainerId          String
+  traineeId          String
+  minWeeklyFrequency Int      @default(3)
+  createdAt          DateTime @default(now())
 
   trainer User @relation("TrainerRelation", fields: [trainerId], references: [id])
   trainee User @relation("TraineeRelation", fields: [traineeId], references: [id])
@@ -101,4 +106,25 @@ model TemplateExercise {
   notes      String?
 
   template SessionTemplate @relation(fields: [templateId], references: [id], onDelete: Cascade)
+}
+
+model TraineeBadge {
+  id        String   @id @default(cuid())
+  traineeId String
+  badgeKey  String
+  earnedAt  DateTime @default(now())
+
+  trainee User @relation(fields: [traineeId], references: [id])
+
+  @@unique([traineeId, badgeKey])
+}
+
+model Reward {
+  id          String   @id @default(cuid())
+  trainerId   String
+  condition   String
+  description String
+  createdAt   DateTime @default(now())
+
+  trainer User @relation(fields: [trainerId], references: [id])
 }

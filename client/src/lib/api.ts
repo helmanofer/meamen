@@ -108,4 +108,27 @@ export const api = {
     request(`/templates/${templateId}/exercises/${exerciseId}`, { method: 'DELETE' }),
   createSessionFromTemplate: (data: { templateId: string; traineeId: string }) =>
     request('/sessions/from-template', { method: 'POST', body: JSON.stringify(data) }),
+
+  // Dedication
+  getDedicationStats: (traineeId?: string) =>
+    request<{
+      currentStreakWeeks: number; longestStreakWeeks: number; perfectWeeks: number;
+      totalWorkoutDays: number; minWeeklyFrequency: number;
+      activityDays: Record<string, number>;
+      badges: Array<{ key: string; earnedAt: string; name?: string; icon?: string }>;
+    }>(`/dedication/stats${traineeId ? `?traineeId=${traineeId}` : ''}`),
+  getBadgeDefinitions: () =>
+    request<Array<{ key: string; name: string; description: string; category: string; icon: string }>>('/dedication/badges'),
+  getLeaderboard: () =>
+    request<Array<{ rank: number; traineeId: string; name: string; currentStreakWeeks: number; totalWorkoutDays: number; badgeCount: number }>>('/dedication/leaderboard'),
+  getDedicationConfig: () =>
+    request<{ leaderboardEnabled: boolean }>('/dedication/config'),
+  getRewards: (traineeId?: string) =>
+    request<Array<{ id: string; condition: string; description: string; met: boolean }>>(`/dedication/rewards${traineeId ? `?traineeId=${traineeId}` : ''}`),
+  createReward: (data: { condition: string; description: string }) =>
+    request('/dedication/rewards', { method: 'POST', body: JSON.stringify(data) }),
+  deleteReward: (id: string) =>
+    request(`/dedication/rewards/${id}`, { method: 'DELETE' }),
+  updateDedicationSettings: (data: { leaderboardOptOut?: boolean; traineeId?: string; minWeeklyFrequency?: number }) =>
+    request('/dedication/settings', { method: 'PUT', body: JSON.stringify(data) }),
 }

@@ -50,25 +50,29 @@ function YouTubeEmbed({ url }: { url: string }) {
   )
 }
 
-function LogForm({ exerciseId, onDone }: { exerciseId: string; onDone: () => void }) {
-  const [sets, setSets] = useState('')
-  const [reps, setReps] = useState('')
-  const [weight, setWeight] = useState('')
+function LogForm({ exerciseId, lastLog, onDone }: {
+  exerciseId: string;
+  lastLog?: { setsCompleted: number | null; repsCompleted: number | null; weightUsed: number | null; notes: string | null };
+  onDone: (newBadges?: string[]) => void;
+}) {
+  const [sets, setSets] = useState(lastLog?.setsCompleted != null ? String(lastLog.setsCompleted) : '')
+  const [reps, setReps] = useState(lastLog?.repsCompleted != null ? String(lastLog.repsCompleted) : '')
+  const [weight, setWeight] = useState(lastLog?.weightUsed != null ? String(lastLog.weightUsed) : '')
   const [notes, setNotes] = useState('')
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault()
-    await api.logExercise(exerciseId, {
+    const result = await api.logExercise(exerciseId, {
       setsCompleted: sets ? Number(sets) : undefined,
       repsCompleted: reps ? Number(reps) : undefined,
       weightUsed: weight ? Number(weight) : undefined,
       notes: notes || undefined,
-    })
+    }) as { newBadges?: string[] }
     setSets('')
     setReps('')
     setWeight('')
     setNotes('')
-    onDone()
+    onDone(result.newBadges)
   }
 
   return (
@@ -284,6 +288,7 @@ export default function SessionDetail() {
   const [loggingExerciseId, setLoggingExerciseId] = useState<string | null>(null)
   const [editingExerciseId, setEditingExerciseId] = useState<string | null>(null)
   const [editingLogId, setEditingLogId] = useState<string | null>(null)
+  const [badgeAlert, setBadgeAlert] = useState<string[] | null>(null)
   const isTrainer = user?.role === 'TRAINER'
 
   const loadSession = useCallback(() => {
@@ -327,6 +332,15 @@ export default function SessionDetail() {
       </header>
 
       <main className="max-w-4xl mx-auto px-4 py-6 space-y-6">
+        {badgeAlert && (
+          <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 flex items-center justify-between">
+            <div>
+              <p className="font-medium text-yellow-900">New badge{badgeAlert.length > 1 ? 's' : ''} earned!</p>
+              <p className="text-sm text-yellow-700">{badgeAlert.join(', ')}</p>
+            </div>
+            <Button variant="ghost" size="sm" onClick={() => setBadgeAlert(null)}>Dismiss</Button>
+          </div>
+        )}
         <div className="flex items-center justify-between">
           <div>
             <h2 className="text-2xl font-semibold">{session.name}</h2>
@@ -401,7 +415,11 @@ export default function SessionDetail() {
                   )}
 
                   {loggingExerciseId === ex.id && (
-                    <LogForm exerciseId={ex.id} onDone={() => { setLoggingExerciseId(null); loadSession() }} />
+                    <LogForm exerciseId={ex.id} lastLog={ex.logs[0]} onDone={(newBadges) => {
+                      setLoggingExerciseId(null)
+                      loadSession()
+                      if (newBadges && newBadges.length > 0) setBadgeAlert(newBadges)
+                    }} />
                   )}
 
                   {ex.logs.length > 0 && (

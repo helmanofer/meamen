@@ -1,1 +1,1 @@
-- add support for deployment on https://render.com/ (alongside fly.io)
+- when logging an exercise, auto fill the last exercise's details

@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card'
+import { StreakBadge } from '@/components/StreakBadge'
 
 interface Trainee {
   id: string
@@ -58,12 +59,22 @@ export default function TrainerDashboard() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
+  const [traineeStats, setTraineeStats] = useState<Record<string, { streak: number; badges: number }>>({})
 
   const loadTrainees = () => {
     api.getTrainees().then(setTrainees).catch(console.error)
   }
 
   useEffect(() => { loadTrainees() }, [])
+
+  // Load dedication stats for each trainee
+  useEffect(() => {
+    trainees.forEach((t) => {
+      api.getDedicationStats(t.id).then((s) => {
+        setTraineeStats((prev) => ({ ...prev, [t.id]: { streak: s.currentStreakWeeks, badges: s.badges.length } }))
+      }).catch(() => {})
+    })
+  }, [trainees])
 
   const handleDelete = async (trainee: Trainee) => {
     if (!window.confirm(`Delete ${trainee.name}? This will remove them from your trainees.`)) return
@@ -155,6 +166,16 @@ export default function TrainerDashboard() {
                     <div className="min-w-0 flex-1">
                       <CardTitle className="truncate">{t.name}</CardTitle>
                       <p className="text-sm text-muted-foreground truncate">{t.email}</p>
+                      <div className="flex items-center gap-2 mt-1">
+                        {traineeStats[t.id] && (
+                          <>
+                            <StreakBadge weeks={traineeStats[t.id].streak} />
+                            {traineeStats[t.id].badges > 0 && (
+                              <span className="text-xs text-muted-foreground">🏅 {traineeStats[t.id].badges}</span>
+                            )}
+                          </>
+                        )}
+                      </div>
                     </div>
                     <div className="flex shrink-0 gap-1">
                       <Button

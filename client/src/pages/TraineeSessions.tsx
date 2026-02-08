@@ -6,6 +6,8 @@ import { api } from '@/lib/api'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card'
+import { StreakBadge } from '@/components/StreakBadge'
+import { WorkoutHeatmap } from '@/components/WorkoutHeatmap'
 
 interface Session {
   id: string
@@ -55,6 +57,11 @@ export default function TraineeSessions() {
   const [sessionName, setSessionName] = useState('')
   const [templates, setTemplates] = useState<Template[]>([])
   const [selectedTemplateId, setSelectedTemplateId] = useState<string | null>(null)
+  const [dedicationStats, setDedicationStats] = useState<{
+    currentStreakWeeks: number; totalWorkoutDays: number;
+    activityDays: Record<string, number>;
+    badges: Array<{ key: string; icon?: string }>
+  } | null>(null)
   const navigate = useNavigate()
   const isTrainer = user?.role === 'TRAINER'
 
@@ -64,6 +71,12 @@ export default function TraineeSessions() {
   }, [isTrainer, traineeId])
 
   useEffect(() => { loadSessions() }, [loadSessions])
+
+  useEffect(() => {
+    api.getDedicationStats(isTrainer ? traineeId : undefined)
+      .then(setDedicationStats)
+      .catch(() => {})
+  }, [isTrainer, traineeId])
 
   const loadTemplates = useCallback(() => {
     if (isTrainer) {
@@ -123,6 +136,9 @@ export default function TraineeSessions() {
             {isTrainer ? `${traineeName}'s Sessions` : 'My Sessions'}
           </h2>
           <div className="flex gap-2">
+            <Link to={isTrainer ? `/trainees/${traineeId}/dedication` : '/dedication'}>
+              <Button variant="outline">Dedication</Button>
+            </Link>
             <Link to={isTrainer ? `/trainees/${traineeId}/progress` : '/progress'}>
               <Button variant="outline">View Progress</Button>
             </Link>
@@ -138,6 +154,37 @@ export default function TraineeSessions() {
             )}
           </div>
         </div>
+
+        {dedicationStats && (
+          <Link to={isTrainer ? `/trainees/${traineeId}/dedication` : '/dedication'} className="block">
+            <Card className="hover:shadow-md transition-shadow">
+              <CardContent className="py-3 flex items-center gap-4">
+                <div className="text-center min-w-[56px]">
+                  <div className="text-2xl">{dedicationStats.currentStreakWeeks > 0 ? '🔥' : '💤'}</div>
+                  <div className="text-lg font-bold leading-tight">{dedicationStats.currentStreakWeeks}w</div>
+                </div>
+                <div className="h-8 w-px bg-border" />
+                <div className="flex-1 flex items-center gap-4 text-sm">
+                  <span className="text-muted-foreground">
+                    <span className="font-medium text-foreground">{dedicationStats.totalWorkoutDays}</span> workout days
+                  </span>
+                  <span className="text-muted-foreground">
+                    <span className="font-medium text-foreground">{dedicationStats.badges.length}</span> badges
+                  </span>
+                  {dedicationStats.badges.length > 0 && (
+                    <span className="hidden sm:inline text-base">
+                      {dedicationStats.badges.slice(0, 5).map((b) => b.icon).join(' ')}
+                    </span>
+                  )}
+                </div>
+                <div className="hidden sm:block">
+                  <WorkoutHeatmap activityDays={dedicationStats.activityDays} compact />
+                </div>
+                <StreakBadge weeks={dedicationStats.currentStreakWeeks} />
+              </CardContent>
+            </Card>
+          </Link>
+        )}
 
         {showForm === 'scratch' && (
           <form onSubmit={handleCreate} className="flex gap-2">

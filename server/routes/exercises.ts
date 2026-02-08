@@ -1,6 +1,7 @@
 import { Hono } from 'hono'
 import { prisma } from '../db.js'
 import { authMiddleware, trainerOnly } from '../middleware/auth.js'
+import { checkAndAwardBadges } from '../services/badges.js'
 
 const exercises = new Hono<{ Variables: { userId: string; role: string } }>()
 
@@ -181,7 +182,10 @@ exercises.post('/:id/log', async (c) => {
     },
   })
 
-  return c.json(log, 201)
+  // Check and award badges after logging
+  const newBadges = await checkAndAwardBadges(traineeId)
+
+  return c.json({ ...log, newBadges }, 201)
 })
 
 // Get exercise logs
