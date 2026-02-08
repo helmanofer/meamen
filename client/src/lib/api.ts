@@ -83,6 +83,10 @@ export const api = {
     request(`/exercises/${exerciseId}/log`, { method: 'POST', body: JSON.stringify(data) }),
   getExerciseLogs: (exerciseId: string) =>
     request<Array<{ id: string; setsCompleted: number | null; repsCompleted: number | null; weightUsed: number | null; completedAt: string; notes: string | null }>>(`/exercises/${exerciseId}/logs`),
+  updateExerciseLog: (logId: string, data: { setsCompleted?: number; repsCompleted?: number; weightUsed?: number; notes?: string }) =>
+    request(`/exercises/log/${logId}`, { method: 'PUT', body: JSON.stringify(data) }),
+  deleteExerciseLog: (logId: string) =>
+    request(`/exercises/log/${logId}`, { method: 'DELETE' }),
 
   // Templates
   getTemplates: () =>

@@ -34,6 +34,67 @@ exercises.post('/session/:sessionId', trainerOnly, async (c) => {
   return c.json(exercise, 201)
 })
 
+// Update exercise log (trainee or trainer)
+exercises.put('/log/:logId', async (c) => {
+  const userId = c.get('userId')
+  const role = c.get('role')
+  const logId = c.req.param('logId')
+  const data = await c.req.json()
+
+  const log = await prisma.exerciseLog.findUnique({
+    where: { id: logId },
+    include: { exercise: { include: { session: true } } },
+  })
+  if (!log) {
+    return c.json({ error: 'Not found' }, 404)
+  }
+
+  if (role === 'TRAINEE' && log.exercise.session.traineeId !== userId) {
+    return c.json({ error: 'Forbidden' }, 403)
+  }
+  if (role === 'TRAINER' && log.exercise.session.trainerId !== userId) {
+    return c.json({ error: 'Forbidden' }, 403)
+  }
+
+  const updated = await prisma.exerciseLog.update({
+    where: { id: logId },
+    data: {
+      setsCompleted: data.setsCompleted,
+      repsCompleted: data.repsCompleted,
+      weightUsed: data.weightUsed,
+      notes: data.notes,
+    },
+  })
+
+  return c.json(updated)
+})
+
+// Delete exercise log (trainee or trainer)
+exercises.delete('/log/:logId', async (c) => {
+  const userId = c.get('userId')
+  const role = c.get('role')
+  const logId = c.req.param('logId')
+
+  const log = await prisma.exerciseLog.findUnique({
+    where: { id: logId },
+    include: { exercise: { include: { session: true } } },
+  })
+  if (!log) {
+    return c.json({ error: 'Not found' }, 404)
+  }
+
+  if (role === 'TRAINEE' && log.exercise.session.traineeId !== userId) {
+    return c.json({ error: 'Forbidden' }, 403)
+  }
+  if (role === 'TRAINER' && log.exercise.session.trainerId !== userId) {
+    return c.json({ error: 'Forbidden' }, 403)
+  }
+
+  await prisma.exerciseLog.delete({ where: { id: logId } })
+
+  return c.json({ ok: true })
+})
+
 // Update an exercise (trainer only)
 exercises.put('/:id', trainerOnly, async (c) => {
   const trainerId = c.get('userId')

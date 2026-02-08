@@ -94,6 +94,48 @@ function LogForm({ exerciseId, onDone }: { exerciseId: string; onDone: () => voi
   )
 }
 
+function EditLogForm({ log, onDone }: { log: { id: string; setsCompleted: number | null; repsCompleted: number | null; weightUsed: number | null; notes: string | null }; onDone: () => void }) {
+  const [sets, setSets] = useState(log.setsCompleted != null ? String(log.setsCompleted) : '')
+  const [reps, setReps] = useState(log.repsCompleted != null ? String(log.repsCompleted) : '')
+  const [weight, setWeight] = useState(log.weightUsed != null ? String(log.weightUsed) : '')
+  const [notes, setNotes] = useState(log.notes ?? '')
+
+  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault()
+    await api.updateExerciseLog(log.id, {
+      setsCompleted: sets ? Number(sets) : undefined,
+      repsCompleted: reps ? Number(reps) : undefined,
+      weightUsed: weight ? Number(weight) : undefined,
+      notes: notes || undefined,
+    })
+    onDone()
+  }
+
+  return (
+    <form onSubmit={handleSubmit} className="mt-1 p-2 border rounded-md space-y-2 bg-secondary/30">
+      <div className="grid grid-cols-3 gap-2">
+        <div>
+          <Label className="text-xs">Sets</Label>
+          <Input type="number" value={sets} onChange={(e) => setSets(e.target.value)} placeholder="3" />
+        </div>
+        <div>
+          <Label className="text-xs">Reps</Label>
+          <Input type="number" value={reps} onChange={(e) => setReps(e.target.value)} placeholder="10" />
+        </div>
+        <div>
+          <Label className="text-xs">Weight (kg)</Label>
+          <Input type="number" step="0.5" value={weight} onChange={(e) => setWeight(e.target.value)} placeholder="20" />
+        </div>
+      </div>
+      <Input placeholder="Notes (optional)" value={notes} onChange={(e) => setNotes(e.target.value)} />
+      <div className="flex gap-2">
+        <Button type="submit" size="sm">Save</Button>
+        <Button type="button" variant="ghost" size="sm" onClick={onDone}>Cancel</Button>
+      </div>
+    </form>
+  )
+}
+
 function EditExerciseForm({ exercise, onDone }: { exercise: Exercise; onDone: () => void }) {
   const [name, setName] = useState(exercise.name)
   const [sets, setSets] = useState(String(exercise.sets))
@@ -241,6 +283,7 @@ export default function SessionDetail() {
   const [showAddForm, setShowAddForm] = useState(false)
   const [loggingExerciseId, setLoggingExerciseId] = useState<string | null>(null)
   const [editingExerciseId, setEditingExerciseId] = useState<string | null>(null)
+  const [editingLogId, setEditingLogId] = useState<string | null>(null)
   const isTrainer = user?.role === 'TRAINER'
 
   const loadSession = useCallback(() => {
@@ -253,6 +296,12 @@ export default function SessionDetail() {
   const handleDeleteExercise = async (id: string) => {
     if (!window.confirm('Delete this exercise?')) return
     await api.deleteExercise(id)
+    loadSession()
+  }
+
+  const handleDeleteLog = async (logId: string) => {
+    if (!window.confirm('Delete this log entry?')) return
+    await api.deleteExerciseLog(logId)
     loadSession()
   }
 
@@ -360,12 +409,33 @@ export default function SessionDetail() {
                       <p className="text-xs font-medium text-muted-foreground mb-1">Recent Logs</p>
                       <div className="space-y-1">
                         {ex.logs.map((log) => (
-                          <div key={log.id} className="text-xs text-muted-foreground flex gap-3">
-                            <span>{new Date(log.completedAt).toLocaleDateString('en-GB')}</span>
-                            {log.setsCompleted != null && <span>{log.setsCompleted} sets</span>}
-                            {log.repsCompleted != null && <span>{log.repsCompleted} reps</span>}
-                            {log.weightUsed != null && <span>{log.weightUsed}kg</span>}
-                            {log.notes && <span>- {log.notes}</span>}
+                          <div key={log.id}>
+                            <div className="text-xs text-muted-foreground flex items-center gap-3">
+                              <span>{new Date(log.completedAt).toLocaleDateString('en-GB')}</span>
+                              {log.setsCompleted != null && <span>{log.setsCompleted} sets</span>}
+                              {log.repsCompleted != null && <span>{log.repsCompleted} reps</span>}
+                              {log.weightUsed != null && <span>{log.weightUsed}kg</span>}
+                              {log.notes && <span>- {log.notes}</span>}
+                              <span className="ml-auto flex gap-1">
+                                <button
+                                  onClick={() => setEditingLogId(editingLogId === log.id ? null : log.id)}
+                                  className="hover:text-foreground"
+                                  title="Edit log"
+                                >
+                                  &#9998;
+                                </button>
+                                <button
+                                  onClick={() => handleDeleteLog(log.id)}
+                                  className="hover:text-destructive"
+                                  title="Delete log"
+                                >
+                                  &#128465;
+                                </button>
+                              </span>
+                            </div>
+                            {editingLogId === log.id && (
+                              <EditLogForm log={log} onDone={() => { setEditingLogId(null); loadSession() }} />
+                            )}
                           </div>
                         ))}
                       </div>

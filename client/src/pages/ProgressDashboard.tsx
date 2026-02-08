@@ -1,8 +1,11 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
+import type { FormEvent } from 'react'
 import { useParams, Link } from 'react-router-dom'
 import { useAuth } from '@/lib/auth'
 import { api } from '@/lib/api'
 import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card'
 
 interface ExerciseLog {
@@ -40,10 +43,63 @@ function TrendIndicator({ current, previous }: { current: number | null; previou
   return <span className="text-muted-foreground ml-1" title="No change">&#9644;</span>
 }
 
-function ExerciseProgressCard({ exercise, sessionName }: { exercise: Exercise; sessionName: string }) {
+function EditLogFormInline({ log, onDone }: { log: ExerciseLog; onDone: () => void }) {
+  const [sets, setSets] = useState(log.setsCompleted != null ? String(log.setsCompleted) : '')
+  const [reps, setReps] = useState(log.repsCompleted != null ? String(log.repsCompleted) : '')
+  const [weight, setWeight] = useState(log.weightUsed != null ? String(log.weightUsed) : '')
+  const [notes, setNotes] = useState(log.notes ?? '')
+
+  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault()
+    await api.updateExerciseLog(log.id, {
+      setsCompleted: sets ? Number(sets) : undefined,
+      repsCompleted: reps ? Number(reps) : undefined,
+      weightUsed: weight ? Number(weight) : undefined,
+      notes: notes || undefined,
+    })
+    onDone()
+  }
+
+  return (
+    <tr>
+      <td colSpan={6} className="py-2">
+        <form onSubmit={handleSubmit} className="p-2 border rounded-md space-y-2 bg-secondary/30">
+          <div className="grid grid-cols-3 gap-2">
+            <div>
+              <Label className="text-xs">Sets</Label>
+              <Input type="number" value={sets} onChange={(e) => setSets(e.target.value)} placeholder="3" />
+            </div>
+            <div>
+              <Label className="text-xs">Reps</Label>
+              <Input type="number" value={reps} onChange={(e) => setReps(e.target.value)} placeholder="10" />
+            </div>
+            <div>
+              <Label className="text-xs">Weight (kg)</Label>
+              <Input type="number" step="0.5" value={weight} onChange={(e) => setWeight(e.target.value)} placeholder="20" />
+            </div>
+          </div>
+          <Input placeholder="Notes (optional)" value={notes} onChange={(e) => setNotes(e.target.value)} />
+          <div className="flex gap-2">
+            <Button type="submit" size="sm">Save</Button>
+            <Button type="button" variant="ghost" size="sm" onClick={onDone}>Cancel</Button>
+          </div>
+        </form>
+      </td>
+    </tr>
+  )
+}
+
+function ExerciseProgressCard({ exercise, sessionName, onRefresh }: { exercise: Exercise; sessionName: string; onRefresh: () => void }) {
   const { logs } = exercise
   const latest = logs.length > 0 ? logs[logs.length - 1] : null
   const previous = logs.length > 1 ? logs[logs.length - 2] : null
+  const [editingLogId, setEditingLogId] = useState<string | null>(null)
+
+  const handleDeleteLog = async (logId: string) => {
+    if (!window.confirm('Delete this log entry?')) return
+    await api.deleteExerciseLog(logId)
+    onRefresh()
+  }
 
   return (
     <Card>
@@ -95,20 +151,43 @@ function ExerciseProgressCard({ exercise, sessionName }: { exercise: Exercise; s
                     <th className="pb-2 pr-4">Sets</th>
                     <th className="pb-2 pr-4">Reps</th>
                     <th className="pb-2 pr-4">Weight</th>
-                    <th className="pb-2">Notes</th>
+                    <th className="pb-2 pr-4">Notes</th>
+                    <th className="pb-2"></th>
                   </tr>
                 </thead>
                 <tbody>
                   {[...logs].reverse().map((log) => (
-                    <tr key={log.id} className="border-b last:border-0">
-                      <td className="py-2 pr-4 whitespace-nowrap">
-                        {new Date(log.completedAt).toLocaleDateString('en-GB')}
-                      </td>
-                      <td className="py-2 pr-4">{log.setsCompleted ?? '-'}</td>
-                      <td className="py-2 pr-4">{log.repsCompleted ?? '-'}</td>
-                      <td className="py-2 pr-4">{log.weightUsed != null ? `${log.weightUsed}kg` : '-'}</td>
-                      <td className="py-2 text-muted-foreground">{log.notes || '-'}</td>
-                    </tr>
+                    editingLogId === log.id ? (
+                      <EditLogFormInline key={`edit-${log.id}`} log={log} onDone={() => { setEditingLogId(null); onRefresh() }} />
+                    ) : (
+                      <tr key={log.id} className="border-b last:border-0">
+                        <td className="py-2 pr-4 whitespace-nowrap">
+                          {new Date(log.completedAt).toLocaleDateString('en-GB')}
+                        </td>
+                        <td className="py-2 pr-4">{log.setsCompleted ?? '-'}</td>
+                        <td className="py-2 pr-4">{log.repsCompleted ?? '-'}</td>
+                        <td className="py-2 pr-4">{log.weightUsed != null ? `${log.weightUsed}kg` : '-'}</td>
+                        <td className="py-2 text-muted-foreground">{log.notes || '-'}</td>
+                        <td className="py-2 whitespace-nowrap">
+                          <span className="flex gap-1">
+                            <button
+                              onClick={() => setEditingLogId(log.id)}
+                              className="text-muted-foreground hover:text-foreground"
+                              title="Edit log"
+                            >
+                              &#9998;
+                            </button>
+                            <button
+                              onClick={() => handleDeleteLog(log.id)}
+                              className="text-muted-foreground hover:text-destructive"
+                              title="Delete log"
+                            >
+                              &#128465;
+                            </button>
+                          </span>
+                        </td>
+                      </tr>
+                    )
                   ))}
                 </tbody>
               </table>
@@ -129,10 +208,12 @@ export default function ProgressDashboard() {
   const [error, setError] = useState('')
   const isTrainer = user?.role === 'TRAINER'
 
-  useEffect(() => {
+  const loadProgress = useCallback(() => {
     const id = isTrainer ? traineeId : undefined
     api.getProgress(id).then(setSessions).catch((err) => setError(err.message))
   }, [traineeId, isTrainer])
+
+  useEffect(() => { loadProgress() }, [loadProgress])
 
   if (error) {
     return (
@@ -181,7 +262,7 @@ export default function ProgressDashboard() {
             {exercisesWithLogs.length > 0 && (
               <div className="space-y-4">
                 {exercisesWithLogs.map((ex) => (
-                  <ExerciseProgressCard key={ex.id} exercise={ex} sessionName={ex.sessionName} />
+                  <ExerciseProgressCard key={ex.id} exercise={ex} sessionName={ex.sessionName} onRefresh={loadProgress} />
                 ))}
               </div>
             )}
