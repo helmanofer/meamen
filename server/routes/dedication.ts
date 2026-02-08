@@ -2,7 +2,6 @@ import { Hono } from 'hono'
 import { prisma } from '../db.js'
 import { authMiddleware, trainerOnly } from '../middleware/auth.js'
 import { computeStreak } from '../services/streaks.js'
-import { checkAndAwardBadges } from '../services/badges.js'
 import { BADGES, BADGE_MAP } from '../badges.js'
 
 const dedication = new Hono<{ Variables: { userId: string; role: string } }>()
