@@ -54,7 +54,7 @@ jobs:
         run: |
           RESPONSE=$(curl -s "${{ secrets.RENDER_DEPLOY_HOOK_URL }}")
           echo "Hook response: $RESPONSE"
-          DEPLOY_ID=$(echo "$RESPONSE" | jq -r '.deploy.id // empty' 2>/dev/null)
+          DEPLOY_ID=$(echo "$RESPONSE" | jq -r '.deploy.id // empty' 2>/dev/null || true)
           if [ -z "$DEPLOY_ID" ]; then
             echo "No deploy ID in hook response, fetching latest deploy..."
             sleep 5
