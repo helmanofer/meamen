@@ -1,6 +1,6 @@
 # Meamen
 
-**Live**: [https://meamen.fly.dev/](https://meamen.fly.dev/)
+**Live**: [https://meamen.fly.dev/](https://meamen.fly.dev/) | [https://meamen.onrender.com/](https://meamen.onrender.com/)
 
 A fitness training management platform built with Bun, Hono.js, React, and Prisma.
 
@@ -156,6 +156,35 @@ docker run -p 3000:3000 meamen
 ```bash
 fly deploy
 ```
+
+### Render.com
+
+#### One-Click Deploy
+
+[![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy?repo=https://github.com/helmanofer/meamen)
+
+This uses the `render.yaml` Blueprint to automatically provision a web service and PostgreSQL database.
+
+#### Manual Setup
+
+1. Create a new **Web Service** on Render
+2. Connect your GitHub repo
+3. Set **Runtime** to **Docker**
+4. Add a **PostgreSQL** database and link it (provides `DATABASE_URL` automatically)
+5. Set environment variables:
+   - `NODE_ENV` = `production`
+   - `PORT` = `8080`
+   - `HOSTNAME` = `0.0.0.0` (required — Render overrides `HOSTNAME` with the container name)
+   - `JWT_SECRET` = (generate a secure random string)
+6. Set **Health Check Path** to: `/api/health`
+7. After the first deploy, push the schema and seed the database using the **external** connection string from the Render dashboard:
+
+```bash
+DATABASE_URL=<external-connection-string> bunx prisma db push --schema prisma/schema.prisma --skip-generate
+DATABASE_URL=<external-connection-string> bunx prisma generate --schema prisma/schema.prisma && DATABASE_URL=<external-connection-string> bun run prisma/seed.ts
+```
+
+> **Note:** Pre-deploy commands require a paid Render plan. On the free tier, run the above commands manually after each schema change.
 
 ## Environment Variables
 
