@@ -10,7 +10,6 @@ import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/com
 
 interface ExerciseLog {
   id: string
-  setsCompleted: number | null
   repsCompleted: number | null
   weightUsed: number | null
   completedAt: string
@@ -69,7 +68,6 @@ function TrendIndicator({ current, previous }: { current: number | null; previou
 }
 
 function EditLogFormInline({ log, onDone }: { log: ExerciseLog; onDone: () => void }) {
-  const [sets, setSets] = useState(log.setsCompleted != null ? String(log.setsCompleted) : '')
   const [reps, setReps] = useState(log.repsCompleted != null ? String(log.repsCompleted) : '')
   const [weight, setWeight] = useState(log.weightUsed != null ? String(log.weightUsed) : '')
   const [notes, setNotes] = useState(log.notes ?? '')
@@ -77,7 +75,6 @@ function EditLogFormInline({ log, onDone }: { log: ExerciseLog; onDone: () => vo
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     await api.updateExerciseLog(log.id, {
-      setsCompleted: sets ? Number(sets) : undefined,
       repsCompleted: reps ? Number(reps) : undefined,
       weightUsed: weight ? Number(weight) : undefined,
       notes: notes || undefined,
@@ -88,11 +85,7 @@ function EditLogFormInline({ log, onDone }: { log: ExerciseLog; onDone: () => vo
   return (
     <form onSubmit={handleSubmit} className="p-3 border rounded-lg bg-secondary/30 space-y-3">
       <p className="text-xs font-medium text-muted-foreground uppercase">Edit Log Entry</p>
-      <div className="grid grid-cols-3 gap-2">
-        <div>
-          <Label className="text-xs">Sets</Label>
-          <Input type="number" value={sets} onChange={(e) => setSets(e.target.value)} placeholder="3" />
-        </div>
+      <div className="grid grid-cols-2 gap-2">
         <div>
           <Label className="text-xs">Reps</Label>
           <Input type="number" value={reps} onChange={(e) => setReps(e.target.value)} placeholder="10" />
@@ -126,7 +119,6 @@ function ExerciseProgressCard({ exercise, sessionName, onRefresh }: { exercise: 
 
   const hasWeight = logs.some(l => l.weightUsed != null)
   const hasReps = logs.some(l => l.repsCompleted != null)
-  const hasSets = logs.some(l => l.setsCompleted != null)
 
   const getTrend = (current: number | null, previous: number | null) => {
     if (current == null || previous == null) return null
@@ -207,7 +199,7 @@ function ExerciseProgressCard({ exercise, sessionName, onRefresh }: { exercise: 
                       <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Progress Trend</p>
                       <span className="text-xs text-muted-foreground">Latest vs Previous</span>
                     </div>
-                    <div className="grid grid-cols-3 gap-4">
+                    <div className="grid grid-cols-2 gap-4">
                       {latest.weightUsed != null && hasWeight && (
                         <div className="text-center">
                           <div className="flex items-center justify-center gap-1">
@@ -224,15 +216,6 @@ function ExerciseProgressCard({ exercise, sessionName, onRefresh }: { exercise: 
                             <TrendIndicator current={latest.repsCompleted} previous={previous.repsCompleted} />
                           </div>
                           <p className="text-xs text-muted-foreground mt-0.5">Reps</p>
-                        </div>
-                      )}
-                      {latest.setsCompleted != null && hasSets && (
-                        <div className="text-center">
-                          <div className="flex items-center justify-center gap-1">
-                            <span className="text-xl font-bold">{latest.setsCompleted}</span>
-                            <TrendIndicator current={latest.setsCompleted} previous={previous.setsCompleted} />
-                          </div>
-                          <p className="text-xs text-muted-foreground mt-0.5">Sets</p>
                         </div>
                       )}
                     </div>
@@ -277,9 +260,6 @@ function ExerciseProgressCard({ exercise, sessionName, onRefresh }: { exercise: 
                               </div>
                             </div>
                             <div className="flex flex-wrap items-center gap-x-4 gap-y-1 mt-2 text-sm">
-                              {log.setsCompleted != null && (
-                                <span className="font-semibold">{log.setsCompleted}<span className="text-muted-foreground ml-0.5">sets</span></span>
-                              )}
                               {log.repsCompleted != null && (
                                 <span className="font-semibold">{log.repsCompleted}<span className="text-muted-foreground ml-0.5">reps</span></span>
                               )}

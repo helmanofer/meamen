@@ -20,7 +20,6 @@ interface Exercise {
   notes: string | null
   logs: Array<{
     id: string
-    setsCompleted: number | null
     repsCompleted: number | null
     weightUsed: number | null
     completedAt: string
@@ -50,39 +49,33 @@ function YouTubeEmbed({ url }: { url: string }) {
   )
 }
 
-function LogForm({ exerciseId, lastLog, onDone }: {
+function LogForm({ exerciseId, lastLog, exerciseDefaults, onDone }: {
   exerciseId: string;
-  lastLog?: { setsCompleted: number | null; repsCompleted: number | null; weightUsed: number | null; notes: string | null };
+  lastLog?: { repsCompleted: number | null; weightUsed: number | null; notes: string | null };
+  exerciseDefaults: { reps: number | null; weight: number | null };
   onDone: (newBadges?: string[]) => void;
 }) {
-  const [sets, setSets] = useState(lastLog?.setsCompleted != null ? String(lastLog.setsCompleted) : '')
-  const [reps, setReps] = useState(lastLog?.repsCompleted != null ? String(lastLog.repsCompleted) : '')
-  const [weight, setWeight] = useState(lastLog?.weightUsed != null ? String(lastLog.weightUsed) : '')
+  const defaultReps = lastLog?.repsCompleted ?? exerciseDefaults.reps
+  const defaultWeight = lastLog?.weightUsed ?? exerciseDefaults.weight
+
+  const [reps, setReps] = useState(defaultReps != null ? String(defaultReps) : '')
+  const [weight, setWeight] = useState(defaultWeight != null ? String(defaultWeight) : '')
   const [notes, setNotes] = useState('')
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     const result = await api.logExercise(exerciseId, {
-      setsCompleted: sets ? Number(sets) : undefined,
       repsCompleted: reps ? Number(reps) : undefined,
       weightUsed: weight ? Number(weight) : undefined,
       notes: notes || undefined,
     }) as { newBadges?: string[] }
-    setSets('')
-    setReps('')
-    setWeight('')
-    setNotes('')
     onDone(result.newBadges)
   }
 
   return (
     <form onSubmit={handleSubmit} className="mt-3 p-3 border rounded-md space-y-3 bg-secondary/30">
-      <p className="text-sm font-medium">Log your performance</p>
-      <div className="grid grid-cols-3 gap-2">
-        <div>
-          <Label className="text-xs">Sets</Label>
-          <Input type="number" value={sets} onChange={(e) => setSets(e.target.value)} placeholder="3" />
-        </div>
+      <p className="text-sm font-medium">Log set</p>
+      <div className="grid grid-cols-2 gap-2">
         <div>
           <Label className="text-xs">Reps</Label>
           <Input type="number" value={reps} onChange={(e) => setReps(e.target.value)} placeholder="10" />
@@ -93,13 +86,12 @@ function LogForm({ exerciseId, lastLog, onDone }: {
         </div>
       </div>
       <Input placeholder="Notes (optional)" value={notes} onChange={(e) => setNotes(e.target.value)} />
-      <Button type="submit" size="sm">Save Log</Button>
+      <Button type="submit" size="sm">Save Set</Button>
     </form>
   )
 }
 
-function EditLogForm({ log, onDone }: { log: { id: string; setsCompleted: number | null; repsCompleted: number | null; weightUsed: number | null; notes: string | null }; onDone: () => void }) {
-  const [sets, setSets] = useState(log.setsCompleted != null ? String(log.setsCompleted) : '')
+function EditLogForm({ log, onDone }: { log: { id: string; repsCompleted: number | null; weightUsed: number | null; notes: string | null }; onDone: () => void }) {
   const [reps, setReps] = useState(log.repsCompleted != null ? String(log.repsCompleted) : '')
   const [weight, setWeight] = useState(log.weightUsed != null ? String(log.weightUsed) : '')
   const [notes, setNotes] = useState(log.notes ?? '')
@@ -107,7 +99,6 @@ function EditLogForm({ log, onDone }: { log: { id: string; setsCompleted: number
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     await api.updateExerciseLog(log.id, {
-      setsCompleted: sets ? Number(sets) : undefined,
       repsCompleted: reps ? Number(reps) : undefined,
       weightUsed: weight ? Number(weight) : undefined,
       notes: notes || undefined,
@@ -117,11 +108,7 @@ function EditLogForm({ log, onDone }: { log: { id: string; setsCompleted: number
 
   return (
     <form onSubmit={handleSubmit} className="mt-1 p-2 border rounded-md space-y-2 bg-secondary/30">
-      <div className="grid grid-cols-3 gap-2">
-        <div>
-          <Label className="text-xs">Sets</Label>
-          <Input type="number" value={sets} onChange={(e) => setSets(e.target.value)} placeholder="3" />
-        </div>
+      <div className="grid grid-cols-2 gap-2">
         <div>
           <Label className="text-xs">Reps</Label>
           <Input type="number" value={reps} onChange={(e) => setReps(e.target.value)} placeholder="10" />
@@ -289,12 +276,30 @@ export default function SessionDetail() {
   const [editingExerciseId, setEditingExerciseId] = useState<string | null>(null)
   const [editingLogId, setEditingLogId] = useState<string | null>(null)
   const [badgeAlert, setBadgeAlert] = useState<string[] | null>(null)
+  const [quickLogging, setQuickLogging] = useState<string | null>(null)
   const isTrainer = user?.role === 'TRAINER'
 
   const loadSession = useCallback(() => {
     if (!sessionId) return
     api.getSession(sessionId).then(setSession).catch(console.error)
   }, [sessionId])
+
+  const handleQuickLog = async (exercise: Exercise) => {
+    setQuickLogging(exercise.id)
+    try {
+      const lastLog = exercise.logs[0]
+      const reps = lastLog?.repsCompleted ?? exercise.reps
+      const weight = lastLog?.weightUsed ?? exercise.weight
+      const result = await api.logExercise(exercise.id, {
+        repsCompleted: reps ?? undefined,
+        weightUsed: weight ?? undefined,
+      }) as { newBadges?: string[] }
+      loadSession()
+      if (result.newBadges && result.newBadges.length > 0) setBadgeAlert(result.newBadges)
+    } finally {
+      setQuickLogging(null)
+    }
+  }
 
   useEffect(() => { loadSession() }, [loadSession])
 
@@ -380,6 +385,14 @@ export default function SessionDetail() {
                   </div>
                   <div className="flex gap-2">
                     <Button
+                      variant="default"
+                      size="sm"
+                      disabled={quickLogging === ex.id}
+                      onClick={() => handleQuickLog(ex)}
+                    >
+                      {quickLogging === ex.id ? 'Logging...' : 'Quick Log'}
+                    </Button>
+                    <Button
                       variant="outline"
                       size="sm"
                       onClick={() =>
@@ -416,74 +429,85 @@ export default function SessionDetail() {
                     )}
 
                     {loggingExerciseId === ex.id && (
-                      <LogForm exerciseId={ex.id} lastLog={ex.logs[0]} onDone={(newBadges) => {
-                        setLoggingExerciseId(null)
-                        loadSession()
-                        if (newBadges && newBadges.length > 0) setBadgeAlert(newBadges)
-                      }} />
+                      <LogForm
+                        exerciseId={ex.id}
+                        lastLog={ex.logs[0]}
+                        exerciseDefaults={{ reps: ex.reps, weight: ex.weight }}
+                        onDone={(newBadges) => {
+                          setLoggingExerciseId(null)
+                          loadSession()
+                          if (newBadges && newBadges.length > 0) setBadgeAlert(newBadges)
+                        }}
+                      />
                     )}
 
-                    {ex.logs.length > 0 && (
-                      <div className="mt-4 pt-3 border-t border-border/50">
-                        <div className="flex items-center justify-between mb-2">
-                          <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Recent Logs</p>
-                          <span className="text-xs text-muted-foreground">{ex.logs.length} log{ex.logs.length !== 1 ? 's' : ''}</span>
-                        </div>
-                        <div className="space-y-2">
-                          {ex.logs.map((log, idx) => (
-                            <div key={log.id} className={`p-3 rounded-lg border ${idx === 0 ? 'bg-primary/5 border-primary/20' : 'bg-secondary/30 border-border/60'}`}>
-                              <div className="flex items-start justify-between gap-2">
-                                <div className="flex items-center gap-2">
-                                  <span className={`text-xs font-medium ${idx === 0 ? 'text-primary' : 'text-muted-foreground'}`}>
-                                    {new Date(log.completedAt).toLocaleDateString('en-GB', { month: 'short', day: 'numeric' })}
-                                  </span>
-                                  {idx === 0 && <span className="hidden xs:inline text-[10px] px-1.5 py-0.5 bg-primary/10 text-primary rounded-full">Latest</span>}
-                                </div>
-                                <div className="flex gap-1">
-                                  <button
-                                    onClick={() => setEditingLogId(editingLogId === log.id ? null : log.id)}
-                                    className="p-1.5 rounded hover:bg-secondary text-muted-foreground hover:text-foreground transition-colors"
-                                    title="Edit log"
-                                  >
-                                    <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
-                                    </svg>
-                                  </button>
-                                  <button
-                                    onClick={() => handleDeleteLog(log.id)}
-                                    className="p-1.5 rounded hover:bg-destructive/10 text-muted-foreground hover:text-destructive transition-colors"
-                                    title="Delete log"
-                                  >
-                                    <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                                    </svg>
-                                  </button>
-                                </div>
-                              </div>
-                              <div className="flex flex-wrap items-center gap-x-3 gap-y-1 mt-1.5 text-xs sm:text-sm">
-                                {log.setsCompleted != null && (
-                                  <span className="font-semibold">{log.setsCompleted}<span className="text-muted-foreground ml-0.5">sets</span></span>
-                                )}
-                                {log.repsCompleted != null && (
-                                  <span className="font-semibold">{log.repsCompleted}<span className="text-muted-foreground ml-0.5">reps</span></span>
-                                )}
-                                {log.weightUsed != null && (
-                                  <span className="font-semibold">{log.weightUsed}<span className="text-muted-foreground ml-0.5">kg</span></span>
-                                )}
-                              </div>
-                              {log.notes && (
-                                <p className="text-xs text-muted-foreground mt-1.5 italic line-clamp-2">"{log.notes}"</p>
+                    {ex.logs.length > 0 && (() => {
+                      const today = new Date().toDateString()
+                      const todaySets = ex.logs.filter(l => new Date(l.completedAt).toDateString() === today).length
+                      return (
+                        <div className="mt-4 pt-3 border-t border-border/50">
+                          <div className="flex items-center justify-between mb-2">
+                            <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Recent Sets</p>
+                            <div className="flex items-center gap-2">
+                              {todaySets > 0 && (
+                                <span className="text-xs font-medium text-primary">{todaySets}/{ex.sets} sets today</span>
                               )}
-                              {editingLogId === log.id && (
-                                <div className="mt-3 pt-2 border-t border-border/50">
-                                  <EditLogForm log={log} onDone={() => { setEditingLogId(null); loadSession() }} />
-                                </div>
-                              )}
+                              <span className="text-xs text-muted-foreground">{ex.logs.length} total</span>
                             </div>
-                          ))}
+                          </div>
+                          <div className="space-y-2">
+                            {ex.logs.map((log, idx) => (
+                              <div key={log.id} className={`p-3 rounded-lg border ${idx === 0 ? 'bg-primary/5 border-primary/20' : 'bg-secondary/30 border-border/60'}`}>
+                                <div className="flex items-start justify-between gap-2">
+                                  <div className="flex items-center gap-2">
+                                    <span className={`text-xs font-medium ${idx === 0 ? 'text-primary' : 'text-muted-foreground'}`}>
+                                      {new Date(log.completedAt).toLocaleDateString('en-GB', { month: 'short', day: 'numeric' })}
+                                    </span>
+                                    {idx === 0 && <span className="hidden xs:inline text-[10px] px-1.5 py-0.5 bg-primary/10 text-primary rounded-full">Latest</span>}
+                                  </div>
+                                  <div className="flex gap-1">
+                                    <button
+                                      onClick={() => setEditingLogId(editingLogId === log.id ? null : log.id)}
+                                      className="p-1.5 rounded hover:bg-secondary text-muted-foreground hover:text-foreground transition-colors"
+                                      title="Edit log"
+                                    >
+                                      <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                                      </svg>
+                                    </button>
+                                    <button
+                                      onClick={() => handleDeleteLog(log.id)}
+                                      className="p-1.5 rounded hover:bg-destructive/10 text-muted-foreground hover:text-destructive transition-colors"
+                                      title="Delete log"
+                                    >
+                                      <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                      </svg>
+                                    </button>
+                                  </div>
+                                </div>
+                                <div className="flex flex-wrap items-center gap-x-3 gap-y-1 mt-1.5 text-xs sm:text-sm">
+                                  {log.repsCompleted != null && (
+                                    <span className="font-semibold">{log.repsCompleted}<span className="text-muted-foreground ml-0.5">reps</span></span>
+                                  )}
+                                  {log.weightUsed != null && (
+                                    <span className="font-semibold">{log.weightUsed}<span className="text-muted-foreground ml-0.5">kg</span></span>
+                                  )}
+                                </div>
+                                {log.notes && (
+                                  <p className="text-xs text-muted-foreground mt-1.5 italic line-clamp-2">"{log.notes}"</p>
+                                )}
+                                {editingLogId === log.id && (
+                                  <div className="mt-3 pt-2 border-t border-border/50">
+                                    <EditLogForm log={log} onDone={() => { setEditingLogId(null); loadSession() }} />
+                                  </div>
+                                )}
+                              </div>
+                            ))}
+                          </div>
                         </div>
-                      </div>
-                    )}
+                      )
+                    })()}
                   </CardContent>
                 )}
               </Card>
