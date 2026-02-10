@@ -131,4 +131,21 @@ export const api = {
     request(`/dedication/rewards/${id}`, { method: 'DELETE' }),
   updateDedicationSettings: (data: { leaderboardOptOut?: boolean; traineeId?: string; minWeeklyFrequency?: number }) =>
     request('/dedication/settings', { method: 'PUT', body: JSON.stringify(data) }),
+
+  // Challenges
+  getChallenges: () =>
+    request<{
+      active: Array<{ id: string; title: string; description: string; type: string; startDate: string; endDate: string }>
+      upcoming: Array<{ id: string; title: string; description: string; type: string; startDate: string; endDate: string }>
+      past: Array<{ id: string; title: string; description: string; type: string; startDate: string; endDate: string }>
+    }>('/challenges'),
+  getChallengeScoreboard: (id: string) =>
+    request<{
+      challenge: { id: string; title: string; description: string; type: string; startDate: string; endDate: string }
+      scoreboard: Array<{ rank: number; traineeId: string; name: string; score: number; unit: string }>
+    }>(`/challenges/${id}/scoreboard`),
+  createChallenge: (data: { title: string; description?: string; type: string; startDate: string; endDate: string }) =>
+    request('/challenges', { method: 'POST', body: JSON.stringify(data) }),
+  deleteChallenge: (id: string) =>
+    request(`/challenges/${id}`, { method: 'DELETE' }),
 }

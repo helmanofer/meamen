@@ -8,6 +8,7 @@ import sessions from './routes/sessions.js'
 import exercises from './routes/exercises.js'
 import templates from './routes/templates.js'
 import dedication from './routes/dedication.js'
+import challenges from './routes/challenges.js'
 
 const app = new Hono<{ Variables: { userId: string; role: string } }>()
 
@@ -27,6 +28,7 @@ app.route('/api/sessions', sessions)
 app.route('/api/exercises', exercises)
 app.route('/api/templates', templates)
 app.route('/api/dedication', dedication)
+app.route('/api/challenges', challenges)
 
 app.get('/api/health', (c) => c.json({ status: 'ok' }))
 

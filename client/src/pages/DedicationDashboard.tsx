@@ -9,6 +9,7 @@ import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card'
 import { BadgeIcon } from '@/components/BadgeIcon'
 import { LeaderboardTable } from '@/components/LeaderboardTable'
 import { WorkoutHeatmap } from '@/components/WorkoutHeatmap'
+import { ChallengeCard } from '@/components/ChallengeCard'
 
 interface Stats {
   currentStreakWeeks: number
@@ -44,6 +45,15 @@ interface LeaderboardEntry {
   badgeCount: number
 }
 
+interface ChallengeItem {
+  id: string
+  title: string
+  description: string
+  type: string
+  startDate: string
+  endDate: string
+}
+
 export default function DedicationDashboard() {
   const { user, logout } = useAuth()
   const { traineeId } = useParams<{ traineeId: string }>()
@@ -56,6 +66,15 @@ export default function DedicationDashboard() {
   const [leaderboard, setLeaderboard] = useState<LeaderboardEntry[]>([])
   const [config, setConfig] = useState<{ leaderboardEnabled: boolean }>({ leaderboardEnabled: false })
   const [leaderboardOptOut, setLeaderboardOptOut] = useState(false)
+
+  // Challenges
+  const [challengeData, setChallengeData] = useState<{ active: ChallengeItem[]; upcoming: ChallengeItem[]; past: ChallengeItem[] }>({ active: [], upcoming: [], past: [] })
+  const [showChallengeForm, setShowChallengeForm] = useState(false)
+  const [challengeTitle, setChallengeTitle] = useState('')
+  const [challengeDescription, setChallengeDescription] = useState('')
+  const [challengeType, setChallengeType] = useState('most_workouts')
+  const [challengeStartDate, setChallengeStartDate] = useState('')
+  const [challengeEndDate, setChallengeEndDate] = useState('')
 
   // Reward creation form
   const [showRewardForm, setShowRewardForm] = useState(false)
@@ -85,6 +104,11 @@ export default function DedicationDashboard() {
         setLeaderboard(lb)
       } catch { /* leaderboard may fail if disabled */ }
     }
+
+    try {
+      const ch = await api.getChallenges()
+      setChallengeData(ch)
+    } catch { /* challenges may not be available */ }
   }, [targetTraineeId])
 
   useEffect(() => {
@@ -125,6 +149,32 @@ export default function DedicationDashboard() {
     setEditingFrequency(false)
     loadData()
   }
+
+  const handleCreateChallenge = async (e: FormEvent) => {
+    e.preventDefault()
+    await api.createChallenge({
+      title: challengeTitle,
+      description: challengeDescription,
+      type: challengeType,
+      startDate: new Date(challengeStartDate).toISOString(),
+      endDate: new Date(challengeEndDate).toISOString(),
+    })
+    setChallengeTitle('')
+    setChallengeDescription('')
+    setChallengeType('most_workouts')
+    setChallengeStartDate('')
+    setChallengeEndDate('')
+    setShowChallengeForm(false)
+    loadData()
+  }
+
+  const handleDeleteChallenge = async (id: string) => {
+    if (!window.confirm('Delete this challenge?')) return
+    await api.deleteChallenge(id)
+    loadData()
+  }
+
+  const allChallenges = [...challengeData.active, ...challengeData.upcoming, ...challengeData.past]
 
   const earnedKeys = new Set(stats?.badges.map((b) => b.key) ?? [])
   const backPath = isTrainer
@@ -223,6 +273,115 @@ export default function DedicationDashboard() {
                     />
                   ))}
                 </div>
+              </CardContent>
+            </Card>
+
+            {/* Challenges */}
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between">
+                <CardTitle>Challenges</CardTitle>
+                {isTrainer && (
+                  <Button size="sm" variant="outline" onClick={() => setShowChallengeForm(!showChallengeForm)}>
+                    {showChallengeForm ? 'Cancel' : 'New Challenge'}
+                  </Button>
+                )}
+              </CardHeader>
+              <CardContent>
+                {showChallengeForm && (
+                  <form onSubmit={handleCreateChallenge} className="mb-4 space-y-3 p-3 border rounded-md bg-secondary/30">
+                    <div className="space-y-2">
+                      <Label className="text-xs">Title</Label>
+                      <Input value={challengeTitle} onChange={(e) => setChallengeTitle(e.target.value)} placeholder="Week 1: Push harder!" required />
+                    </div>
+                    <div className="space-y-2">
+                      <Label className="text-xs">Description (optional)</Label>
+                      <Input value={challengeDescription} onChange={(e) => setChallengeDescription(e.target.value)} placeholder="Who can log the most workout days this week?" />
+                    </div>
+                    <div className="space-y-2">
+                      <Label className="text-xs">Type</Label>
+                      <select
+                        value={challengeType}
+                        onChange={(e) => setChallengeType(e.target.value)}
+                        className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                      >
+                        <option value="most_workouts">Most Workout Days</option>
+                        <option value="total_weight">Total Volume (weight x reps x sets)</option>
+                        <option value="consistency">Consistency (% days active)</option>
+                      </select>
+                    </div>
+                    <div className="grid grid-cols-2 gap-3">
+                      <div className="space-y-2">
+                        <Label className="text-xs">Start Date</Label>
+                        <Input type="date" value={challengeStartDate} onChange={(e) => setChallengeStartDate(e.target.value)} required />
+                      </div>
+                      <div className="space-y-2">
+                        <Label className="text-xs">End Date</Label>
+                        <Input type="date" value={challengeEndDate} onChange={(e) => setChallengeEndDate(e.target.value)} required />
+                      </div>
+                    </div>
+                    <Button type="submit" size="sm">Create Challenge</Button>
+                  </form>
+                )}
+                {allChallenges.length === 0 ? (
+                  <p className="text-sm text-muted-foreground text-center py-2">No challenges yet.</p>
+                ) : (
+                  <div className="space-y-3">
+                    {challengeData.active.length > 0 && (
+                      <div className="space-y-2">
+                        <div className="text-xs font-medium text-orange-600 uppercase tracking-wide">Active Now</div>
+                        {challengeData.active.map((ch) => (
+                          <div key={ch.id} className="relative">
+                            <ChallengeCard challenge={ch} currentUserId={user?.id} />
+                            {isTrainer && (
+                              <button
+                                className="absolute top-3 right-3 text-xs text-muted-foreground hover:text-destructive z-10"
+                                onClick={(e) => { e.stopPropagation(); handleDeleteChallenge(ch.id) }}
+                              >
+                                Delete
+                              </button>
+                            )}
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                    {challengeData.upcoming.length > 0 && (
+                      <div className="space-y-2">
+                        <div className="text-xs font-medium text-blue-600 uppercase tracking-wide">Upcoming</div>
+                        {challengeData.upcoming.map((ch) => (
+                          <div key={ch.id} className="relative">
+                            <ChallengeCard challenge={ch} currentUserId={user?.id} />
+                            {isTrainer && (
+                              <button
+                                className="absolute top-3 right-3 text-xs text-muted-foreground hover:text-destructive z-10"
+                                onClick={(e) => { e.stopPropagation(); handleDeleteChallenge(ch.id) }}
+                              >
+                                Delete
+                              </button>
+                            )}
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                    {challengeData.past.length > 0 && (
+                      <div className="space-y-2">
+                        <div className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Completed</div>
+                        {challengeData.past.slice(0, 3).map((ch) => (
+                          <div key={ch.id} className="relative">
+                            <ChallengeCard challenge={ch} currentUserId={user?.id} />
+                            {isTrainer && (
+                              <button
+                                className="absolute top-3 right-3 text-xs text-muted-foreground hover:text-destructive z-10"
+                                onClick={(e) => { e.stopPropagation(); handleDeleteChallenge(ch.id) }}
+                              >
+                                Delete
+                              </button>
+                            )}
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                )}
               </CardContent>
             </Card>
 

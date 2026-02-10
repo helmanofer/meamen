@@ -25,6 +25,7 @@ model User {
   templates        SessionTemplate[]
   badges           TraineeBadge[]
   rewards          Reward[]
+  challenges       Challenge[]
 }
 
 model TrainerTrainee {
@@ -124,6 +125,19 @@ model Reward {
   trainerId   String
   condition   String
   description String
+  createdAt   DateTime @default(now())
+
+  trainer User @relation(fields: [trainerId], references: [id])
+}
+
+model Challenge {
+  id          String   @id @default(cuid())
+  trainerId   String
+  title       String
+  description String
+  type        String   // "most_workouts" | "total_weight" | "consistency"
+  startDate   DateTime
+  endDate     DateTime
   createdAt   DateTime @default(now())
 
   trainer User @relation(fields: [trainerId], references: [id])
